@@ -1,0 +1,10 @@
+{
+    "provides": "imgui",
+    "targets": {
+        "macos-aarch64": {
+            "cflags": "-mmacos-version-min=11.0"
+        },
+        "linux-x64": {},
+        "windows-x64": {}
+    }
+}
