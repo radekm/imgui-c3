@@ -3,13 +3,13 @@
     "targets": {
         "macos-aarch64": {
             "cflags": "-mmacos-version-min=11.0",
-            "linked-libraries" : ["cimgui", "stdc++"]
+            "linked-libraries" : ["cimgui", "cimplot", "stdc++"]
         },
         "linux-x64": {
-            "linked-libraries" : ["cimgui", "stdc++"]
+            "linked-libraries" : ["cimgui", "cimplot", "stdc++"]
         },
         "windows-x64": {
-            "linked-libraries" : ["cimgui", "imm32"]
+            "linked-libraries" : ["cimgui", "cimplot", "imm32"]
         }
     }
 }

@@ -22,7 +22,13 @@ macro @each_asc(map; @body(key, value))
     }
 }
 
-String current_module = "ig";
+const bool GENERATE_GUI @if($feature(GENERATE_GUI)) = true;
+const bool GENERATE_GUI @if($feature(GENERATE_PLOT)) = false;
+
+const String ENUM_PREFIX_TO_DROP = GENERATE_GUI ? "ImGui" : "ImPlot";
+// Dropped from function excpect for instance methods.
+const String FUNC_PREFIX_TO_DROP = GENERATE_GUI ? "ig" : "ImPlot_";
+String current_module = GENERATE_GUI ? "ig" : "ipl";
 
 fault GeneratorError
 {
@@ -57,6 +63,7 @@ fn bool is_typedef_predefined(String alias_name)
 
 fn String! translate_type_in_typedef(String type, String name)
 {
+$if GENERATE_GUI:
     switch (type)
     {
         case "void (*)(ImGuiContext* ctx, void* user_data, const char* msg);":
@@ -76,6 +83,21 @@ fn String! translate_type_in_typedef(String type, String name)
         default:
             return translate_non_array_type(type, name);
     }
+$else
+    switch (type)
+    {
+        case "int (*)(double value, char* buff, int size, void* user_data);":
+            return "fn int(double value, ZString buff, CInt size, void* user_data)";
+        case "void (*)(ImPlotTicker& ticker, const ImPlotRange& range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data);":
+            return "fn void(ImPlotTicker* ticker, ImPlotRange* range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data)";
+        case "double (*)(double value, void* user_data);":
+            return "fn double(double value, void* user_data)";
+        case "ImPlotPoint (*)(int idx, void* user_data);":
+            return "fn ImPlotPoint(CInt idx, void* user_data)";
+        default:
+            return translate_non_array_type(type, name);
+    }
+$endif
 }
 
 fn void! generate_typedefs(Object* node)
@@ -156,43 +178,9 @@ fn String! translate_non_array_type(String type, String name)
     // Ignore `struct`.
     type = type.strip("struct ");
 
+$if GENERATE_GUI:
     switch (type)
     {
-        case "signed char": return "ichar";
-        case "unsigned short": return "CUShort";
-        case "short": return "CShort";
-        case "unsigned int": return "CUInt";
-        case "unsigned int*": return "CUInt*";
-        case "int":
-        case "signed int":
-            return "CInt";
-        case "int*":
-            return "CInt*";
-        case "size_t": return "usz";
-        case "size_t*": return "usz*";
-        case "bool":
-        case "bool*":
-        case "float":
-        case "float*":
-        case "double":
-        case "double*":
-        case "void":
-        case "void*":
-        case "void**":
-            return type;
-
-        // NOTE: It seems that `unsigned char` is not used for strings.
-        case "unsigned char": return "char";
-        case "unsigned char*": return "char*";        
-        case "unsigned char**": return "char**";        
-        case "char": return "char";  // NOTE: This is also applied for char arrays.
-        // Maybe we shouldn't return `ZString` for `ImFont_CalcTextSizeA`.
-        case "char*": return "ZString";
-        case "char* const[]": return "ZString*";
-        case "char**": return "char**";
-
-        case "FILE*": return "libc::CFile";
-
         // Function pointers when generating structs.
         case "void(*)(ImGuiContext* ctx,ImGuiSettingsHandler* handler)":
             if (name == "ClearAllFn" || name == "ReadInitFn" || name == "ApplyAllFn") return string::tformat("Settings_%s", name);
@@ -294,6 +282,48 @@ fn String! translate_non_array_type(String type, String name)
             return "union { ImGuiInputEventMousePos mouse_pos; ImGuiInputEventMouseWheel mouse_wheel; ImGuiInputEventMouseButton mouse_button; ImGuiInputEventMouseViewport mouse_viewport; ImGuiInputEventKey key; ImGuiInputEventText text; ImGuiInputEventAppFocused app_focused; }";
         case "union { int val_i; float val_f; void* val_p;}":
             return "union { int val_i; float val_f; void* val_p; }";
+    }
+$endif
+
+    switch (type)
+    {
+        case "signed char": return "ichar";
+        case "unsigned short": return "CUShort";
+        case "short": return "CShort";
+        case "unsigned int": return "CUInt";
+        case "unsigned int*": return "CUInt*";
+        case "int":
+        case "signed int":
+            return "CInt";
+        case "int*":
+            return "CInt*";
+        case "size_t": return "usz";
+        case "size_t*": return "usz*";
+        case "bool":
+        case "bool*":
+        case "float":
+        case "float*":
+        case "double":
+        case "double*":
+        case "void":
+        case "void*":
+        case "void**":
+            return type;
+
+        // NOTE: It seems that `unsigned char` is not used for strings.
+        case "unsigned char": return "char";
+        case "unsigned char*": return "char*";        
+        case "unsigned char**": return "char**";        
+        case "char": return "char";  // NOTE: This is also applied for char arrays.
+        // Maybe we shouldn't return `ZString` for `ImFont_CalcTextSizeA`.
+        case "char*": return "ZString";
+        case "char* const[]": return "ZString*";
+        case "char**": return "char**";
+
+        case "FILE*": return "libc::CFile";
+        case "tm": return "libc::Tm";
+        case "tm*": return "libc::Tm*";
+        case "time_t": return "libc::Time_t";
 
         default:
 
@@ -313,6 +343,7 @@ fn String! translate_non_array_type(String type, String name)
 
 fn String! translate_array_size(String size)
 {
+$if GENERATE_GUI:
     // Handle case when array size is specified by number of items in enum.
     // For example array size `ImGuiKey_NamedKey_COUNT` shoule be translated to `key::NAMED_KEY_COUNT`.
     if (size.starts_with("ImGui") && size.ends_with("_COUNT"))
@@ -323,6 +354,11 @@ fn String! translate_array_size(String size)
         return string::tformat("(usz)%s::%s", translate_field_name(size[:first_underscore_idx]), translate_constant_name(size[first_underscore_idx+1..]));
     }
     return size;
+$else
+    if (size == "ImAxis_COUNT") return "(usz)ipl::axis::COUNT";
+    if (size == "ImPlotCol_COUNT") return "(usz)ipl::col::COUNT";
+    return size;
+$endif
 }
 
 // For arrays name contains array size (eg. `SearchBuffer[64]`) and we have to move it to type.
@@ -342,10 +378,8 @@ fn void! generate_structs_and_enums(Object* node)
 {
     if (!node.is_map()) return GeneratorError.INVALID_DEFINITION?;
 
-
     Object* enum_types_obj = node.get("enumtypes")!;
-    if (!enum_types_obj.is_map()) return GeneratorError.INVALID_DEFINITION?;
-    HashMap(<String, Object*>) enum_types = enum_types_obj.map;
+    if (!enum_types_obj.is_keyable()) return GeneratorError.INVALID_DEFINITION?;
 
     @each_asc(node.map; String key, Object* val)
     {
@@ -360,6 +394,12 @@ fn void! generate_structs_and_enums(Object* node)
                 break;
             case "structs":
                 if (!val.is_map()) return GeneratorError.INVALID_DEFINITION?;
+
+$if !GENERATE_GUI:
+                io::printfn("import libc;");
+                io::printfn("import ig;");
+$endif
+
                 @each_asc(val.map; String struct_name, Object* desc)
                 {
                     if (!desc.is_array()) return GeneratorError.INVALID_DEFINITION?;
@@ -393,9 +433,9 @@ fn void! generate_structs_and_enums(Object* node)
 
                     String c3_item_type = enum_name.strip_end("_");                    
                     String c3_enum_submodule =
-                        enum_name.starts_with("ImGui") ?
-                        enum_name.strip("ImGui") :
-                        // Some enum names don't start with `ImGui` but only with `Im`.
+                        enum_name.starts_with(ENUM_PREFIX_TO_DROP) ?
+                        enum_name.strip(ENUM_PREFIX_TO_DROP) :
+                        // Some enum names don't start with `ImGui` (nor with `ImPlot`) but only with `Im`.
                         // But we don't want `im_` prefix in submodule name.
                         // For example enums `ImDrawListFlags_` resp. `ImFontAtlasFlags_`
                         // shoule be in module `ig::draw_flags` not `ig::im_draw_flags`
@@ -413,7 +453,7 @@ fn void! generate_structs_and_enums(Object* node)
                         {
                             // If not specified otherwise underlying type for C enums is int.
                             String underlying_type = "int";
-                            if (enum_types.has_key(c3_item_type))
+                            if (enum_types_obj.has_key(c3_item_type))
                             {
                                 underlying_type = enum_types_obj.get_string(c3_item_type)!;
                             }
@@ -450,7 +490,8 @@ fn bool is_unsupported_function(String name)
 {
     switch (name)
     {
-        // Use `va_list`.
+        // From ImGui.
+        // These use `va_list` which is not supported.
         case "ImGuiTextBuffer_appendfv":
         case "igBulletTextV":
         case "igDebugLogV":
@@ -468,6 +509,15 @@ fn bool is_unsupported_function(String name)
         case "igTreeNodeExV_Ptr":
         case "igTreeNodeV_Str":
         case "igTreeNodeV_Ptr":
+            return true;
+
+        // From ImPlot.
+        // These use `va_list` which is not supported.
+        case "ImPlotAnnotationCollection_AppendV":
+        case "ImPlotTagCollection_AppendV":
+        case "ImPlot_AnnotationV":
+        case "ImPlot_TagXV":
+        case "ImPlot_TagYV":
             return true;
         default:
             return false;
@@ -572,11 +622,23 @@ fn void! generate_functions(Object* node)
 
             if (is_instance_method)
             {
+                String c3_method_name = translate_field_name(ov_cimguiname[stname.len+1..]);
+                $if !GENERATE_GUI:
+                    // Unfortunately two methods of `ImPlotItemGroup` are translated to same name.
+                    if (stname == "ImPlotItemGroup")
+                    {
+                        // Overload of method `GetItem`.
+                        if (ov_cimguiname == "ImPlotItemGroup_GetItem_ID") c3_method_name = "get_item_by_id";
+                        // Method `GetItemID`.
+                        if (ov_cimguiname == "ImPlotItemGroup_GetItemID") c3_method_name = "get_item_id";
+                    }
+                $endif
+
                 io::printf(
                     "extern fn %s %s.%s(",
                     translate_non_array_type(ret, ov_cimguiname)!,
                     stname,
-                    translate_field_name(ov_cimguiname[stname.len+1..]));
+                    c3_method_name);
             }
             else
             {
@@ -586,7 +648,7 @@ fn void! generate_functions(Object* node)
                 io::printf(
                     "extern fn %s %s(",
                     translate_non_array_type(ret, ov_cimguiname)!,
-                    translate_field_name(ov_cimguiname.strip("ig")));
+                    translate_field_name(ov_cimguiname.strip(FUNC_PREFIX_TO_DROP)));
             }
             bool first_arg = true;
             foreach (arg : args_t)
@@ -611,6 +673,7 @@ fn void! generate_functions(Object* node)
                         if (default_value == "ImVec2(1,0)") default_value = "{1, 0}";
                         if (default_value == "ImVec2(1,1)") default_value = "{1, 1}";
                         if (default_value == "ImVec2(-FLT_MIN,0)") default_value = "{-math::FLOAT_MIN, 0}";
+                        if (default_value == "ImVec2(-1,0)") default_value = "{-1, 0}";
                         if (default_value == "ImVec4(0,0,0,0)") default_value = "{}";
                         if (default_value == "ImVec4(1,1,1,1)") default_value = "{1, 1, 1, 1}";
                         if (default_value == "ImGuiTypingSelectFlags_None") default_value = "typing_select_flags::NONE";
@@ -619,6 +682,8 @@ fn void! generate_functions(Object* node)
                         if (default_value == "FLT_MIN") default_value = "math::FLOAT_MIN";
                         if (default_value == "FLT_MAX") default_value = "math::FLOAT_MAX";
                         if (default_value == "NULL" || default_value == "nullptr") default_value = "null";
+                        // Translates for example `sizeof(float)` to `float.sizeof`.
+                        if (default_value.starts_with("sizeof(") && default_value.ends_with(")")) default_value = string::tformat("%s.sizeof", default_value[7..^2]);
                         io::printf(" = %s", default_value);
                     }
                 }
@@ -628,7 +693,7 @@ fn void! generate_functions(Object* node)
     };
 }
 
-fn void! generate_code()
+fn void! generate_imgui_code()
 {
     io::printfn("module %s;", current_module);
     io::printfn("import libc;");
@@ -724,7 +789,28 @@ fn void! generate_code()
     generate_functions(obj)!;
 }
 
+fn void! generate_implot_code()
+{
+    io::printfn("module %s;", current_module);
+
+    char[] bytes = file::load_temp("imgui-generator/definitions/cimplot/typedefs_dict.json")!;
+    Object* obj = json::parse_string((String)bytes)!;
+    generate_typedefs(obj)!;
+
+    bytes = file::load_temp("imgui-generator/definitions/cimplot/structs_and_enums.json")!;
+    obj = json::parse_string((String)bytes)!;
+    generate_structs_and_enums(obj)!;
+
+    bytes = file::load_temp("imgui-generator/definitions/cimplot/definitions.json")!;
+    obj = json::parse_string((String)bytes)!;
+    generate_functions(obj)!;
+}
+
 fn void! main()
 {
-    generate_code()!;
+$if GENERATE_GUI: 
+    generate_imgui_code()!;
+$else
+    generate_implot_code()!;
+$endif
 }

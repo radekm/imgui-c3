@@ -23,7 +23,24 @@ add_library(cimgui STATIC
 target_compile_definitions(cimgui PRIVATE IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
 target_compile_definitions(cimgui PRIVATE IMGUI_IMPL_API=extern\t\"C\"\t)
 target_include_directories(cimgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
-target_include_directories(cimgui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
+
+add_library(cimplot STATIC
+    cimplot/cimplot.cpp
+    cimplot/implot/implot.cpp
+    cimplot/implot/implot_demo.cpp
+    cimplot/implot/implot_items.cpp
+)
+
+# Same defines as used for ImGui.
+# For example if you omit `IMGUI_DISABLE_OBSOLETE_FUNCTIONS` here
+# then you will get segfault when running example.
+target_compile_definitions(cimplot PRIVATE IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+target_compile_definitions(cimplot PRIVATE IMGUI_IMPL_API=extern\t\"C\"\t)
+
+target_compile_definitions(cimplot PRIVATE IMPLOT_DISABLE_OBSOLETE_FUNCTIONS=1)
+target_include_directories(cimplot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimplot)
+target_include_directories(cimplot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
+target_include_directories(cimplot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
 
 add_library(sokol STATIC 
     sokol/sokol.c
