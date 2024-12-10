@@ -1,0 +1,32 @@
+on: [push]
+
+jobs:
+  build-and-run:
+    strategy:
+      # Continue build even if some platforms fail.
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            arch: arm64
+          - os: ubuntu-latest
+            arch: x64
+          - os: windows-latest
+            arch: x64   
+    runs-on: ${{ matrix.os }}
+    name: Build and run
+    steps:
+      - uses: actions/checkout@v4
+      - uses: radekm/setup-c3@v1
+        with:
+          version: v0.6.4
+      - if: runner.os == 'Linux'
+        name: Install Linux Dependencies
+        run: |
+          sudo apt update
+          sudo apt install libglu1-mesa-dev mesa-common-dev xorg-dev libasound-dev
+      - shell: bash
+        run: |
+          ./build-libs.sh
+          ./build-example.sh
+          ls -l build

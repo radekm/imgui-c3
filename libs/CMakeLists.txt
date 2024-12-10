@@ -1,9 +1,15 @@
 cmake_minimum_required(VERSION 3.20)
 project(libs)
 
-set (CMAKE_C_STANDARD 17)
-set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17)
+
+# For macOS. Must be also set in both `manifest.json` files.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0")
+
+# Otherwise on Windows static libraries end up in `Debug` or `Release` subfolder.
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
 
 add_library(cimgui STATIC
     cimgui/cimgui.cpp
@@ -14,17 +20,22 @@ add_library(cimgui STATIC
     cimgui/imgui/imgui_tables.cpp
 )
 
-target_compile_definitions(cimgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
-target_compile_definitions(cimgui PUBLIC IMGUI_IMPL_API=extern\t\"C\"\t)
+target_compile_definitions(cimgui PRIVATE IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+target_compile_definitions(cimgui PRIVATE IMGUI_IMPL_API=extern\t\"C\"\t)
 target_include_directories(cimgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
-target_include_directories(cimgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
+target_include_directories(cimgui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
 
 add_library(sokol STATIC 
     sokol/sokol.c
 )
 
-target_include_directories(sokol PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
+target_include_directories(sokol PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
 if (APPLE)
-    target_compile_definitions(sokol PUBLIC SOKOL_METAL=1)
+    target_compile_definitions(sokol PRIVATE SOKOL_METAL=1)
     target_compile_options(sokol PRIVATE -x objective-c)
+elseif (WIN32)
+    target_compile_definitions(sokol PRIVATE SOKOL_D3D11=1)
+else()
+    # Assume Linux.
+    target_compile_definitions(sokol PRIVATE SOKOL_GLCORE=1)
 endif()

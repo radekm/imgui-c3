@@ -14,6 +14,23 @@
                 "Metal.framework",
                 "MetalKit.framework"
             ]
+        },
+        "linux-x64": {
+            "linked-libraries": [
+                "sokol",
+                "X11",
+                "Xi",
+                "Xcursor",
+                "GL",
+                "asound",
+                "dl",
+                "pthread"
+            ]
+        },
+        "windows-x64": {
+            "linked-libraries": [
+                "sokol"
+            ]
         }
     }
 }

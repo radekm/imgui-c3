@@ -8,4 +8,4 @@ mkdir -p "$build_dir"
 cd "$build_dir"
 
 cmake "$script_dir/libs" -DCMAKE_BUILD_TYPE=Release
-cmake --build .
+cmake --build . --config Release

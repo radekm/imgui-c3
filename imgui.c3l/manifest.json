@@ -4,6 +4,12 @@
         "macos-aarch64": {
             "cflags": "-mmacos-version-min=11.0",
             "linked-libraries" : ["cimgui", "stdc++"]
+        },
+        "linux-x64": {
+            "linked-libraries" : ["cimgui", "stdc++"]
+        },
+        "windows-x64": {
+            "linked-libraries" : ["cimgui", "imm32"]
         }
     }
 }
