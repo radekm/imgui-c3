@@ -149,19 +149,15 @@ fn String translate_constant_name(String name)
 
 // `name` is either field name or type alias name.
 fn String! translate_non_array_type(String type, String name)
-{
-    // Handle `ZString` before ignoring `const`.
-    //
-    // Maybe this is not universally correct and sometimes `const char*`
-    // doesn't represent zero terminated string.
-    if (type == "const char*") return "ZString";
-    
+{    
+    type = type.trim();
     // Ignore `const`.
-    if (type.starts_with("const ")) type = type["const ".len..];
+    type = type.strip("const ");
+    // Ignore `struct`.
+    type = type.strip("struct ");
 
     switch (type)
     {
-        case "bool": return "CBool";
         case "signed char": return "ichar";
         case "unsigned short": return "CUShort";
         case "short": return "CShort";
@@ -170,24 +166,34 @@ fn String! translate_non_array_type(String type, String name)
         case "int":
         case "signed int":
             return "CInt";
+        case "int*":
+            return "CInt*";
         case "size_t": return "usz";
+        case "size_t*": return "usz*";
+        case "bool":
+        case "bool*":
         case "float":
+        case "float*":
         case "double":
+        case "double*":
+        case "void":
         case "void*":
+        case "void**":
             return type;
 
         // NOTE: It seems that `unsigned char` is not used for strings.
         case "unsigned char": return "char";
         case "unsigned char*": return "char*";        
+        case "unsigned char**": return "char**";        
         case "char": return "char";  // NOTE: This is also applied for char arrays.
-        case "char*":
-            if (name == "Buf" || name == "Name") return "ZString";
-            io::printfn("Should we translate '%s' with type '%s' to ZString?", name, type);
-            return GeneratorError.UNKNOWN_TYPE?;
+        // Maybe we shouldn't return `ZString` for `ImFont_CalcTextSizeA`.
+        case "char*": return "ZString";
+        case "char* const[]": return "ZString*";
+        case "char**": return "char**";
 
         case "FILE*": return "libc::CFile";
 
-        // Function pointers.
+        // Function pointers when generating structs.
         case "void(*)(ImGuiContext* ctx,ImGuiSettingsHandler* handler)":
             if (name == "ClearAllFn" || name == "ReadInitFn" || name == "ApplyAllFn") return string::tformat("Settings_%s", name);
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
@@ -359,14 +365,6 @@ fn void! generate_structs_and_enums(Object* node)
                     if (!desc.is_array()) return GeneratorError.INVALID_DEFINITION?;
                     List(<Object*>) fields = desc.array;
 
-                    // We use C3 vectors instead of structs.
-                    switch (struct_name)
-                    {
-                        case "ImVec1": struct_name = "Old_ImVec1";
-                        case "ImVec2": struct_name = "Old_ImVec2";
-                        case "ImVec4": struct_name = "Old_ImVec4";
-                    }
-
                     io::printfn("struct %s", struct_name);
                     io::printfn("{");
                     foreach (field : fields)
@@ -448,6 +446,188 @@ fn void! generate_structs_and_enums(Object* node)
     };
 }
 
+fn bool is_unsupported_function(String name)
+{
+    switch (name)
+    {
+        // Use `va_list`.
+        case "ImGuiTextBuffer_appendfv":
+        case "igBulletTextV":
+        case "igDebugLogV":
+        case "igImFormatStringToTempBufferV":
+        case "igImFormatStringV":
+        case "igLabelTextV":
+        case "igLogTextV":
+        case "igSetItemTooltipV":
+        case "igSetTooltipV":
+        case "igTextColoredV":
+        case "igTextDisabledV":
+        case "igTextV":
+        case "igTextWrappedV":
+        case "igTreeNodeExV_Str":
+        case "igTreeNodeExV_Ptr":
+        case "igTreeNodeV_Str":
+        case "igTreeNodeV_Ptr":
+            return true;
+        default:
+            return false;
+    }
+}
+
+// For arrays name contains array size (eg. `SearchBuffer[64]`) and we have to move it to type.
+fn String! translate_function_argument_type(String type, String name)
+{
+    switch (type)
+    {
+        // Arrays are passed as pointers to the first element.
+        case "char[5]": return "char[5]*";
+        case "unsigned char[256]":
+        case "const unsigned char[256]":
+            return "char[256]*";
+        case "int[2]": return "CInt[2]*";
+        case "int[3]": return "CInt[3]*";
+        case "int[4]": return "CInt[4]*";
+        case "float[2]": return "float[2]*";
+        case "float[3]": return "float[3]*";
+        case "float[4]": return "float[4]*";
+ 
+         // Here we use existing typedefs `ImGuiMemAllocFunc` and `ImGuiMemFreeFunc`
+        // so we should check when updating ImGui that they're in sync.
+        case "void*(*)(size_t sz,void* user_data)":
+            if (name == "alloc_func") return "ImGuiMemAllocFunc";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "void(*)(void* ptr,void* user_data)":
+            if (name == "free_func") return "ImGuiMemFreeFunc";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        
+        // Here we use custom aliases.
+        case "const char*(*)(void* user_data,int idx)":
+            if (name == "getter") return "GetZStringByIndexFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "int(*)(void const*,void const*)":
+            if (name == "compare_func") return "CompareFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "float(*)(void* data,int idx)":
+            if (name == "values_getter") return "GetFloatByIndexFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "const char*(*)(void*,int)":
+            if (name == "get_item_name_func") return "GetZStringByIndexFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+
+        default:
+            return translate_non_array_type(type, name);   
+    }     
+}
+
+fn void! generate_functions(Object* node)
+{
+    if (!node.is_map()) return GeneratorError.INVALID_DEFINITION?;
+
+    @each_asc(node.map; String key, Object* overloads_obj)
+    {
+        if (!overloads_obj.is_array()) return GeneratorError.INVALID_DEFINITION?;
+        List(<Object*>) overloads = overloads_obj.array;
+
+        foreach (overload : overloads)
+        {
+            // Name of exported symbol for linking.
+            String ov_cimguiname = overload.get_string("ov_cimguiname")!;
+
+            if (is_unsupported_function(ov_cimguiname)) continue;
+
+            bool templated = overload.get_bool("templated") ?? false;
+            if (templated)
+            {
+                // Templated types are currently not supported.
+                io::printfn("// Skipping templated: %s", ov_cimguiname);
+                continue;
+            }
+
+            // Function is either static or instance method on this type (if `stname` non-empty).
+            String stname = overload.get_string("stname")!;
+            bool constructor = overload.get_bool("constructor") ?? false;
+            // Constructors don't have `ret`.
+            String ret = !constructor ? overload.get_string("ret")! : string::tformat("%s*", stname);
+            Object* args_t_obj = overload.get("argsT")!;
+            // We have to use `is_indexable` because `is_array` returns false for empty array.
+            if (!args_t_obj.is_indexable()) return GeneratorError.INVALID_DEFINITION?;
+            Object*[] args_t = args_t_obj.is_array() ? args_t_obj.array.array_view() : {};
+            Object* defaults_obj = overload.get("defaults")!;
+            // We have to use `is_keyable` because `is_map` returns false for empty object.
+            if (!defaults_obj.is_keyable()) return GeneratorError.INVALID_DEFINITION?;
+
+            bool is_instance_method =
+                stname != "" &&
+                ov_cimguiname.starts_with(stname) &&
+                ov_cimguiname.len > stname.len &&
+                ov_cimguiname[stname.len] == '_' &&
+                args_t.len > 0 &&
+                args_t[0].get_string("name")! == "self";
+
+            if (is_instance_method)
+            {
+                io::printf(
+                    "extern fn %s %s.%s(",
+                    translate_non_array_type(ret, ov_cimguiname)!,
+                    stname,
+                    translate_field_name(ov_cimguiname[stname.len+1..]));
+            }
+            else
+            {
+                // TODO: Do we want to emit constructors?
+                //       Many of them are not useful because they allocate small structs on heap.
+                // TODO: Are names of static methods reasonable?
+                io::printf(
+                    "extern fn %s %s(",
+                    translate_non_array_type(ret, ov_cimguiname)!,
+                    translate_field_name(ov_cimguiname.strip("ig")));
+            }
+            bool first_arg = true;
+            foreach (arg : args_t)
+            {
+                if (!first_arg) io::printf(", ");
+                first_arg = false;
+
+                String arg_type = arg.get_string("type")!;
+                String arg_name = arg.get_string("name")!;
+                if (arg_type == "..." && arg_name == "...")
+                {
+                    io::printf("...");                    
+                }
+                else
+                {
+                    io::printf("%s %s", translate_function_argument_type(arg_type, arg_name)!, translate_field_name(arg_name));
+                    if (defaults_obj.has_key(arg_name))
+                    {
+                        String default_value = defaults_obj.get_string(arg_name)!;
+                        if (default_value == "ImVec2(0,0)" || default_value == "ImVec2(0.0f,0.0f)") default_value = "{}";
+                        if (default_value == "ImVec2(0,1)") default_value = "{1, 1}";
+                        if (default_value == "ImVec2(1,0)") default_value = "{1, 0}";
+                        if (default_value == "ImVec2(1,1)") default_value = "{1, 1}";
+                        if (default_value == "ImVec2(-FLT_MIN,0)") default_value = "{-math::FLOAT_MIN, 0}";
+                        if (default_value == "ImVec4(0,0,0,0)") default_value = "{}";
+                        if (default_value == "ImVec4(1,1,1,1)") default_value = "{1, 1, 1, 1}";
+                        if (default_value == "ImGuiTypingSelectFlags_None") default_value = "typing_select_flags::NONE";
+                        if (default_value == "ImGuiPopupFlags_None") default_value = "popup_flags::NONE";
+                        if (default_value == "ImGuiNavRenderCursorFlags_None") default_value = "nav_render_cursor_flags::NONE";
+                        if (default_value == "FLT_MIN") default_value = "math::FLOAT_MIN";
+                        if (default_value == "FLT_MAX") default_value = "math::FLOAT_MAX";
+                        if (default_value == "NULL" || default_value == "nullptr") default_value = "null";
+                        io::printf(" = %s", default_value);
+                    }
+                }
+            }
+            io::printfn(") @extern(\"%s\");", ov_cimguiname);
+        }
+    };
+}
+
 fn void! generate_code()
 {
     io::printfn("module %s;", current_module);
@@ -459,14 +639,11 @@ fn void! generate_code()
     io::printfn("{");
     io::printfn("    ImU32[((usz)key::NAMED_KEY_COUNT + 31) >> 5] storage;");
     io::printfn("}");
-    io::printfn("// Using C3 vectors instead of structs ImVec1, ImVec2 and ImVec4 is more convenient.");
-    io::printfn("// Hopefully their layout is same. We only check that their size is same.");
-    io::printfn("def ImVec1 = float[<1>];");
-    io::printfn("$assert(ImVec1.sizeof == Old_ImVec1.sizeof);");
-    io::printfn("def ImVec2 = float[<2>];");
-    io::printfn("$assert(ImVec2.sizeof == Old_ImVec2.sizeof);");
-    io::printfn("def ImVec4 = float[<4>];");
-    io::printfn("$assert(ImVec4.sizeof == Old_ImVec4.sizeof);");
+    // Unfortunately we can't use C3 vectors for ImVec1, ImVec2 and ImVec4.
+    // It doesn't work even though their size is same.
+    // io::printfn("def ImVec1 = float[<1>];");
+    // io::printfn("def ImVec2 = float[<2>];");
+    // io::printfn("def ImVec4 = float[<4>];");
     io::printfn("// Following templated types are defined manually.");
     io::printfn("// Hopefully their layout is same.");
     io::printfn("struct ImVector");
@@ -513,23 +690,26 @@ fn void! generate_code()
     io::printfn("def Settings_ApplyAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);");
     io::printfn("def Settings_WriteAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf);");
     io::printfn("def Context_DockNodeWindowMenuHandler = fn void(ImGuiContext* ctx, ImGuiDockNode* node, ImGuiTabBar* tab_bar);");
-    io::printfn("def FontBuilder_Build = fn CBool(ImFontAtlas* atlas);");
+    io::printfn("def FontBuilder_Build = fn bool(ImFontAtlas* atlas);");
     io::printfn("def Platform_GetClipboardTextFn = fn ZString(ImGuiContext* ctx);");
     io::printfn("def Platform_SetClipboardTextFn = fn void(ImGuiContext* ctx, ZString text);");
-    io::printfn("def Platform_OpenInShellFn = fn CBool(ImGuiContext* ctx, ZString path);");
+    io::printfn("def Platform_OpenInShellFn = fn bool(ImGuiContext* ctx, ZString path);");
     io::printfn("def Platform_SetImeDataFn = fn void(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);");
     io::printfn("def Platform_WindowActionFn = fn void(ImGuiViewport* vp);");
     io::printfn("def Platform_SetWindowPosOrSizeFn = fn void(ImGuiViewport* vp, ImVec2 pos_or_size);");
     io::printfn("def Platform_GetWindowPosOrSizeFn = fn ImVec2(ImGuiViewport* vp);");
     io::printfn("def Platform_GetWindowWorkAreaInsetsFn = fn ImVec4(ImGuiViewport* vp);");
-    io::printfn("def Platform_GetWindowBoolPropFn = fn CBool(ImGuiViewport* vp);");
+    io::printfn("def Platform_GetWindowBoolPropFn = fn bool(ImGuiViewport* vp);");
     io::printfn("def Platform_SetWindowTitleFn = fn void(ImGuiViewport* vp, ZString str);");
     io::printfn("def Platform_SetWindowAlphaFn = fn void(ImGuiViewport* vp, float alpha);");
     io::printfn("def Platform_RenderActionFn = fn void(ImGuiViewport* vp, void* render_arg);");
     io::printfn("def Platform_GetWindowDpiScaleFn = fn float(ImGuiViewport* vp);");
     io::printfn("def Platform_CreateVkSurfaceFn = fn CInt(ImGuiViewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);");
     io::printfn("def SelectionStorage_AdapterIndexToStorageIdFn = fn ImGuiID(ImGuiSelectionBasicStorage* self, CInt idx);");
-    io::printfn("def SelectionStorage_AdapterSetItemSelectedFn = fn void(ImGuiSelectionExternalStorage* self, CInt idx, CBool selected);");
+    io::printfn("def SelectionStorage_AdapterSetItemSelectedFn = fn void(ImGuiSelectionExternalStorage* self, CInt idx, bool selected);");
+    io::printfn("def GetZStringByIndexFn = fn ZString(void* user_data, CInt idx);");
+    io::printfn("def CompareFn = fn CInt(void*, void*);");
+    io::printfn("def GetFloatByIndexFn = fn float(void* data, CInt idx);");
 
     char[] bytes = file::load_temp("imgui-generator/definitions/cimgui/typedefs_dict.json")!;
     Object* obj = json::parse_string((String)bytes)!;
@@ -538,6 +718,10 @@ fn void! generate_code()
     bytes = file::load_temp("imgui-generator/definitions/cimgui/structs_and_enums.json")!;
     obj = json::parse_string((String)bytes)!;
     generate_structs_and_enums(obj)!;
+
+    bytes = file::load_temp("imgui-generator/definitions/cimgui/definitions.json")!;
+    obj = json::parse_string((String)bytes)!;
+    generate_functions(obj)!;
 }
 
 fn void! main()
