@@ -1,0 +1,19 @@
+{
+    "provides": "sokol",
+    "targets": {
+        "macos-aarch64": {
+            "cflags": "-mmacos-version-min=11.0",
+            "linked-libraries": [
+                "sokol",
+                "Foundation.framework",
+                "CoreGraphics.framework",
+                "Cocoa.framework",
+                "QuartzCore.framework",
+                "CoreAudio.framework",
+                "AudioToolbox.framework",
+                "Metal.framework",
+                "MetalKit.framework"
+            ]
+        }
+    }
+}
