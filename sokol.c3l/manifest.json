@@ -2,7 +2,7 @@
     "provides": "sokol",
     "targets": {
         "macos-aarch64": {
-            "cflags": "-mmacos-version-min=11.0",
+            "cflags": "-mmacos-version-min=13.0",
             "linked-libraries": [
                 "sokol",
                 "Foundation.framework",

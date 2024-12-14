@@ -2,8 +2,8 @@
     "provides": "imgui",
     "targets": {
         "macos-aarch64": {
-            "cflags": "-mmacos-version-min=11.0",
-            "linked-libraries" : ["cimgui", "cimplot", "stdc++"]
+            "cflags": "-mmacos-version-min=13.0",
+            "linked-libraries" : ["cimgui", "cimplot", "c++"]
         },
         "linux-x64": {
             "linked-libraries" : ["cimgui", "cimplot", "stdc++"]
