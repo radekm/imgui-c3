@@ -675,11 +675,13 @@ fn void! generate_functions(Object* node)
                         if (default_value == "ImVec2(-FLT_MIN,0)") default_value = "{-math::FLOAT_MIN, 0}";
                         if (default_value == "ImVec2(-1,0)") default_value = "{-1, 0}";
                         if (default_value == "ImVec4(0,0,0,0)") default_value = "{}";
+                        if (default_value == "ImVec4(0,0,0,-1)") default_value = "{0, 0, 0, -1}";
                         if (default_value == "ImVec4(1,1,1,1)") default_value = "{1, 1, 1, 1}";
                         if (default_value == "ImGuiTypingSelectFlags_None") default_value = "typing_select_flags::NONE";
                         if (default_value == "ImGuiPopupFlags_None") default_value = "popup_flags::NONE";
                         if (default_value == "ImGuiNavRenderCursorFlags_None") default_value = "nav_render_cursor_flags::NONE";
-                        if (default_value == "FLT_MIN") default_value = "math::FLOAT_MIN";
+                        if (default_value == "ImGuiNavRenderCursorFlags_None") default_value = "nav_render_cursor_flags::NONE";
+                        if (default_value == "ImPlotCond_Once") default_value = "ipl::cond::ONCE";
                         if (default_value == "FLT_MAX") default_value = "math::FLOAT_MAX";
                         if (default_value == "NULL" || default_value == "nullptr") default_value = "null";
                         // Translates for example `sizeof(float)` to `float.sizeof`.
