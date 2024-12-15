@@ -1,7 +1,7 @@
 on: [push]
 
 jobs:
-  build-and-run:
+  build-in-bash:
     strategy:
       # Continue build even if some platforms fail.
       fail-fast: false
@@ -14,10 +14,10 @@ jobs:
           - os: windows-latest
             arch: x64   
     runs-on: ${{ matrix.os }}
-    name: Build and run
+    name: Build in Bash
     steps:
       - uses: actions/checkout@v4
-      - uses: radekm/setup-c3@v1
+      - uses: radekm/setup-c3@v2
         with:
           version: v0.6.5
       - if: runner.os == 'Linux'
@@ -30,3 +30,26 @@ jobs:
           ./build-libs.sh
           ./build-example.sh
           ls -l build
+  build-in-cmd:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    name: Build in cmd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: radekm/setup-c3@v2
+        with:
+          version: v0.6.5
+      - shell: cmd
+        run: |
+          md build\libs
+          cd build\libs
+          cmake ..\..\libs
+          cmake --build . --config Release
+
+          cd ..
+          c3c compile -O1 -L libs --libdir .. --lib sokol --lib imgui ..\example\main.c3 -o example
+          dir
