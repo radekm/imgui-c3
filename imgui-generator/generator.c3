@@ -640,11 +640,31 @@ fn void! generate_functions(Object* node)
                     stname,
                     c3_method_name);
             }
+            else if (constructor)
+            {
+                // Some constructors are necessary because some ImGui
+                // structs shouldn't be initialized with zeros.
+                bool prefix_ok =
+                    ov_cimguiname.len > stname.len &&
+                    ov_cimguiname.starts_with(stname) &&
+                    ov_cimguiname[stname.len] == '_';
+                if (!prefix_ok) return GeneratorError.INVALID_DEFINITION?;
+
+                // Replace type prefix by `new_`.
+                // For example `ImFontConfig_ImFontConfig` is translated to `new_im_font_config`.
+                io::printf(
+                    "extern fn %s new_%s(",
+                    translate_non_array_type(ret, ov_cimguiname)!,
+                    translate_field_name(ov_cimguiname.strip(stname).strip("_")));
+            }
             else
             {
-                // TODO: Do we want to emit constructors?
-                //       Many of them are not useful because they allocate small structs on heap.
-                // TODO: Are names of static methods reasonable?
+                // Here we translate:
+                // - Normal functions (which usually start with prefix `FUNC_PREFIX_TO_DROP`).
+                // - Non-constructor static methods (which start with type name and underscore).
+                // - Instance methods which weren't recognized (which start with type name and underscore).
+                //   These weren't recognized because they either don't call their first parameter `self`
+                //   or `self` is their second parameter.
                 io::printf(
                     "extern fn %s %s(",
                     translate_non_array_type(ret, ov_cimguiname)!,
