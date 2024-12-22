@@ -1,11 +1,11 @@
 
-Dear ImGui for C3 language. This binding is based on `cimgui` and `cimplot`
+Dear ImGui for C3 language. This binding is based on `cimgui`, `cimplot` and `ImGuiFileDialog`
 and as a backend uses `sokol`.
 
 ## Usage
 
 **Copy directories** `libs`, `sokol.c3l` and `imgui.c3l` to you project.
-`libs` contains C and C++ code of sokol and Dear ImGui, ImPlot, cimgui and cimplot.
+`libs` contains C and C++ code of sokol, Dear ImGui, ImPlot, cimgui, cimplot and ImGuiFileDialog.
 `sokol.c3l` and `imgui.c3l` contain C3 signatures.
 
 `sokol.c3l` and `imgui.c3l` depend on static libraries, so you must build those
@@ -73,7 +73,7 @@ We don't accept:
 
 ## Maintenance
 
-### Update Dear ImGui, ImPlot
+### Update Dear ImGui, ImPlot and ImGuiFileDialog
 
 **Update cimgui definitions:**
 Go to repository https://github.com/cimgui/cimgui and copy definitions from `generator/output`
@@ -84,8 +84,8 @@ Go to repository https://github.com/cimgui/cimplot and copy definitions from `ge
 locally to `imgui-generator/definitions/cimplot`.
 
 **Update C and C++ sources:**
-Go to repositories of Dear ImGui, cimgui, ImPlot and cimplot
-and update sources in `libs/cimgui` and `libs/cimplot`.
+Go to repositories of Dear ImGui, cimgui, ImPlot, cimplot and ImGuiFileDialog
+and update sources in `libs/cimgui`, `libs/cimplot` and `libs/filedialog`.
 You may also need to update `sokol_imgui.h` which is in sokol repo
 and regenerate `simgui.c3`. Unfortunately at the moment this
 means manually modifying `bindgen/gen_all.py` and `bindgen/gen_c3.py`

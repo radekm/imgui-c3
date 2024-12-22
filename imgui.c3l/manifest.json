@@ -3,13 +3,13 @@
     "targets": {
         "macos-aarch64": {
             "cflags": "-mmacos-version-min=13.0",
-            "linked-libraries" : ["cimgui", "cimplot", "c++"]
+            "linked-libraries" : ["cimgui", "cimplot", "filedialog", "c++"]
         },
         "linux-x64": {
-            "linked-libraries" : ["cimgui", "cimplot", "stdc++"]
+            "linked-libraries" : ["cimgui", "cimplot", "filedialog", "stdc++"]
         },
         "windows-x64": {
-            "linked-libraries" : ["cimgui", "cimplot", "imm32"]
+            "linked-libraries" : ["cimgui", "cimplot", "filedialog", "imm32"]
         }
     }
 }

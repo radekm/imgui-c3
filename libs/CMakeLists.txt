@@ -42,6 +42,16 @@ target_include_directories(cimplot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/cimplot)
 target_include_directories(cimplot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui)
 target_include_directories(cimplot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
 
+add_library(filedialog STATIC
+    filedialog/ImGuiFileDialog.cpp
+)
+
+# Same defines as used for ImGui.
+target_compile_definitions(filedialog PRIVATE IMGUI_DISABLE_OBSOLETE_FUNCTIONS=1)
+target_compile_definitions(filedialog PRIVATE IMGUI_IMPL_API=extern\t\"C\"\t)
+
+target_include_directories(filedialog PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
+
 add_library(sokol STATIC 
     sokol/sokol.c
 )
