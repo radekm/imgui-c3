@@ -51,6 +51,6 @@ jobs:
           cmake --build . --config Release
 
           cd ..
-          c3c compile -O1 -L libs --libdir .. --lib sokol --lib imgui ..\examples\plot_example.c3 -o plot_example
-          c3c compile -O1 -L libs --libdir .. --lib sokol --lib imgui ..\examples\file_dialog_example.c3 -o file_dialog_example
+          c3c compile --wincrt=none -O1 -L libs --libdir .. --lib sokol --lib imgui ..\examples\plot_example.c3 -o plot_example
+          c3c compile --wincrt=none -O1 -L libs --libdir .. --lib sokol --lib imgui ..\examples\file_dialog_example.c3 -o file_dialog_example
           dir
