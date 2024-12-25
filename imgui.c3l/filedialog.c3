@@ -194,22 +194,22 @@ extern fn Selection FileDialog.get_selection(FileDialog* self, ResultMode mode) 
 // Save File behavior: will always return the content of the field
 // with current filter extention and current path.
 //
-// You must free returned `ZString` by `libc::free` because it is allocated by `strncpy`.
+// You must free returned `ZString` by `libc::free` because it is allocated by `malloc`.
 extern fn ZString FileDialog.get_file_path_name(
     FileDialog* self,
     ResultMode mode = result_mode::ADD_IF_NO_FILE_EXT) @extern("IGFD_GetFilePathName");
 
 // Save File behavior: will always return the content of the field with current filter extention.
 //
-// You must free returned `ZString` by `libc::free` because it is allocated by `strncpy`.
+// You must free returned `ZString` by `libc::free` because it is allocated by `malloc`.
 extern fn ZString FileDialog.get_current_file_name(
     FileDialog* self,
     ResultMode mode = result_mode::ADD_IF_NO_FILE_EXT) @extern("IGFD_GetCurrentFileName");
 
-// You must free returned `ZString` by `libc::free` because it is allocated by `strncpy`.
+// You must free returned `ZString` by `libc::free` because it is allocated by `malloc`.
 extern fn ZString FileDialog.get_current_path(FileDialog* self) @extern("IGFD_GetCurrentPath");
 
-// You must free returned `ZString` by `libc::free` because it is allocated by `strncpy`.
+// You must free returned `ZString` by `libc::free` because it is allocated by `malloc`.
 extern fn ZString FileDialog.get_current_filter(FileDialog* self) @extern("IGFD_GetCurrentFilter");
 
 extern fn void* FileDialog.get_user_data(FileDialog* self) @extern("IGFD_GetUserDatas");
@@ -230,7 +230,7 @@ extern fn void FileDialog.set_file_style2(
     ZString icon_text,
     ImFont* font) @extern("IGFD_SetFileStyle2");
 
-// You must free `out_icon_text` by `libc::free` because it is allocated by `strncpy`.
+// You must free `out_icon_text` by `libc::free` because it is allocated by `malloc`.
 extern fn bool FileDialog.get_file_style(
     FileDialog* self,
     FileStyleFlags file_style_flags,
