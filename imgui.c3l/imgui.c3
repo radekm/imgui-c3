@@ -289,9 +289,10 @@ const ImGuiColorEditFlags NO_LABEL = 128;  // 1 << 7
 const ImGuiColorEditFlags NO_SIDE_PREVIEW = 256;  // 1 << 8
 const ImGuiColorEditFlags NO_DRAG_DROP = 512;  // 1 << 9
 const ImGuiColorEditFlags NO_BORDER = 1024;  // 1 << 10
+const ImGuiColorEditFlags ALPHA_OPAQUE = 2048;  // 1 << 11
+const ImGuiColorEditFlags ALPHA_NO_BG = 4096;  // 1 << 12
+const ImGuiColorEditFlags ALPHA_PREVIEW_HALF = 8192;  // 1 << 13
 const ImGuiColorEditFlags ALPHA_BAR = 65536;  // 1 << 16
-const ImGuiColorEditFlags ALPHA_PREVIEW = 131072;  // 1 << 17
-const ImGuiColorEditFlags ALPHA_PREVIEW_HALF = 262144;  // 1 << 18
 const ImGuiColorEditFlags HDR = 524288;  // 1 << 19
 const ImGuiColorEditFlags DISPLAY_RGB = 1048576;  // 1 << 20
 const ImGuiColorEditFlags DISPLAY_HSV = 2097152;  // 1 << 21
@@ -303,6 +304,7 @@ const ImGuiColorEditFlags PICKER_HUE_WHEEL = 67108864;  // 1 << 26
 const ImGuiColorEditFlags INPUT_RGB = 134217728;  // 1 << 27
 const ImGuiColorEditFlags INPUT_HSV = 268435456;  // 1 << 28
 const ImGuiColorEditFlags DEFAULT_OPTIONS_ = 177209344;  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar
+const ImGuiColorEditFlags ALPHA_MASK_ = 14338;  // ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaOpaque | ImGuiColorEditFlags_AlphaNoBg | ImGuiColorEditFlags_AlphaPreviewHalf
 const ImGuiColorEditFlags DISPLAY_MASK_ = 7340032;  // ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex
 const ImGuiColorEditFlags DATA_TYPE_MASK_ = 25165824;  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float
 const ImGuiColorEditFlags PICKER_MASK_ = 100663296;  // ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar
@@ -369,7 +371,8 @@ const ImGuiDataType U64 = 7;  // 7
 const ImGuiDataType FLOAT = 8;  // 8
 const ImGuiDataType DOUBLE = 9;  // 9
 const ImGuiDataType BOOL = 10;  // 10
-const ImGuiDataType COUNT = 11;  // 11
+const ImGuiDataType STRING = 11;  // 11
+const ImGuiDataType COUNT = 12;  // 12
 module ig;
 module ig::debug_log_flags;
 const ImGuiDebugLogFlags NONE = 0;  // 0
@@ -381,10 +384,11 @@ const ImGuiDebugLogFlags EVENT_NAV = 16;  // 1 << 4
 const ImGuiDebugLogFlags EVENT_CLIPPER = 32;  // 1 << 5
 const ImGuiDebugLogFlags EVENT_SELECTION = 64;  // 1 << 6
 const ImGuiDebugLogFlags EVENT_IO = 128;  // 1 << 7
-const ImGuiDebugLogFlags EVENT_INPUT_ROUTING = 256;  // 1 << 8
-const ImGuiDebugLogFlags EVENT_DOCKING = 512;  // 1 << 9
-const ImGuiDebugLogFlags EVENT_VIEWPORT = 1024;  // 1 << 10
-const ImGuiDebugLogFlags EVENT_MASK_ = 2047;  // ImGuiDebugLogFlags_EventError | ImGuiDebugLogFlags_EventActiveId | ImGuiDebugLogFlags_EventFocus | ImGuiDebugLogFlags_EventPopup | ImGuiDebugLogFlags_EventNav | ImGuiDebugLogFlags_EventClipper | ImGuiDebugLogFlags_EventSelection | ImGuiDebugLogFlags_EventIO | ImGuiDebugLogFlags_EventInputRouting | ImGuiDebugLogFlags_EventDocking | ImGuiDebugLogFlags_EventViewport
+const ImGuiDebugLogFlags EVENT_FONT = 256;  // 1 << 8
+const ImGuiDebugLogFlags EVENT_INPUT_ROUTING = 512;  // 1 << 9
+const ImGuiDebugLogFlags EVENT_DOCKING = 1024;  // 1 << 10
+const ImGuiDebugLogFlags EVENT_VIEWPORT = 2048;  // 1 << 11
+const ImGuiDebugLogFlags EVENT_MASK_ = 4095;  // ImGuiDebugLogFlags_EventError | ImGuiDebugLogFlags_EventActiveId | ImGuiDebugLogFlags_EventFocus | ImGuiDebugLogFlags_EventPopup | ImGuiDebugLogFlags_EventNav | ImGuiDebugLogFlags_EventClipper | ImGuiDebugLogFlags_EventSelection | ImGuiDebugLogFlags_EventIO | ImGuiDebugLogFlags_EventFont | ImGuiDebugLogFlags_EventInputRouting | ImGuiDebugLogFlags_EventDocking | ImGuiDebugLogFlags_EventViewport
 const ImGuiDebugLogFlags OUTPUT_TO_TTY = 1048576;  // 1 << 20
 const ImGuiDebugLogFlags OUTPUT_TO_TEST_ENGINE = 2097152;  // 1 << 21
 module ig;
@@ -531,12 +535,13 @@ const ImGuiInputTextFlags PARSE_EMPTY_REF_VAL = 8192;  // 1 << 13
 const ImGuiInputTextFlags DISPLAY_EMPTY_REF_VAL = 16384;  // 1 << 14
 const ImGuiInputTextFlags NO_HORIZONTAL_SCROLL = 32768;  // 1 << 15
 const ImGuiInputTextFlags NO_UNDO_REDO = 65536;  // 1 << 16
-const ImGuiInputTextFlags CALLBACK_COMPLETION = 131072;  // 1 << 17
-const ImGuiInputTextFlags CALLBACK_HISTORY = 262144;  // 1 << 18
-const ImGuiInputTextFlags CALLBACK_ALWAYS = 524288;  // 1 << 19
-const ImGuiInputTextFlags CALLBACK_CHAR_FILTER = 1048576;  // 1 << 20
-const ImGuiInputTextFlags CALLBACK_RESIZE = 2097152;  // 1 << 21
-const ImGuiInputTextFlags CALLBACK_EDIT = 4194304;  // 1 << 22
+const ImGuiInputTextFlags ELIDE_LEFT = 131072;  // 1 << 17
+const ImGuiInputTextFlags CALLBACK_COMPLETION = 262144;  // 1 << 18
+const ImGuiInputTextFlags CALLBACK_HISTORY = 524288;  // 1 << 19
+const ImGuiInputTextFlags CALLBACK_ALWAYS = 1048576;  // 1 << 20
+const ImGuiInputTextFlags CALLBACK_CHAR_FILTER = 2097152;  // 1 << 21
+const ImGuiInputTextFlags CALLBACK_RESIZE = 4194304;  // 1 << 22
+const ImGuiInputTextFlags CALLBACK_EDIT = 8388608;  // 1 << 23
 module ig;
 module ig::item_flags;
 const ImGuiItemFlags NONE = 0;  // 0
@@ -684,49 +689,50 @@ const ImGuiKey KEYPAD_ENTER = 627;  // 627
 const ImGuiKey KEYPAD_EQUAL = 628;  // 628
 const ImGuiKey APP_BACK = 629;  // 629
 const ImGuiKey APP_FORWARD = 630;  // 630
-const ImGuiKey GAMEPAD_START = 631;  // 631
-const ImGuiKey GAMEPAD_BACK = 632;  // 632
-const ImGuiKey GAMEPAD_FACE_LEFT = 633;  // 633
-const ImGuiKey GAMEPAD_FACE_RIGHT = 634;  // 634
-const ImGuiKey GAMEPAD_FACE_UP = 635;  // 635
-const ImGuiKey GAMEPAD_FACE_DOWN = 636;  // 636
-const ImGuiKey GAMEPAD_DPAD_LEFT = 637;  // 637
-const ImGuiKey GAMEPAD_DPAD_RIGHT = 638;  // 638
-const ImGuiKey GAMEPAD_DPAD_UP = 639;  // 639
-const ImGuiKey GAMEPAD_DPAD_DOWN = 640;  // 640
-const ImGuiKey GAMEPAD_L1 = 641;  // 641
-const ImGuiKey GAMEPAD_R1 = 642;  // 642
-const ImGuiKey GAMEPAD_L2 = 643;  // 643
-const ImGuiKey GAMEPAD_R2 = 644;  // 644
-const ImGuiKey GAMEPAD_L3 = 645;  // 645
-const ImGuiKey GAMEPAD_R3 = 646;  // 646
-const ImGuiKey GAMEPAD_LSTICK_LEFT = 647;  // 647
-const ImGuiKey GAMEPAD_LSTICK_RIGHT = 648;  // 648
-const ImGuiKey GAMEPAD_LSTICK_UP = 649;  // 649
-const ImGuiKey GAMEPAD_LSTICK_DOWN = 650;  // 650
-const ImGuiKey GAMEPAD_RSTICK_LEFT = 651;  // 651
-const ImGuiKey GAMEPAD_RSTICK_RIGHT = 652;  // 652
-const ImGuiKey GAMEPAD_RSTICK_UP = 653;  // 653
-const ImGuiKey GAMEPAD_RSTICK_DOWN = 654;  // 654
-const ImGuiKey MOUSE_LEFT = 655;  // 655
-const ImGuiKey MOUSE_RIGHT = 656;  // 656
-const ImGuiKey MOUSE_MIDDLE = 657;  // 657
-const ImGuiKey MOUSE_X1 = 658;  // 658
-const ImGuiKey MOUSE_X2 = 659;  // 659
-const ImGuiKey MOUSE_WHEEL_X = 660;  // 660
-const ImGuiKey MOUSE_WHEEL_Y = 661;  // 661
-const ImGuiKey RESERVED_FOR_MOD_CTRL = 662;  // 662
-const ImGuiKey RESERVED_FOR_MOD_SHIFT = 663;  // 663
-const ImGuiKey RESERVED_FOR_MOD_ALT = 664;  // 664
-const ImGuiKey RESERVED_FOR_MOD_SUPER = 665;  // 665
-const ImGuiKey NAMED_KEY_END = 666;  // 666
+const ImGuiKey OEM102 = 631;  // 631
+const ImGuiKey GAMEPAD_START = 632;  // 632
+const ImGuiKey GAMEPAD_BACK = 633;  // 633
+const ImGuiKey GAMEPAD_FACE_LEFT = 634;  // 634
+const ImGuiKey GAMEPAD_FACE_RIGHT = 635;  // 635
+const ImGuiKey GAMEPAD_FACE_UP = 636;  // 636
+const ImGuiKey GAMEPAD_FACE_DOWN = 637;  // 637
+const ImGuiKey GAMEPAD_DPAD_LEFT = 638;  // 638
+const ImGuiKey GAMEPAD_DPAD_RIGHT = 639;  // 639
+const ImGuiKey GAMEPAD_DPAD_UP = 640;  // 640
+const ImGuiKey GAMEPAD_DPAD_DOWN = 641;  // 641
+const ImGuiKey GAMEPAD_L1 = 642;  // 642
+const ImGuiKey GAMEPAD_R1 = 643;  // 643
+const ImGuiKey GAMEPAD_L2 = 644;  // 644
+const ImGuiKey GAMEPAD_R2 = 645;  // 645
+const ImGuiKey GAMEPAD_L3 = 646;  // 646
+const ImGuiKey GAMEPAD_R3 = 647;  // 647
+const ImGuiKey GAMEPAD_LSTICK_LEFT = 648;  // 648
+const ImGuiKey GAMEPAD_LSTICK_RIGHT = 649;  // 649
+const ImGuiKey GAMEPAD_LSTICK_UP = 650;  // 650
+const ImGuiKey GAMEPAD_LSTICK_DOWN = 651;  // 651
+const ImGuiKey GAMEPAD_RSTICK_LEFT = 652;  // 652
+const ImGuiKey GAMEPAD_RSTICK_RIGHT = 653;  // 653
+const ImGuiKey GAMEPAD_RSTICK_UP = 654;  // 654
+const ImGuiKey GAMEPAD_RSTICK_DOWN = 655;  // 655
+const ImGuiKey MOUSE_LEFT = 656;  // 656
+const ImGuiKey MOUSE_RIGHT = 657;  // 657
+const ImGuiKey MOUSE_MIDDLE = 658;  // 658
+const ImGuiKey MOUSE_X1 = 659;  // 659
+const ImGuiKey MOUSE_X2 = 660;  // 660
+const ImGuiKey MOUSE_WHEEL_X = 661;  // 661
+const ImGuiKey MOUSE_WHEEL_Y = 662;  // 662
+const ImGuiKey RESERVED_FOR_MOD_CTRL = 663;  // 663
+const ImGuiKey RESERVED_FOR_MOD_SHIFT = 664;  // 664
+const ImGuiKey RESERVED_FOR_MOD_ALT = 665;  // 665
+const ImGuiKey RESERVED_FOR_MOD_SUPER = 666;  // 666
+const ImGuiKey NAMED_KEY_END = 667;  // 667
 const ImGuiKey MOD_NONE = 0;  // 0
 const ImGuiKey MOD_CTRL = 4096;  // 1 << 12
 const ImGuiKey MOD_SHIFT = 8192;  // 1 << 13
 const ImGuiKey MOD_ALT = 16384;  // 1 << 14
 const ImGuiKey MOD_SUPER = 32768;  // 1 << 15
 const ImGuiKey MOD_MASK_ = 61440;  // 0xF000
-const ImGuiKey NAMED_KEY_COUNT = 154;  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
+const ImGuiKey NAMED_KEY_COUNT = 155;  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
 module ig;
 module ig::layout_type;
 const ImGuiLayoutType HORIZONTAL = 0;  // 0
@@ -773,8 +779,10 @@ const ImGuiMouseCursor RESIZE_EW = 4;  // 4
 const ImGuiMouseCursor RESIZE_NESW = 5;  // 5
 const ImGuiMouseCursor RESIZE_NWSE = 6;  // 6
 const ImGuiMouseCursor HAND = 7;  // 7
-const ImGuiMouseCursor NOT_ALLOWED = 8;  // 8
-const ImGuiMouseCursor COUNT = 9;  // 9
+const ImGuiMouseCursor WAIT = 8;  // 8
+const ImGuiMouseCursor PROGRESS = 9;  // 9
+const ImGuiMouseCursor NOT_ALLOWED = 10;  // 10
+const ImGuiMouseCursor COUNT = 11;  // 11
 module ig;
 distinct ImGuiMouseSource = CInt;
 module ig::mouse_source;
@@ -852,11 +860,12 @@ const ImGuiNextWindowDataFlags HAS_SIZE_CONSTRAINT = 16;  // 1 << 4
 const ImGuiNextWindowDataFlags HAS_FOCUS = 32;  // 1 << 5
 const ImGuiNextWindowDataFlags HAS_BG_ALPHA = 64;  // 1 << 6
 const ImGuiNextWindowDataFlags HAS_SCROLL = 128;  // 1 << 7
-const ImGuiNextWindowDataFlags HAS_CHILD_FLAGS = 256;  // 1 << 8
-const ImGuiNextWindowDataFlags HAS_REFRESH_POLICY = 512;  // 1 << 9
-const ImGuiNextWindowDataFlags HAS_VIEWPORT = 1024;  // 1 << 10
-const ImGuiNextWindowDataFlags HAS_DOCK = 2048;  // 1 << 11
-const ImGuiNextWindowDataFlags HAS_WINDOW_CLASS = 4096;  // 1 << 12
+const ImGuiNextWindowDataFlags HAS_WINDOW_FLAGS = 256;  // 1 << 8
+const ImGuiNextWindowDataFlags HAS_CHILD_FLAGS = 512;  // 1 << 9
+const ImGuiNextWindowDataFlags HAS_REFRESH_POLICY = 1024;  // 1 << 10
+const ImGuiNextWindowDataFlags HAS_VIEWPORT = 2048;  // 1 << 11
+const ImGuiNextWindowDataFlags HAS_DOCK = 4096;  // 1 << 12
+const ImGuiNextWindowDataFlags HAS_WINDOW_CLASS = 8192;  // 1 << 13
 module ig;
 module ig::old_column_flags;
 const ImGuiOldColumnFlags NONE = 0;  // 0
@@ -932,6 +941,7 @@ const ImGuiSliderFlags NO_INPUT = 128;  // 1 << 7
 const ImGuiSliderFlags WRAP_AROUND = 256;  // 1 << 8
 const ImGuiSliderFlags CLAMP_ON_INPUT = 512;  // 1 << 9
 const ImGuiSliderFlags CLAMP_ZERO_RANGE = 1024;  // 1 << 10
+const ImGuiSliderFlags NO_SPEED_TWEAKS = 2048;  // 1 << 11
 const ImGuiSliderFlags ALWAYS_CLAMP = 1536;  // ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ClampZeroRange
 const ImGuiSliderFlags INVALID_MASK_ = 1879048207;  // 0x7000000F
 module ig;
@@ -964,19 +974,20 @@ const ImGuiStyleVar SCROLLBAR_SIZE = 18;  // 18
 const ImGuiStyleVar SCROLLBAR_ROUNDING = 19;  // 19
 const ImGuiStyleVar GRAB_MIN_SIZE = 20;  // 20
 const ImGuiStyleVar GRAB_ROUNDING = 21;  // 21
-const ImGuiStyleVar TAB_ROUNDING = 22;  // 22
-const ImGuiStyleVar TAB_BORDER_SIZE = 23;  // 23
-const ImGuiStyleVar TAB_BAR_BORDER_SIZE = 24;  // 24
-const ImGuiStyleVar TAB_BAR_OVERLINE_SIZE = 25;  // 25
-const ImGuiStyleVar TABLE_ANGLED_HEADERS_ANGLE = 26;  // 26
-const ImGuiStyleVar TABLE_ANGLED_HEADERS_TEXT_ALIGN = 27;  // 27
-const ImGuiStyleVar BUTTON_TEXT_ALIGN = 28;  // 28
-const ImGuiStyleVar SELECTABLE_TEXT_ALIGN = 29;  // 29
-const ImGuiStyleVar SEPARATOR_TEXT_BORDER_SIZE = 30;  // 30
-const ImGuiStyleVar SEPARATOR_TEXT_ALIGN = 31;  // 31
-const ImGuiStyleVar SEPARATOR_TEXT_PADDING = 32;  // 32
-const ImGuiStyleVar DOCKING_SEPARATOR_SIZE = 33;  // 33
-const ImGuiStyleVar COUNT = 34;  // 34
+const ImGuiStyleVar IMAGE_BORDER_SIZE = 22;  // 22
+const ImGuiStyleVar TAB_ROUNDING = 23;  // 23
+const ImGuiStyleVar TAB_BORDER_SIZE = 24;  // 24
+const ImGuiStyleVar TAB_BAR_BORDER_SIZE = 25;  // 25
+const ImGuiStyleVar TAB_BAR_OVERLINE_SIZE = 26;  // 26
+const ImGuiStyleVar TABLE_ANGLED_HEADERS_ANGLE = 27;  // 27
+const ImGuiStyleVar TABLE_ANGLED_HEADERS_TEXT_ALIGN = 28;  // 28
+const ImGuiStyleVar BUTTON_TEXT_ALIGN = 29;  // 29
+const ImGuiStyleVar SELECTABLE_TEXT_ALIGN = 30;  // 30
+const ImGuiStyleVar SEPARATOR_TEXT_BORDER_SIZE = 31;  // 31
+const ImGuiStyleVar SEPARATOR_TEXT_ALIGN = 32;  // 32
+const ImGuiStyleVar SEPARATOR_TEXT_PADDING = 33;  // 33
+const ImGuiStyleVar DOCKING_SEPARATOR_SIZE = 34;  // 34
+const ImGuiStyleVar COUNT = 35;  // 35
 module ig;
 module ig::tab_bar_flags;
 const ImGuiTabBarFlags NONE = 0;  // 0
@@ -1106,9 +1117,10 @@ const ImGuiTreeNodeFlags BULLET = 512;  // 1 << 9
 const ImGuiTreeNodeFlags FRAME_PADDING = 1024;  // 1 << 10
 const ImGuiTreeNodeFlags SPAN_AVAIL_WIDTH = 2048;  // 1 << 11
 const ImGuiTreeNodeFlags SPAN_FULL_WIDTH = 4096;  // 1 << 12
-const ImGuiTreeNodeFlags SPAN_TEXT_WIDTH = 8192;  // 1 << 13
+const ImGuiTreeNodeFlags SPAN_LABEL_WIDTH = 8192;  // 1 << 13
 const ImGuiTreeNodeFlags SPAN_ALL_COLUMNS = 16384;  // 1 << 14
-const ImGuiTreeNodeFlags NAV_LEFT_JUMPS_BACK_HERE = 32768;  // 1 << 15
+const ImGuiTreeNodeFlags LABEL_SPAN_ALL_COLUMNS = 32768;  // 1 << 15
+const ImGuiTreeNodeFlags NAV_LEFT_JUMPS_BACK_HERE = 131072;  // 1 << 17
 const ImGuiTreeNodeFlags COLLAPSING_HEADER = 26;  // ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
 module ig;
 module ig::typing_select_flags;
@@ -1170,12 +1182,12 @@ const ImGuiWindowFlags NO_DOCKING = 524288;  // 1 << 19
 const ImGuiWindowFlags NO_NAV = 196608;  // ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
 const ImGuiWindowFlags NO_DECORATION = 43;  // ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse
 const ImGuiWindowFlags NO_INPUTS = 197120;  // ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
+const ImGuiWindowFlags DOCK_NODE_HOST = 8388608;  // 1 << 23
 const ImGuiWindowFlags CHILD_WINDOW = 16777216;  // 1 << 24
 const ImGuiWindowFlags TOOLTIP = 33554432;  // 1 << 25
 const ImGuiWindowFlags POPUP = 67108864;  // 1 << 26
 const ImGuiWindowFlags MODAL = 134217728;  // 1 << 27
 const ImGuiWindowFlags CHILD_MENU = 268435456;  // 1 << 28
-const ImGuiWindowFlags DOCK_NODE_HOST = 536870912;  // 1 << 29
 module ig;
 module ig::window_refresh_flags;
 const ImGuiWindowRefreshFlags NONE = 0;  // 0
@@ -1253,18 +1265,19 @@ struct ImDrawList
 struct ImDrawListSharedData
 {
     ImVec2 tex_uv_white_pixel;
+    ImVec4* tex_uv_lines;
     ImFont* font;
     float font_size;
     float font_scale;
     float curve_tessellation_tol;
     float circle_segment_max_error;
-    ImVec4 clip_rect_fullscreen;
+    float initial_fringe_scale;
     ImDrawListFlags initial_flags;
+    ImVec4 clip_rect_fullscreen;
     ImVector temp_buffer;
     ImVec2[48] arc_fast_vtx;
     float arc_fast_radius_cutoff;
     ImU8[64] circle_segment_counts;
-    ImVec4* tex_uv_lines;
 }
 struct ImDrawListSplitter
 {
@@ -1287,19 +1300,19 @@ struct ImFont
     ImVector glyphs;
     ImFontGlyph* fallback_glyph;
     ImFontAtlas* container_atlas;
-    ImFontConfig* config_data;
-    CShort config_data_count;
-    ImWchar fallback_char;
-    ImWchar ellipsis_char;
+    ImFontConfig* sources;
+    CShort sources_count;
     CShort ellipsis_char_count;
+    ImWchar ellipsis_char;
+    ImWchar fallback_char;
     float ellipsis_width;
     float ellipsis_char_step;
-    bool dirty_lookup_tables;
     float scale;
     float ascent;
     float descent;
     CInt metrics_total_surface;
-    ImU8[(0xFFFF+1)/4096/8] used4k_pages_map;
+    bool dirty_lookup_tables;
+    ImU8[(0xFFFF+1)/8192/8] used8k_pages_map;
 }
 struct ImFontAtlas
 {
@@ -1307,8 +1320,8 @@ struct ImFontAtlas
     ImTextureID tex_id;
     CInt tex_desired_width;
     CInt tex_glyph_padding;
-    bool locked;
     void* user_data;
+    bool locked;
     bool tex_ready;
     bool tex_pixels_use_colors;
     char* tex_pixels_alpha8;
@@ -1319,8 +1332,8 @@ struct ImFontAtlas
     ImVec2 tex_uv_white_pixel;
     ImVector fonts;
     ImVector custom_rects;
-    ImVector config_data;
-    ImVec4[(63)+1] tex_uv_lines;
+    ImVector sources;
+    ImVec4[(32)+1] tex_uv_lines;
     ImFontBuilderIO* font_builder_io;
     CUInt font_builder_flags;
     CInt pack_id_mouse_cursors;
@@ -1328,10 +1341,10 @@ struct ImFontAtlas
 }
 struct ImFontAtlasCustomRect
 {
-    CUShort width;
-    CUShort height;
     CUShort x;
     CUShort y;
+    CUShort width;
+    CUShort height;
     CUInt glyph_id;
     CUInt glyph_colored;
     float glyph_advance_x;
@@ -1347,17 +1360,17 @@ struct ImFontConfig
     void* font_data;
     CInt font_data_size;
     bool font_data_owned_by_atlas;
+    bool merge_mode;
+    bool pixel_snap_h;
     CInt font_no;
-    float size_pixels;
     CInt oversample_h;
     CInt oversample_v;
-    bool pixel_snap_h;
-    ImVec2 glyph_extra_spacing;
+    float size_pixels;
     ImVec2 glyph_offset;
     ImWchar* glyph_ranges;
     float glyph_min_advance_x;
     float glyph_max_advance_x;
-    bool merge_mode;
+    float glyph_extra_advance_x;
     CUInt font_builder_flags;
     float rasterizer_multiply;
     float rasterizer_density;
@@ -1436,9 +1449,9 @@ struct ImGuiContext
     CInt frame_count_ended;
     CInt frame_count_platform_ended;
     CInt frame_count_rendered;
+    ImGuiID within_end_child_id;
     bool within_frame_scope;
     bool within_frame_scope_with_implicit_window;
-    bool within_end_child;
     bool gc_compact_all;
     bool test_engine_hook_items;
     void* test_engine;
@@ -1453,7 +1466,7 @@ struct ImGuiContext
     ImVector current_window_stack;
     ImGuiStorage windows_by_id;
     CInt windows_active_count;
-    ImVec2 windows_hover_padding;
+    float windows_border_hover_padding;
     ImGuiID debug_break_in_window;
     ImGuiWindow* current_window;
     ImGuiWindow* hovered_window;
@@ -1492,9 +1505,8 @@ struct ImGuiContext
     ImGuiWindow* active_id_window;
     ImGuiInputSource active_id_source;
     ImGuiID active_id_previous_frame;
-    bool active_id_previous_frame_is_alive;
-    bool active_id_previous_frame_has_been_edited_before;
-    ImGuiWindow* active_id_previous_frame_window;
+    ImGuiDeactivatedItemData deactivated_item_data;
+    ImGuiDataTypeStorage active_id_value_on_activation;
     ImGuiID last_active_id;
     float last_active_id_timer;
     double last_key_mods_change_time;
@@ -1752,11 +1764,12 @@ struct ImGuiDataTypeStorage
 {
     ImU8[8] data;
 }
-struct ImGuiDataVarInfo
+struct ImGuiDeactivatedItemData
 {
-    ImGuiDataType type;
-    ImU32 count;
-    ImU32 offset;
+    ImGuiID id;
+    CInt elapse_frame;
+    bool has_been_edited_before;
+    bool is_alive;
 }
 struct ImGuiDebugAllocEntry
 {
@@ -1853,7 +1866,7 @@ struct ImGuiGroupData
     ImVec2 backup_curr_line_size;
     float backup_curr_line_text_base_offset;
     ImGuiID backup_active_id_is_alive;
-    bool backup_active_id_previous_frame_is_alive;
+    bool backup_deactivated_id_is_alive;
     bool backup_hovered_id_is_alive;
     bool backup_is_same_line;
     bool emit_item;
@@ -1866,6 +1879,7 @@ struct ImGuiIDStackTool
     ImVector results;
     bool copy_to_clipboard_on_ctrl_c;
     float copy_to_clipboard_last_time;
+    ImGuiTextBuffer result_path_buf;
 }
 struct ImGuiIO
 {
@@ -1919,6 +1933,7 @@ struct ImGuiIO
     bool config_error_recovery_enable_tooltip;
     bool config_debug_is_debugger_present;
     bool config_debug_highlight_id_conflicts;
+    bool config_debug_highlight_id_conflicts_show_item_picker;
     bool config_debug_begin_return_value_once;
     bool config_debug_begin_return_value_loop;
     bool config_debug_ignore_focus_loss;
@@ -1963,6 +1978,7 @@ struct ImGuiIO
     ImU16[5] mouse_clicked_count;
     ImU16[5] mouse_clicked_last_count;
     bool[5] mouse_released;
+    double[5] mouse_released_time;
     bool[5] mouse_down_owned;
     bool[5] mouse_down_owned_unless_popup_close;
     bool mouse_wheel_request_axis_swap;
@@ -2046,8 +2062,10 @@ struct ImGuiInputTextState
 {
     ImGuiContext* ctx;
     ImStbTexteditState* stb;
+    ImGuiInputTextFlags flags;
     ImGuiID id;
     CInt text_len;
+    ZString text_src;
     ImVector text_a;
     ImVector text_to_revert_to;
     ImVector callback_text_backup;
@@ -2057,8 +2075,7 @@ struct ImGuiInputTextState
     bool cursor_follow;
     bool selected_all_mouse_lock;
     bool edited;
-    ImGuiInputTextFlags flags;
-    bool reload_user_buf;
+    bool want_reload_user_buf;
     CInt reload_selection_start;
     CInt reload_selection_end;
 }
@@ -2155,7 +2172,6 @@ struct ImGuiMetricsConfig
     bool show_draw_cmd_mesh;
     bool show_draw_cmd_bounding_boxes;
     bool show_text_encoding_viewer;
-    bool show_atlas_tinted_with_text_color;
     bool show_docking_nodes;
     CInt show_windows_rects_type;
     CInt show_tables_rects_type;
@@ -2229,7 +2245,7 @@ struct ImGuiNextItemData
 }
 struct ImGuiNextWindowData
 {
-    ImGuiNextWindowDataFlags flags;
+    ImGuiNextWindowDataFlags has_flags;
     ImGuiCond pos_cond;
     ImGuiCond size_cond;
     ImGuiCond collapsed_cond;
@@ -2239,6 +2255,7 @@ struct ImGuiNextWindowData
     ImVec2 size_val;
     ImVec2 content_size_val;
     ImVec2 scroll_val;
+    ImGuiWindowFlags window_flags;
     ImGuiChildFlags child_flags;
     bool pos_undock;
     bool collapsed_val;
@@ -2434,6 +2451,7 @@ struct ImGuiStyle
     ImVec2 window_padding;
     float window_rounding;
     float window_border_size;
+    float window_border_hover_padding;
     ImVec2 window_min_size;
     ImVec2 window_title_align;
     ImGuiDir window_menu_button_position;
@@ -2455,9 +2473,11 @@ struct ImGuiStyle
     float grab_min_size;
     float grab_rounding;
     float log_slider_deadzone;
+    float image_border_size;
     float tab_rounding;
     float tab_border_size;
-    float tab_min_width_for_close_button;
+    float tab_close_button_min_width_selected;
+    float tab_close_button_min_width_unselected;
     float tab_bar_border_size;
     float tab_bar_overline_size;
     float table_angled_headers_angle;
@@ -2488,6 +2508,12 @@ struct ImGuiStyleMod
 {
     ImGuiStyleVar var_idx;
     union { CInt[2] backup_int; float[2] backup_float; }
+}
+struct ImGuiStyleVarInfo
+{
+    ImU32 count;
+    ImGuiDataType data_type;
+    ImU32 offset;
 }
 struct ImGuiTabBar
 {
@@ -2636,6 +2662,7 @@ struct ImGuiTable
     ImGuiTableDrawChannelIdx dummy_draw_channel;
     ImGuiTableDrawChannelIdx bg2_draw_channel_current;
     ImGuiTableDrawChannelIdx bg2_draw_channel_unfrozen;
+    ImS8 nav_layer;
     bool is_layout_locked;
     bool is_inside_row;
     bool is_initializing;
@@ -2715,7 +2742,7 @@ struct ImGuiTableColumnSettings
     ImGuiTableColumnIdx display_order;
     ImGuiTableColumnIdx sort_order;
     ImU8 sort_direction;
-    ImU8 is_enabled;
+    ImS8 is_enabled;
     ImU8 is_stretch;
 }
 struct ImGuiTableColumnSortSpecs
@@ -2907,6 +2934,8 @@ struct ImGuiWindow
     ImVec2 scrollbar_sizes;
     bool scrollbar_x;
     bool scrollbar_y;
+    bool scrollbar_xstabilize_enabled;
+    ImU8 scrollbar_xstabilize_toggled_history;
     bool viewport_owned;
     bool active;
     bool was_active;
@@ -2959,7 +2988,9 @@ struct ImGuiWindow
     ImGuiStorage state_storage;
     ImVector columns_storage;
     float font_window_scale;
+    float font_window_scale_parents;
     float font_dpi_scale;
+    float font_ref_size;
     CInt settings_offset;
     ImDrawList* draw_list;
     ImDrawList draw_list_inst;
@@ -2988,8 +3019,6 @@ struct ImGuiWindow
     ImGuiDockNode* dock_node;
     ImGuiDockNode* dock_node_as_host;
     ImGuiID dock_id;
-    ImGuiItemStatusFlags dock_tab_item_status_flags;
-    ImRect dock_tab_item_rect;
 }
 struct ImGuiWindowClass
 {
@@ -3028,6 +3057,7 @@ struct ImGuiWindowStackData
     ImGuiLastItemData parent_last_item_data_backup;
     ImGuiErrorRecoveryState stack_sizes_in_begin;
     bool disabled_override_reenable;
+    float disabled_override_reenable_alpha_backup;
 }
 struct ImGuiWindowTempData
 {
@@ -3064,6 +3094,10 @@ struct ImGuiWindowTempData
     ImGuiLayoutType layout_type;
     ImGuiLayoutType parent_layout_type;
     ImU32 modal_dim_bg_color;
+    ImGuiItemStatusFlags window_item_status_flags;
+    ImGuiItemStatusFlags child_item_status_flags;
+    ImGuiItemStatusFlags dock_tab_item_status_flags;
+    ImRect dock_tab_item_rect;
     float item_width;
     float text_wrap_pos;
     ImVector item_width_stack;
@@ -3245,7 +3279,6 @@ extern fn ImWchar* ImFontAtlas.get_glyph_ranges_japanese(ImFontAtlas* self) @ext
 extern fn ImWchar* ImFontAtlas.get_glyph_ranges_korean(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesKorean");
 extern fn ImWchar* ImFontAtlas.get_glyph_ranges_thai(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesThai");
 extern fn ImWchar* ImFontAtlas.get_glyph_ranges_vietnamese(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesVietnamese");
-extern fn bool ImFontAtlas.get_mouse_cursor_tex_data(ImFontAtlas* self, ImGuiMouseCursor cursor, ImVec2* out_offset, ImVec2* out_size, ImVec2[2] out_uv_border, ImVec2[2] out_uv_fill) @extern("ImFontAtlas_GetMouseCursorTexData");
 extern fn void ImFontAtlas.get_tex_data_as_alpha8(ImFontAtlas* self, char** out_pixels, CInt* out_width, CInt* out_height, CInt* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsAlpha8");
 extern fn void ImFontAtlas.get_tex_data_as_rgba32(ImFontAtlas* self, char** out_pixels, CInt* out_width, CInt* out_height, CInt* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsRGBA32");
 extern fn ImFontAtlas* new_im_font_atlas() @extern("ImFontAtlas_ImFontAtlas");
@@ -3279,7 +3312,6 @@ extern fn bool ImFont.is_glyph_range_unused(ImFont* self, CUInt c_begin, CUInt c
 extern fn bool ImFont.is_loaded(ImFont* self) @extern("ImFont_IsLoaded");
 extern fn void ImFont.render_char(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImWchar c) @extern("ImFont_RenderChar");
 extern fn void ImFont.render_text(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImVec4 clip_rect, ZString text_begin, ZString text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) @extern("ImFont_RenderText");
-extern fn void ImFont.set_glyph_visible(ImFont* self, ImWchar c, bool visible) @extern("ImFont_SetGlyphVisible");
 extern fn void ImFont.destroy(ImFont* self) @extern("ImFont_destroy");
 extern fn ImGuiBoxSelectState* new_im_gui_box_select_state() @extern("ImGuiBoxSelectState_ImGuiBoxSelectState");
 extern fn void ImGuiBoxSelectState.destroy(ImGuiBoxSelectState* self) @extern("ImGuiBoxSelectState_destroy");
@@ -3289,7 +3321,6 @@ extern fn ImGuiContextHook* new_im_gui_context_hook() @extern("ImGuiContextHook_
 extern fn void ImGuiContextHook.destroy(ImGuiContextHook* self) @extern("ImGuiContextHook_destroy");
 extern fn ImGuiContext* new_im_gui_context(ImFontAtlas* shared_font_atlas) @extern("ImGuiContext_ImGuiContext");
 extern fn void ImGuiContext.destroy(ImGuiContext* self) @extern("ImGuiContext_destroy");
-extern fn void* ImGuiDataVarInfo.get_var_ptr(ImGuiDataVarInfo* self, void* parent) @extern("ImGuiDataVarInfo_GetVarPtr");
 extern fn ImGuiDebugAllocInfo* new_im_gui_debug_alloc_info() @extern("ImGuiDebugAllocInfo_ImGuiDebugAllocInfo");
 extern fn void ImGuiDebugAllocInfo.destroy(ImGuiDebugAllocInfo* self) @extern("ImGuiDebugAllocInfo_destroy");
 extern fn ImGuiDockContext* new_im_gui_dock_context() @extern("ImGuiDockContext_ImGuiDockContext");
@@ -3465,6 +3496,7 @@ extern fn ImGuiStyleMod* new_im_gui_style_mod_int(ImGuiStyleVar idx, CInt v) @ex
 extern fn ImGuiStyleMod* new_im_gui_style_mod_float(ImGuiStyleVar idx, float v) @extern("ImGuiStyleMod_ImGuiStyleMod_Float");
 extern fn ImGuiStyleMod* new_im_gui_style_mod_vec2(ImGuiStyleVar idx, ImVec2 v) @extern("ImGuiStyleMod_ImGuiStyleMod_Vec2");
 extern fn void ImGuiStyleMod.destroy(ImGuiStyleMod* self) @extern("ImGuiStyleMod_destroy");
+extern fn void* ImGuiStyleVarInfo.get_var_ptr(ImGuiStyleVarInfo* self, void* parent) @extern("ImGuiStyleVarInfo_GetVarPtr");
 extern fn ImGuiStyle* new_im_gui_style() @extern("ImGuiStyle_ImGuiStyle");
 extern fn void ImGuiStyle.scale_all_sizes(ImGuiStyle* self, float scale_factor) @extern("ImGuiStyle_ScaleAllSizes");
 extern fn void ImGuiStyle.destroy(ImGuiStyle* self) @extern("ImGuiStyle_destroy");
@@ -3491,7 +3523,7 @@ extern fn ImGuiTable* new_im_gui_table() @extern("ImGuiTable_ImGuiTable");
 extern fn void ImGuiTable.destroy(ImGuiTable* self) @extern("ImGuiTable_destroy");
 extern fn ImGuiTextBuffer* new_im_gui_text_buffer() @extern("ImGuiTextBuffer_ImGuiTextBuffer");
 extern fn void ImGuiTextBuffer.append(ImGuiTextBuffer* self, ZString str, ZString str_end = null) @extern("ImGuiTextBuffer_append");
-extern fn void im_gui_text_buffer_appendf(ImGuiTextBuffer* buffer, ZString fmt, ...) @extern("ImGuiTextBuffer_appendf");
+extern fn void ImGuiTextBuffer.appendf(ImGuiTextBuffer* self, ZString fmt, ...) @extern("ImGuiTextBuffer_appendf");
 extern fn ZString ImGuiTextBuffer.begin(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_begin");
 extern fn ZString ImGuiTextBuffer.c_str(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_c_str");
 extern fn void ImGuiTextBuffer.clear(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_clear");
@@ -3499,6 +3531,7 @@ extern fn void ImGuiTextBuffer.destroy(ImGuiTextBuffer* self) @extern("ImGuiText
 extern fn bool ImGuiTextBuffer.empty(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_empty");
 extern fn ZString ImGuiTextBuffer.end(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_end");
 extern fn void ImGuiTextBuffer.reserve(ImGuiTextBuffer* self, CInt capacity) @extern("ImGuiTextBuffer_reserve");
+extern fn void ImGuiTextBuffer.resize(ImGuiTextBuffer* self, CInt size) @extern("ImGuiTextBuffer_resize");
 extern fn CInt ImGuiTextBuffer.size(ImGuiTextBuffer* self) @extern("ImGuiTextBuffer_size");
 extern fn void ImGuiTextFilter.build(ImGuiTextFilter* self) @extern("ImGuiTextFilter_Build");
 extern fn void ImGuiTextFilter.clear(ImGuiTextFilter* self) @extern("ImGuiTextFilter_Clear");
@@ -3707,6 +3740,7 @@ extern fn bool begin_popup_context_item(ZString str_id = null, ImGuiPopupFlags p
 extern fn bool begin_popup_context_void(ZString str_id = null, ImGuiPopupFlags popup_flags = 1) @extern("igBeginPopupContextVoid");
 extern fn bool begin_popup_context_window(ZString str_id = null, ImGuiPopupFlags popup_flags = 1) @extern("igBeginPopupContextWindow");
 extern fn bool begin_popup_ex(ImGuiID id, ImGuiWindowFlags extra_window_flags) @extern("igBeginPopupEx");
+extern fn bool begin_popup_menu_ex(ImGuiID id, ZString label, ImGuiWindowFlags extra_window_flags) @extern("igBeginPopupMenuEx");
 extern fn bool begin_popup_modal(ZString name, bool* p_open = null, ImGuiWindowFlags flags = 0) @extern("igBeginPopupModal");
 extern fn bool begin_tab_bar(ZString str_id, ImGuiTabBarFlags flags = 0) @extern("igBeginTabBar");
 extern fn bool begin_tab_bar_ex(ImGuiTabBar* tab_bar, ImRect bb, ImGuiTabBarFlags flags) @extern("igBeginTabBarEx");
@@ -3969,8 +4003,8 @@ extern fn ImGuiID get_idptr(void* ptr_id) @extern("igGetID_Ptr");
 extern fn ImGuiID get_idint(CInt int_id) @extern("igGetID_Int");
 extern fn ImGuiID get_idwith_seed_str(ZString str_id_begin, ZString str_id_end, ImGuiID seed) @extern("igGetIDWithSeed_Str");
 extern fn ImGuiID get_idwith_seed_int(CInt n, ImGuiID seed) @extern("igGetIDWithSeed_Int");
-extern fn ImGuiIO* get_io() @extern("igGetIO");
-extern fn ImGuiIO* get_ioex(ImGuiContext* ctx) @extern("igGetIOEx");
+extern fn ImGuiIO* get_ionil() @extern("igGetIO_Nil");
+extern fn ImGuiIO* get_iocontext_ptr(ImGuiContext* ctx) @extern("igGetIO_ContextPtr");
 extern fn ImGuiInputTextState* get_input_text_state(ImGuiID id) @extern("igGetInputTextState");
 extern fn ImGuiItemFlags get_item_flags() @extern("igGetItemFlags");
 extern fn ImGuiID get_item_id() @extern("igGetItemID");
@@ -3994,7 +4028,8 @@ extern fn void get_mouse_pos(ImVec2* p_out) @extern("igGetMousePos");
 extern fn void get_mouse_pos_on_opening_current_popup(ImVec2* p_out) @extern("igGetMousePosOnOpeningCurrentPopup");
 extern fn ImGuiMultiSelectState* get_multi_select_state(ImGuiID id) @extern("igGetMultiSelectState");
 extern fn float get_nav_tweak_pressed_amount(ImGuiAxis axis) @extern("igGetNavTweakPressedAmount");
-extern fn ImGuiPlatformIO* get_platform_io() @extern("igGetPlatformIO");
+extern fn ImGuiPlatformIO* get_platform_ionil() @extern("igGetPlatformIO_Nil");
+extern fn ImGuiPlatformIO* get_platform_iocontext_ptr(ImGuiContext* ctx) @extern("igGetPlatformIO_ContextPtr");
 extern fn void get_popup_allowed_extent_rect(ImRect* p_out, ImGuiWindow* window) @extern("igGetPopupAllowedExtentRect");
 extern fn float get_scroll_max_x() @extern("igGetScrollMaxX");
 extern fn float get_scroll_max_y() @extern("igGetScrollMaxY");
@@ -4005,7 +4040,7 @@ extern fn ImGuiStorage* get_state_storage() @extern("igGetStateStorage");
 extern fn ImGuiStyle* get_style() @extern("igGetStyle");
 extern fn ZString get_style_color_name(ImGuiCol idx) @extern("igGetStyleColorName");
 extern fn ImVec4* get_style_color_vec4(ImGuiCol idx) @extern("igGetStyleColorVec4");
-extern fn ImGuiDataVarInfo* get_style_var_info(ImGuiStyleVar idx) @extern("igGetStyleVarInfo");
+extern fn ImGuiStyleVarInfo* get_style_var_info(ImGuiStyleVar idx) @extern("igGetStyleVarInfo");
 extern fn float get_text_line_height() @extern("igGetTextLineHeight");
 extern fn float get_text_line_height_with_spacing() @extern("igGetTextLineHeightWithSpacing");
 extern fn double get_time() @extern("igGetTime");
@@ -4048,6 +4083,7 @@ extern fn bool im_char_is_blank_a(char c) @extern("igImCharIsBlankA");
 extern fn bool im_char_is_blank_w(CUInt c) @extern("igImCharIsBlankW");
 extern fn bool im_char_is_xdigit_a(char c) @extern("igImCharIsXdigitA");
 extern fn void im_clamp(ImVec2* p_out, ImVec2 v, ImVec2 mn, ImVec2 mx) @extern("igImClamp");
+extern fn CUInt im_count_set_bits(CUInt v) @extern("igImCountSetBits");
 extern fn float im_dot(ImVec2 a, ImVec2 b) @extern("igImDot");
 extern fn float im_exponential_moving_average(float avg, float sample, CInt n) @extern("igImExponentialMovingAverage");
 extern fn bool im_file_close(ImFileHandle file) @extern("igImFileClose");
@@ -4059,15 +4095,17 @@ extern fn ImU64 im_file_write(void* data, ImU64 size, ImU64 count, ImFileHandle 
 extern fn float im_floor_float(float f) @extern("igImFloor_Float");
 extern fn void im_floor_vec2(ImVec2* p_out, ImVec2 v) @extern("igImFloor_Vec2");
 extern fn void im_font_atlas_build_finish(ImFontAtlas* atlas) @extern("igImFontAtlasBuildFinish");
+extern fn void im_font_atlas_build_get_oversample_factors(ImFontConfig* src, CInt* out_oversample_h, CInt* out_oversample_v) @extern("igImFontAtlasBuildGetOversampleFactors");
 extern fn void im_font_atlas_build_init(ImFontAtlas* atlas) @extern("igImFontAtlasBuildInit");
 extern fn void im_font_atlas_build_multiply_calc_lookup_table(char[256]* out_table, float in_multiply_factor) @extern("igImFontAtlasBuildMultiplyCalcLookupTable");
 extern fn void im_font_atlas_build_multiply_rect_alpha8(char[256]* table, char* pixels, CInt x, CInt y, CInt w, CInt h, CInt stride) @extern("igImFontAtlasBuildMultiplyRectAlpha8");
 extern fn void im_font_atlas_build_pack_custom_rects(ImFontAtlas* atlas, void* stbrp_context_opaque) @extern("igImFontAtlasBuildPackCustomRects");
 extern fn void im_font_atlas_build_render32bpp_rect_from_string(ImFontAtlas* atlas, CInt x, CInt y, CInt w, CInt h, ZString in_str, char in_marker_char, CUInt in_marker_pixel_value) @extern("igImFontAtlasBuildRender32bppRectFromString");
 extern fn void im_font_atlas_build_render8bpp_rect_from_string(ImFontAtlas* atlas, CInt x, CInt y, CInt w, CInt h, ZString in_str, char in_marker_char, char in_marker_pixel_value) @extern("igImFontAtlasBuildRender8bppRectFromString");
-extern fn void im_font_atlas_build_setup_font(ImFontAtlas* atlas, ImFont* font, ImFontConfig* font_config, float ascent, float descent) @extern("igImFontAtlasBuildSetupFont");
+extern fn void im_font_atlas_build_setup_font(ImFontAtlas* atlas, ImFont* font, ImFontConfig* src, float ascent, float descent) @extern("igImFontAtlasBuildSetupFont");
 extern fn ImFontBuilderIO* im_font_atlas_get_builder_for_stb_truetype() @extern("igImFontAtlasGetBuilderForStbTruetype");
-extern fn void im_font_atlas_update_config_data_pointers(ImFontAtlas* atlas) @extern("igImFontAtlasUpdateConfigDataPointers");
+extern fn bool im_font_atlas_get_mouse_cursor_tex_data(ImFontAtlas* atlas, ImGuiMouseCursor cursor_type, ImVec2* out_offset, ImVec2* out_size, ImVec2[2] out_uv_border, ImVec2[2] out_uv_fill) @extern("igImFontAtlasGetMouseCursorTexData");
+extern fn void im_font_atlas_update_sources_pointers(ImFontAtlas* atlas) @extern("igImFontAtlasUpdateSourcesPointers");
 extern fn CInt im_format_string(ZString buf, usz buf_size, ZString fmt, ...) @extern("igImFormatString");
 extern fn void im_format_string_to_temp_buffer(char** out_buf, char** out_buf_end, ZString fmt, ...) @extern("igImFormatStringToTempBuffer");
 extern fn ImGuiID im_hash_data(void* data, usz data_size, ImGuiID seed = 0) @extern("igImHashData");
@@ -4136,9 +4174,10 @@ extern fn bool im_triangle_is_clockwise(ImVec2 a, ImVec2 b, ImVec2 c) @extern("i
 extern fn float im_trunc_float(float f) @extern("igImTrunc_Float");
 extern fn void im_trunc_vec2(ImVec2* p_out, ImVec2 v) @extern("igImTrunc_Vec2");
 extern fn CInt im_upper_power_of_two(CInt v) @extern("igImUpperPowerOfTwo");
-extern fn void image(ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 tint_col = {1, 1, 1, 1}, ImVec4 border_col = {}) @extern("igImage");
+extern fn void image(ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}) @extern("igImage");
 extern fn bool image_button(ZString str_id, ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageButton");
-extern fn bool image_button_ex(ImGuiID id, ImTextureID texture_id, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col, ImGuiButtonFlags flags = 0) @extern("igImageButtonEx");
+extern fn bool image_button_ex(ImGuiID id, ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col, ImGuiButtonFlags flags = 0) @extern("igImageButtonEx");
+extern fn void image_with_bg(ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageWithBg");
 extern fn void indent(float indent_w = 0.0f) @extern("igIndent");
 extern fn void initialize() @extern("igInitialize");
 extern fn bool input_double(ZString label, double* v, double step = 0.0, double step_fast = 0.0, ZString format = "%.6f", ImGuiInputTextFlags flags = 0) @extern("igInputDouble");
@@ -4170,6 +4209,7 @@ extern fn bool is_drag_drop_payload_being_accepted() @extern("igIsDragDropPayloa
 extern fn bool is_gamepad_key(ImGuiKey key) @extern("igIsGamepadKey");
 extern fn bool is_item_activated() @extern("igIsItemActivated");
 extern fn bool is_item_active() @extern("igIsItemActive");
+extern fn bool is_item_active_as_input_text() @extern("igIsItemActiveAsInputText");
 extern fn bool is_item_clicked(ImGuiMouseButton mouse_button = 0) @extern("igIsItemClicked");
 extern fn bool is_item_deactivated() @extern("igIsItemDeactivated");
 extern fn bool is_item_deactivated_after_edit() @extern("igIsItemDeactivatedAfterEdit");
@@ -4203,6 +4243,7 @@ extern fn bool is_mouse_key(ImGuiKey key) @extern("igIsMouseKey");
 extern fn bool is_mouse_pos_valid(ImVec2* mouse_pos = null) @extern("igIsMousePosValid");
 extern fn bool is_mouse_released_nil(ImGuiMouseButton button) @extern("igIsMouseReleased_Nil");
 extern fn bool is_mouse_released_id(ImGuiMouseButton button, ImGuiID owner_id) @extern("igIsMouseReleased_ID");
+extern fn bool is_mouse_released_with_delay(ImGuiMouseButton button, float delay) @extern("igIsMouseReleasedWithDelay");
 extern fn bool is_named_key(ImGuiKey key) @extern("igIsNamedKey");
 extern fn bool is_named_key_or_mod(ImGuiKey key) @extern("igIsNamedKeyOrMod");
 extern fn bool is_popup_open_str(ZString str_id, ImGuiPopupFlags flags = 0) @extern("igIsPopupOpen_Str");
@@ -4303,6 +4344,7 @@ extern fn void push_item_flag(ImGuiItemFlags option, bool enabled) @extern("igPu
 extern fn void push_item_width(float item_width) @extern("igPushItemWidth");
 extern fn void push_multi_items_widths(CInt components, float width_full) @extern("igPushMultiItemsWidths");
 extern fn void push_override_id(ImGuiID id) @extern("igPushOverrideID");
+extern fn void push_password_font() @extern("igPushPasswordFont");
 extern fn void push_style_color_u32(ImGuiCol idx, ImU32 col) @extern("igPushStyleColor_U32");
 extern fn void push_style_color_vec4(ImGuiCol idx, ImVec4 col) @extern("igPushStyleColor_Vec4");
 extern fn void push_style_var_float(ImGuiStyleVar idx, float val) @extern("igPushStyleVar_Float");
@@ -4344,7 +4386,7 @@ extern fn void scroll_to_item(ImGuiScrollFlags flags = 0) @extern("igScrollToIte
 extern fn void scroll_to_rect(ImGuiWindow* window, ImRect rect, ImGuiScrollFlags flags = 0) @extern("igScrollToRect");
 extern fn void scroll_to_rect_ex(ImVec2* p_out, ImGuiWindow* window, ImRect rect, ImGuiScrollFlags flags = 0) @extern("igScrollToRectEx");
 extern fn void scrollbar(ImGuiAxis axis) @extern("igScrollbar");
-extern fn bool scrollbar_ex(ImRect bb, ImGuiID id, ImGuiAxis axis, ImS64* p_scroll_v, ImS64 avail_v, ImS64 contents_v, ImDrawFlags flags) @extern("igScrollbarEx");
+extern fn bool scrollbar_ex(ImRect bb, ImGuiID id, ImGuiAxis axis, ImS64* p_scroll_v, ImS64 avail_v, ImS64 contents_v, ImDrawFlags draw_rounding_flags = 0) @extern("igScrollbarEx");
 extern fn bool selectable_bool(ZString label, bool selected = false, ImGuiSelectableFlags flags = 0, ImVec2 size = {}) @extern("igSelectable_Bool");
 extern fn bool selectable_bool_ptr(ZString label, bool* p_selected, ImGuiSelectableFlags flags = 0, ImVec2 size = {}) @extern("igSelectable_BoolPtr");
 extern fn void separator() @extern("igSeparator");
@@ -4375,7 +4417,7 @@ extern fn void set_item_tooltip(ZString fmt, ...) @extern("igSetItemTooltip");
 extern fn void set_key_owner(ImGuiKey key, ImGuiID owner_id, ImGuiInputFlags flags = 0) @extern("igSetKeyOwner");
 extern fn void set_key_owners_for_key_chord(ImGuiKeyChord key, ImGuiID owner_id, ImGuiInputFlags flags = 0) @extern("igSetKeyOwnersForKeyChord");
 extern fn void set_keyboard_focus_here(CInt offset = 0) @extern("igSetKeyboardFocusHere");
-extern fn void set_last_item_data(ImGuiID item_id, ImGuiItemFlags in_flags, ImGuiItemStatusFlags status_flags, ImRect item_rect) @extern("igSetLastItemData");
+extern fn void set_last_item_data(ImGuiID item_id, ImGuiItemFlags item_flags, ImGuiItemStatusFlags status_flags, ImRect item_rect) @extern("igSetLastItemData");
 extern fn void set_mouse_cursor(ImGuiMouseCursor cursor_type) @extern("igSetMouseCursor");
 extern fn void set_nav_cursor_visible(bool visible) @extern("igSetNavCursorVisible");
 extern fn void set_nav_cursor_visible_after_move() @extern("igSetNavCursorVisibleAfterMove");
@@ -4492,6 +4534,7 @@ extern fn void tab_item_calc_size_str(ImVec2* p_out, ZString label, bool has_clo
 extern fn void tab_item_calc_size_window_ptr(ImVec2* p_out, ImGuiWindow* window) @extern("igTabItemCalcSize_WindowPtr");
 extern fn bool tab_item_ex(ImGuiTabBar* tab_bar, ZString label, bool* p_open, ImGuiTabItemFlags flags, ImGuiWindow* docked_window) @extern("igTabItemEx");
 extern fn void tab_item_label_and_close_button(ImDrawList* draw_list, ImRect bb, ImGuiTabItemFlags flags, ImVec2 frame_padding, ZString label, ImGuiID tab_id, ImGuiID close_button_id, bool is_contents_visible, bool* out_just_closed, bool* out_text_clipped) @extern("igTabItemLabelAndCloseButton");
+extern fn void tab_item_spacing(ZString str_id, ImGuiTabItemFlags flags, float width) @extern("igTabItemSpacing");
 extern fn void table_angled_headers_row() @extern("igTableAngledHeadersRow");
 extern fn void table_angled_headers_row_ex(ImGuiID row_id, float angle, float max_label_width, ImGuiTableHeaderData* data, CInt data_count) @extern("igTableAngledHeadersRowEx");
 extern fn void table_begin_apply_requests(ImGuiTable* table) @extern("igTableBeginApplyRequests");

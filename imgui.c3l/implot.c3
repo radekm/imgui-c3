@@ -253,6 +253,7 @@ module ipl::pie_chart_flags;
 const ImPlotPieChartFlags NONE = 0;  // 0
 const ImPlotPieChartFlags NORMALIZE = 1024;  // 1 << 10
 const ImPlotPieChartFlags IGNORE_HIDDEN = 2048;  // 1 << 11
+const ImPlotPieChartFlags EXPLODING = 4096;  // 1 << 12
 module ipl;
 module ipl::scale;
 const ImPlotScale LINEAR = 0;  // 0
@@ -968,6 +969,7 @@ extern fn void get_last_item_color(ImVec4* p_out) @extern("ImPlot_GetLastItemCol
 extern fn libc::Tm* get_loc_time(ImPlotTime t, libc::Tm* ptm) @extern("ImPlot_GetLocTime");
 extern fn void get_location_pos(ImVec2* p_out, ImRect outer_rect, ImVec2 inner_size, ImPlotLocation location, ImVec2 pad = {}) @extern("ImPlot_GetLocationPos");
 extern fn ZString get_marker_name(ImPlotMarker idx) @extern("ImPlot_GetMarkerName");
+extern fn CInt get_month(ImPlotTime t) @extern("ImPlot_GetMonth");
 extern fn ImPlotPlot* get_plot(ZString title) @extern("ImPlot_GetPlot");
 extern fn ImDrawList* get_plot_draw_list() @extern("ImPlot_GetPlotDrawList");
 extern fn void get_plot_limits(ImPlotRect* p_out, ImAxis x_axis = -1, ImAxis y_axis = -1) @extern("ImPlot_GetPlotLimits");
@@ -979,6 +981,7 @@ extern fn ImPlotStyle* get_style() @extern("ImPlot_GetStyle");
 extern fn ZString get_style_color_name(ImPlotCol idx) @extern("ImPlot_GetStyleColorName");
 extern fn ImU32 get_style_color_u32(ImPlotCol idx) @extern("ImPlot_GetStyleColorU32");
 extern fn void get_style_color_vec4(ImVec4* p_out, ImPlotCol idx) @extern("ImPlot_GetStyleColorVec4");
+extern fn libc::Tm* get_time(ImPlotTime t, libc::Tm* ptm) @extern("ImPlot_GetTime");
 extern fn CInt get_year(ImPlotTime t) @extern("ImPlot_GetYear");
 extern fn void hide_next_item(bool hidden = true, ImPlotCond cond = ipl::cond::ONCE) @extern("ImPlot_HideNextItem");
 extern fn bool im_almost_equal(double v1, double v2, CInt ulp = 2) @extern("ImPlot_ImAlmostEqual");
@@ -1110,9 +1113,11 @@ extern fn void map_input_default(ImPlotInputMap* dst = null) @extern("ImPlot_Map
 extern fn void map_input_reverse(ImPlotInputMap* dst = null) @extern("ImPlot_MapInputReverse");
 extern fn void mk_gmt_time(ImPlotTime* p_out, libc::Tm* ptm) @extern("ImPlot_MkGmtTime");
 extern fn void mk_loc_time(ImPlotTime* p_out, libc::Tm* ptm) @extern("ImPlot_MkLocTime");
+extern fn void mk_time(ImPlotTime* p_out, libc::Tm* ptm) @extern("ImPlot_MkTime");
 extern fn void next_colormap_color(ImVec4* p_out) @extern("ImPlot_NextColormapColor");
 extern fn ImU32 next_colormap_color_u32() @extern("ImPlot_NextColormapColorU32");
 extern fn double nice_num(double x, bool round) @extern("ImPlot_NiceNum");
+extern fn void now(ImPlotTime* p_out) @extern("ImPlot_Now");
 extern fn CInt order_of_magnitude(double val) @extern("ImPlot_OrderOfMagnitude");
 extern fn CInt order_to_precision(CInt order) @extern("ImPlot_OrderToPrecision");
 extern fn void pixels_to_plot_vec2(ImPlotPoint* p_out, ImVec2 pix, ImAxis x_axis = -1, ImAxis y_axis = -1) @extern("ImPlot_PixelsToPlot_Vec2");
@@ -1435,6 +1440,7 @@ extern fn void tag_xbool(double x, ImVec4 col, bool round = false) @extern("ImPl
 extern fn void tag_xstr(double x, ImVec4 col, ZString fmt, ...) @extern("ImPlot_TagX_Str");
 extern fn void tag_ybool(double y, ImVec4 col, bool round = false) @extern("ImPlot_TagY_Bool");
 extern fn void tag_ystr(double y, ImVec4 col, ZString fmt, ...) @extern("ImPlot_TagY_Str");
+extern fn void today(ImPlotTime* p_out) @extern("ImPlot_Today");
 extern fn double transform_forward_log10(double v, void* noname1) @extern("ImPlot_TransformForward_Log10");
 extern fn double transform_forward_logit(double v, void* noname1) @extern("ImPlot_TransformForward_Logit");
 extern fn double transform_forward_sym_log(double v, void* noname1) @extern("ImPlot_TransformForward_SymLog");

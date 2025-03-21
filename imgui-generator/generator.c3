@@ -118,13 +118,13 @@ fn void! generate_typedefs(Object* node)
             // Generate distinct alias expect for function pointers.
             if (c3_type.starts_with("fn "))
             {
-                io::printfn("def %s = %s;", alias_name, c3_type);                   
+                io::printfn("def %s = %s;", alias_name, c3_type);
             }
             else
             {
-                io::printfn("distinct %s = %s;", alias_name, c3_type);   
+                io::printfn("distinct %s = %s;", alias_name, c3_type);
             }
-        }        
+        }
     };
 }
 
@@ -138,13 +138,20 @@ fn String translate_field_name(String name)
     }
 
     DString result = dstring::temp_new();
+    // Put underscore before each initial uppercase character if not already there.
     bool last_letter_upper_or_underscore = true;
     foreach (c : name)
     {
-        if (c.is_upper() || c == '_')
+        if (c.is_upper())
         {
             if (!last_letter_upper_or_underscore) result.append_char('_');
-            result.append_char(c + 'a' - 'A');
+            result.append_char(c.to_lower());
+            last_letter_upper_or_underscore = true;
+        }
+        else if (c == '_')
+        {
+            // NOTE: This doesn't allow double underscores. Should we allow them?
+            if (!last_letter_upper_or_underscore) result.append_char('_');
             last_letter_upper_or_underscore = true;
         }
         else
@@ -163,7 +170,7 @@ fn String translate_constant_name(String name)
 {
     name = translate_field_name(name);
     name.convert_ascii_to_upper();
-    
+
     // Special treatment for constants of `ImGuiKey` which represent numbers 0, 1, 2, ...
     if (name != "" && name[0].is_digit()) return string::tformat("KEY_%s", name);
     return name;
@@ -171,7 +178,7 @@ fn String translate_constant_name(String name)
 
 // `name` is either field name or type alias name.
 fn String! translate_non_array_type(String type, String name)
-{    
+{
     type = type.trim();
     // Ignore `const`.
     type = type.strip("const ");
@@ -198,11 +205,11 @@ $if GENERATE_GUI:
             if (name == "WriteAllFn") return "Settings_WriteAllFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
-        case "void(*)(ImGuiContext* ctx,ImGuiDockNode* node,ImGuiTabBar* tab_bar)":            
+        case "void(*)(ImGuiContext* ctx,ImGuiDockNode* node,ImGuiTabBar* tab_bar)":
             if (name == "DockNodeWindowMenuHandler") return "Context_DockNodeWindowMenuHandler";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
-        case "bool(*)(ImFontAtlas* atlas)":            
+        case "bool(*)(ImFontAtlas* atlas)":
             if (name == "FontBuilder_Build") return "FontBuilder_Build";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
@@ -245,23 +252,23 @@ $if GENERATE_GUI:
         case "bool(*)(ImGuiViewport* vp)":
             if (name == "Platform_GetWindowFocus" || name == "Platform_GetWindowMinimized") return "Platform_GetWindowBoolPropFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
-            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;            
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "void(*)(ImGuiViewport* vp,const char* str)":
             if (name == "Platform_SetWindowTitle") return "Platform_SetWindowTitleFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
-            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;            
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "void(*)(ImGuiViewport* vp,float alpha)":
             if (name == "Platform_SetWindowAlpha") return "Platform_SetWindowAlphaFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
-            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;            
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "void(*)(ImGuiViewport* vp,void* render_arg)":
             if (name == "Platform_RenderWindow" || name == "Platform_SwapBuffers" || name == "Renderer_RenderWindow" || name == "Renderer_SwapBuffers") return "Platform_RenderActionFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
-            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;            
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "float(*)(ImGuiViewport* vp)":
             if (name == "Platform_GetWindowDpiScale") return "Platform_GetWindowDpiScaleFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
-            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;            
+            return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "int(*)(ImGuiViewport* vp,ImU64 vk_inst,const void* vk_allocators,ImU64* out_vk_surface)":
             if (name == "Platform_CreateVkSurface") return "Platform_CreateVkSurfaceFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
@@ -312,8 +319,8 @@ $endif
 
         // NOTE: It seems that `unsigned char` is not used for strings.
         case "unsigned char": return "char";
-        case "unsigned char*": return "char*";        
-        case "unsigned char**": return "char**";        
+        case "unsigned char*": return "char*";
+        case "unsigned char**": return "char**";
         case "char": return "char";  // NOTE: This is also applied for char arrays.
         // Maybe we shouldn't return `ZString` for `ImFont_CalcTextSizeA`.
         case "char*": return "ZString";
@@ -391,6 +398,7 @@ fn void! generate_structs_and_enums(Object* node)
             case "typenames":
             case "templates_done":
             case "templated_structs":
+            case "nonPOD":  // Not plain old data. Should we do something special with them?
                 break;
             case "structs":
                 if (!val.is_map()) return GeneratorError.INVALID_DEFINITION?;
@@ -414,7 +422,7 @@ $endif
                         if (name == "")
                         {
                             // Empty `name` means that field has union type.
-                            io::printfn("    %s", translate_maybe_array_type(type, name)!);                            
+                            io::printfn("    %s", translate_maybe_array_type(type, name)!);
                         }
                         else
                         {
@@ -431,7 +439,7 @@ $endif
                     if (!desc.is_array()) return GeneratorError.INVALID_DEFINITION?;
                     List(<Object*>) items = desc.array;
 
-                    String c3_item_type = enum_name.strip_end("_");                    
+                    String c3_item_type = enum_name.strip_end("_");
                     String c3_enum_submodule =
                         enum_name.starts_with(ENUM_PREFIX_TO_DROP) ?
                         enum_name.strip(ENUM_PREFIX_TO_DROP) :
@@ -443,7 +451,7 @@ $endif
                         enum_name.strip("Im");
                     c3_enum_submodule = translate_field_name(c3_enum_submodule.strip_end("_"));
 
-                    // Skip private enums.                    
+                    // Skip private enums.
                     if (!c3_item_type.ends_with("Private"))
                     {
                         // If original enum name doesn't end with underscore then
@@ -457,7 +465,7 @@ $endif
                             {
                                 underlying_type = enum_types_obj.get_string(c3_item_type)!;
                             }
-                            io::printfn("distinct %s = %s;", c3_item_type, translate_non_array_type(underlying_type, c3_item_type)!);                        
+                            io::printfn("distinct %s = %s;", c3_item_type, translate_non_array_type(underlying_type, c3_item_type)!);
                         }
 
                         io::printfn("module %s::%s;", current_module, c3_enum_submodule);
@@ -540,7 +548,7 @@ fn String! translate_function_argument_type(String type, String name)
         case "float[2]": return "float[2]*";
         case "float[3]": return "float[3]*";
         case "float[4]": return "float[4]*";
- 
+
          // Here we use existing typedefs `ImGuiMemAllocFunc` and `ImGuiMemFreeFunc`
         // so we should check when updating ImGui that they're in sync.
         case "void*(*)(size_t sz,void* user_data)":
@@ -551,7 +559,7 @@ fn String! translate_function_argument_type(String type, String name)
             if (name == "free_func") return "ImGuiMemFreeFunc";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
-        
+
         // Here we use custom aliases.
         case "const char*(*)(void* user_data,int idx)":
             if (name == "getter") return "GetZStringByIndexFn";
@@ -571,8 +579,8 @@ fn String! translate_function_argument_type(String type, String name)
             return GeneratorError.UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
 
         default:
-            return translate_non_array_type(type, name);   
-    }     
+            return translate_non_array_type(type, name);
+    }
 }
 
 fn void! generate_functions(Object* node)
@@ -680,7 +688,7 @@ fn void! generate_functions(Object* node)
                 String arg_name = arg.get_string("name")!;
                 if (arg_type == "..." && arg_name == "...")
                 {
-                    io::printf("...");                    
+                    io::printf("...");
                 }
                 else
                 {
@@ -828,11 +836,11 @@ fn void! generate_implot_code()
     generate_functions(obj)!;
 }
 
-fn void! main()
+fn void main()
 {
-$if GENERATE_GUI: 
-    generate_imgui_code()!;
+$if GENERATE_GUI:
+    generate_imgui_code()!!;
 $else
-    generate_implot_code()!;
+    generate_implot_code()!!;
 $endif
 }
