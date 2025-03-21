@@ -6,11 +6,10 @@ import sokol;
 extern fn void setup(Desc* desc) @extern("simgui_setup");
 extern fn void new_frame(FrameDesc* desc) @extern("simgui_new_frame");
 extern fn void render() @extern("simgui_render");
-extern fn Image make_image(ImageDesc* desc) @extern("simgui_make_image");
-extern fn void destroy_image(Image img) @extern("simgui_destroy_image");
-extern fn ImageDesc query_image_desc(Image img) @extern("simgui_query_image_desc");
-extern fn ulong imtextureid(Image img) @extern("simgui_imtextureid");
-extern fn Image image_from_imtextureid(ulong im_texture_id) @extern("simgui_image_from_imtextureid");
+extern fn ulong imtextureid(sokol::sg::Image img) @extern("simgui_imtextureid");
+extern fn ulong imtextureid_with_sampler(sokol::sg::Image img, sokol::sg::Sampler smp) @extern("simgui_imtextureid_with_sampler");
+extern fn sokol::sg::Image image_from_imtextureid(ulong imtex_id) @extern("simgui_image_from_imtextureid");
+extern fn sokol::sg::Sampler sampler_from_imtextureid(ulong imtex_id) @extern("simgui_sampler_from_imtextureid");
 extern fn void add_focus_event(bool focus) @extern("simgui_add_focus_event");
 extern fn void add_mouse_pos_event(float x, float y) @extern("simgui_add_mouse_pos_event");
 extern fn void add_touch_pos_event(float x, float y) @extern("simgui_add_touch_pos_event");
@@ -26,24 +25,10 @@ extern fn void shutdown() @extern("simgui_shutdown");
 extern fn void create_fonts_texture(FontTexDesc* desc) @extern("simgui_create_fonts_texture");
 extern fn void destroy_fonts_texture() @extern("simgui_destroy_fonts_texture");
 
-const usz INVALID_ID = 0;
-
-struct Image
-{
-    uint id;
-}
-
-struct ImageDesc
-{
-    sokol::sg::Image image;
-    sokol::sg::Sampler sampler;
-}
-
 distinct LogItem = int;
 module sokol::simgui::log_item;
 const LogItem OK = 0;
 const LogItem MALLOC_FAILED = 1;
-const LogItem IMAGE_POOL_EXHAUSTED = 2;
 module sokol::simgui;
 import sokol;
 
@@ -63,7 +48,6 @@ struct Logger
 struct Desc
 {
     CInt max_vertices;
-    CInt image_pool_size;
     sokol::sg::PixelFormat color_format;
     sokol::sg::PixelFormat depth_format;
     CInt sample_count;
