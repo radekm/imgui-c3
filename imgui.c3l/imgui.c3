@@ -4003,7 +4003,7 @@ extern fn ImGuiID get_idptr(void* ptr_id) @extern("igGetID_Ptr");
 extern fn ImGuiID get_idint(CInt int_id) @extern("igGetID_Int");
 extern fn ImGuiID get_idwith_seed_str(ZString str_id_begin, ZString str_id_end, ImGuiID seed) @extern("igGetIDWithSeed_Str");
 extern fn ImGuiID get_idwith_seed_int(CInt n, ImGuiID seed) @extern("igGetIDWithSeed_Int");
-extern fn ImGuiIO* get_ionil() @extern("igGetIO_Nil");
+extern fn ImGuiIO* get_ionil() @extern("igGetIO");
 extern fn ImGuiIO* get_iocontext_ptr(ImGuiContext* ctx) @extern("igGetIO_ContextPtr");
 extern fn ImGuiInputTextState* get_input_text_state(ImGuiID id) @extern("igGetInputTextState");
 extern fn ImGuiItemFlags get_item_flags() @extern("igGetItemFlags");
