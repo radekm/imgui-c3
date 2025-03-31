@@ -25,7 +25,7 @@ extern fn void shutdown() @extern("simgui_shutdown");
 extern fn void create_fonts_texture(FontTexDesc* desc) @extern("simgui_create_fonts_texture");
 extern fn void destroy_fonts_texture() @extern("simgui_destroy_fonts_texture");
 
-distinct LogItem = int;
+typedef LogItem = int;
 module sokol::simgui::log_item;
 const LogItem OK = 0;
 const LogItem MALLOC_FAILED = 1;
@@ -75,7 +75,7 @@ struct FontTexDesc
     sokol::sg::Filter mag_filter;
 }
 
-def AllocCb = fn void*(usz, void*);
-def FreeCb = fn void*(usz, void*);
-def LogCb = fn void(ZString, uint, uint, ZString, uint, ZString, void*);
+alias AllocCb = fn void*(usz, void*);
+alias FreeCb = fn void*(usz, void*);
+alias LogCb = fn void(ZString, uint, uint, ZString, uint, ZString, void*);
 
