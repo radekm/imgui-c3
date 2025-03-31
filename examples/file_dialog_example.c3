@@ -15,11 +15,11 @@ State state;
 
 fn void init()
 {
-    sg::setup(&&sg::Desc {
+    sg::setup(&&(sg::Desc) {
         .environment = sglue::environment(),
         .logger.func = &slog::func,
     });
-    simgui::setup(&&simgui::Desc {});
+    simgui::setup(&&(simgui::Desc) {});
     state.file_dialog = igfd::new_file_dialog();
 
     // initial clear color
@@ -28,7 +28,7 @@ fn void init()
 
 fn void frame()
 {
-    simgui::new_frame(&&simgui::FrameDesc {
+    simgui::new_frame(&&(simgui::FrameDesc) {
         .width = sapp::width(),
         .height = sapp::height(),
         .delta_time = sapp::frame_duration(),
@@ -70,7 +70,7 @@ fn void frame()
     }
     /*=== UI CODE ENDS HERE ===*/
 
-    sg::begin_pass(&&sg::Pass { .action = state.pass_action, .swapchain = sglue::swapchain() });
+    sg::begin_pass(&&(sg::Pass) { .action = state.pass_action, .swapchain = sglue::swapchain() });
     simgui::render();
     sg::end_pass();
     sg::commit();
@@ -90,7 +90,7 @@ fn void cleanup()
 
 fn void main()
 {
-    sapp::run(&&sapp::Desc {
+    sapp::run(&&(sapp::Desc) {
         .init_cb = &init,
         .frame_cb = &frame,
         .cleanup_cb = &cleanup,

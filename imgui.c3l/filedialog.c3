@@ -7,9 +7,9 @@ module igfd;
 // - functions for feature `USE_EXPLORATION_BY_KEYS`
 // - and functions for (de)serialization of bookmarks.
 
-distinct FileDialog = void;
+typedef FileDialog = void;
 
-distinct FileStyleFlags = CInt;
+typedef FileStyleFlags = CInt;
 module igfd::file_style_flags;
 const FileStyleFlags NONE                      = 0;         // define none style
 const FileStyleFlags BY_TYPE_FILE              = (1 << 0);  // define style for all files
@@ -20,7 +20,7 @@ const FileStyleFlags BY_FULL_NAME              = (1 << 4);  // define style for 
 const FileStyleFlags BY_CONTAINED_IN_FULL_NAME = (1 << 5);  // define style for file/dir/link when criteria is contained in full name
 module igfd;
 
-distinct FileDialogFlags = CInt;
+typedef FileDialogFlags = CInt;
 module igfd::file_dialog_flags;
 const FileDialogFlags NONE                                 = 0;
 const FileDialogFlags CONFIRM_OVERWRITE                    = (1 << 0);   // show confirm to overwrite dialog
@@ -45,7 +45,7 @@ const FileDialogFlags DEFAULT =
 module igfd;
 
 // flags used for GetFilePathName(flag) or GetSelection(flag)
-distinct ResultMode = CInt;
+typedef ResultMode = CInt;
 module igfd::result_mode;
 // add the file ext only if there is no file ext
 //   filter {.cpp,.h} with file :
@@ -103,7 +103,7 @@ import std;
 import ig;
 
 // Callback for display the pane.
-def PaneCb = fn void(ZString, void*, bool*);
+alias PaneCb = fn void(ZString, void*, bool*);
 
 struct FileDialogConfig
 {

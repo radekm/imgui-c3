@@ -1,6 +1,6 @@
 module ig;
 import libc;
-distinct ImStbTexteditState = void;
+typedef ImStbTexteditState = void;
 // Manually translated from cimgui.h.
 // It should be kept in sync.
 struct ImBitArrayForNamedKeys
@@ -31,118 +31,118 @@ struct ImChunkStream
 {
     ImVector buf;
 }
-def ImWchar16 = ushort;
-def ImWchar32 = ulong;
+alias ImWchar16 = ushort;
+alias ImWchar32 = ulong;
 // We don't compile ImGui with IMGUI_USE_WCHAR32 option.
 // This means that ImWchar has 2 bytes.
-def ImWchar = ImWchar16;
-def ImS8 = ichar;
-def ImS16 = short;
-def ImS32 = int;
-def ImS64 = long;
-def ImU8 = char;
-def ImU16 = ushort;
-def ImU32 = uint;
-def ImU64 = ulong;
+alias ImWchar = ImWchar16;
+alias ImS8 = ichar;
+alias ImS16 = short;
+alias ImS32 = int;
+alias ImS64 = long;
+alias ImU8 = char;
+alias ImU16 = ushort;
+alias ImU32 = uint;
+alias ImU64 = ulong;
 // Aliases for function pointers.
-def Settings_ClearAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
-def Settings_ReadInitFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
-def Settings_ReadOpenFn = fn void*(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ZString name);
-def Settings_ReadLineFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, void* entry, ZString line);
-def Settings_ApplyAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
-def Settings_WriteAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf);
-def Context_DockNodeWindowMenuHandler = fn void(ImGuiContext* ctx, ImGuiDockNode* node, ImGuiTabBar* tab_bar);
-def FontBuilder_Build = fn bool(ImFontAtlas* atlas);
-def Platform_GetClipboardTextFn = fn ZString(ImGuiContext* ctx);
-def Platform_SetClipboardTextFn = fn void(ImGuiContext* ctx, ZString text);
-def Platform_OpenInShellFn = fn bool(ImGuiContext* ctx, ZString path);
-def Platform_SetImeDataFn = fn void(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);
-def Platform_WindowActionFn = fn void(ImGuiViewport* vp);
-def Platform_SetWindowPosOrSizeFn = fn void(ImGuiViewport* vp, ImVec2 pos_or_size);
-def Platform_GetWindowPosOrSizeFn = fn ImVec2(ImGuiViewport* vp);
-def Platform_GetWindowWorkAreaInsetsFn = fn ImVec4(ImGuiViewport* vp);
-def Platform_GetWindowBoolPropFn = fn bool(ImGuiViewport* vp);
-def Platform_SetWindowTitleFn = fn void(ImGuiViewport* vp, ZString str);
-def Platform_SetWindowAlphaFn = fn void(ImGuiViewport* vp, float alpha);
-def Platform_RenderActionFn = fn void(ImGuiViewport* vp, void* render_arg);
-def Platform_GetWindowDpiScaleFn = fn float(ImGuiViewport* vp);
-def Platform_CreateVkSurfaceFn = fn CInt(ImGuiViewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);
-def SelectionStorage_AdapterIndexToStorageIdFn = fn ImGuiID(ImGuiSelectionBasicStorage* self, CInt idx);
-def SelectionStorage_AdapterSetItemSelectedFn = fn void(ImGuiSelectionExternalStorage* self, CInt idx, bool selected);
-def GetZStringByIndexFn = fn ZString(void* user_data, CInt idx);
-def CompareFn = fn CInt(void*, void*);
-def GetFloatByIndexFn = fn float(void* data, CInt idx);
-distinct ImBitArrayPtr = ImU32*;
-def ImDrawCallback = fn void(ImDrawList* parent_list, ImDrawCmd* cmd);
-distinct ImDrawFlags = CInt;
-distinct ImDrawIdx = CUShort;
-distinct ImDrawListFlags = CInt;
-distinct ImFileHandle = libc::CFile;
-distinct ImFontAtlasFlags = CInt;
-distinct ImGuiActivateFlags = CInt;
-distinct ImGuiBackendFlags = CInt;
-distinct ImGuiButtonFlags = CInt;
-distinct ImGuiChildFlags = CInt;
-distinct ImGuiCol = CInt;
-distinct ImGuiColorEditFlags = CInt;
-distinct ImGuiComboFlags = CInt;
-distinct ImGuiCond = CInt;
-distinct ImGuiConfigFlags = CInt;
-def ImGuiContextHookCallback = fn void(ImGuiContext* ctx, ImGuiContextHook* hook);
-distinct ImGuiDataAuthority = CInt;
-distinct ImGuiDataType = CInt;
-distinct ImGuiDebugLogFlags = CInt;
-distinct ImGuiDockNodeFlags = CInt;
-distinct ImGuiDragDropFlags = CInt;
-def ImGuiErrorCallback = fn void(ImGuiContext* ctx, void* user_data, char* msg);
-distinct ImGuiFocusRequestFlags = CInt;
-distinct ImGuiFocusedFlags = CInt;
-distinct ImGuiHoveredFlags = CInt;
-distinct ImGuiID = CUInt;
-distinct ImGuiInputFlags = CInt;
-def ImGuiInputTextCallback = fn int(ImGuiInputTextCallbackData* data);
-distinct ImGuiInputTextFlags = CInt;
-distinct ImGuiItemFlags = CInt;
-distinct ImGuiItemStatusFlags = CInt;
-distinct ImGuiKeyChord = CInt;
-distinct ImGuiKeyRoutingIndex = ImS16;
-distinct ImGuiLayoutType = CInt;
-distinct ImGuiLogFlags = CInt;
-def ImGuiMemAllocFunc = fn void*(usz sz, void* user_data);
-def ImGuiMemFreeFunc = fn void(void* ptr, void* user_data);
-distinct ImGuiMouseButton = CInt;
-distinct ImGuiMouseCursor = CInt;
-distinct ImGuiMultiSelectFlags = CInt;
-distinct ImGuiNavMoveFlags = CInt;
-distinct ImGuiNavRenderCursorFlags = CInt;
-distinct ImGuiNextItemDataFlags = CInt;
-distinct ImGuiNextWindowDataFlags = CInt;
-distinct ImGuiOldColumnFlags = CInt;
-distinct ImGuiPopupFlags = CInt;
-distinct ImGuiScrollFlags = CInt;
-distinct ImGuiSelectableFlags = CInt;
-distinct ImGuiSelectionUserData = ImS64;
-distinct ImGuiSeparatorFlags = CInt;
-def ImGuiSizeCallback = fn void(ImGuiSizeCallbackData* data);
-distinct ImGuiSliderFlags = CInt;
-distinct ImGuiStyleVar = CInt;
-distinct ImGuiTabBarFlags = CInt;
-distinct ImGuiTabItemFlags = CInt;
-distinct ImGuiTableBgTarget = CInt;
-distinct ImGuiTableColumnFlags = CInt;
-distinct ImGuiTableColumnIdx = ImS16;
-distinct ImGuiTableDrawChannelIdx = ImU16;
-distinct ImGuiTableFlags = CInt;
-distinct ImGuiTableRowFlags = CInt;
-distinct ImGuiTextFlags = CInt;
-distinct ImGuiTooltipFlags = CInt;
-distinct ImGuiTreeNodeFlags = CInt;
-distinct ImGuiTypingSelectFlags = CInt;
-distinct ImGuiViewportFlags = CInt;
-distinct ImGuiWindowFlags = CInt;
-distinct ImGuiWindowRefreshFlags = CInt;
-distinct ImPoolIdx = CInt;
-distinct ImTextureID = ImU64;
+alias Settings_ClearAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
+alias Settings_ReadInitFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
+alias Settings_ReadOpenFn = fn void*(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ZString name);
+alias Settings_ReadLineFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, void* entry, ZString line);
+alias Settings_ApplyAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler);
+alias Settings_WriteAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf);
+alias Context_DockNodeWindowMenuHandler = fn void(ImGuiContext* ctx, ImGuiDockNode* node, ImGuiTabBar* tab_bar);
+alias FontBuilder_Build = fn bool(ImFontAtlas* atlas);
+alias Platform_GetClipboardTextFn = fn ZString(ImGuiContext* ctx);
+alias Platform_SetClipboardTextFn = fn void(ImGuiContext* ctx, ZString text);
+alias Platform_OpenInShellFn = fn bool(ImGuiContext* ctx, ZString path);
+alias Platform_SetImeDataFn = fn void(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);
+alias Platform_WindowActionFn = fn void(ImGuiViewport* vp);
+alias Platform_SetWindowPosOrSizeFn = fn void(ImGuiViewport* vp, ImVec2 pos_or_size);
+alias Platform_GetWindowPosOrSizeFn = fn ImVec2(ImGuiViewport* vp);
+alias Platform_GetWindowWorkAreaInsetsFn = fn ImVec4(ImGuiViewport* vp);
+alias Platform_GetWindowBoolPropFn = fn bool(ImGuiViewport* vp);
+alias Platform_SetWindowTitleFn = fn void(ImGuiViewport* vp, ZString str);
+alias Platform_SetWindowAlphaFn = fn void(ImGuiViewport* vp, float alpha);
+alias Platform_RenderActionFn = fn void(ImGuiViewport* vp, void* render_arg);
+alias Platform_GetWindowDpiScaleFn = fn float(ImGuiViewport* vp);
+alias Platform_CreateVkSurfaceFn = fn CInt(ImGuiViewport* vp, ImU64 vk_inst, void* vk_allocators, ImU64* out_vk_surface);
+alias SelectionStorage_AdapterIndexToStorageIdFn = fn ImGuiID(ImGuiSelectionBasicStorage* self, CInt idx);
+alias SelectionStorage_AdapterSetItemSelectedFn = fn void(ImGuiSelectionExternalStorage* self, CInt idx, bool selected);
+alias GetZStringByIndexFn = fn ZString(void* user_data, CInt idx);
+alias CompareFn = fn CInt(void*, void*);
+alias GetFloatByIndexFn = fn float(void* data, CInt idx);
+typedef ImBitArrayPtr = ImU32*;
+alias ImDrawCallback = fn void(ImDrawList* parent_list, ImDrawCmd* cmd);
+typedef ImDrawFlags = CInt;
+typedef ImDrawIdx = CUShort;
+typedef ImDrawListFlags = CInt;
+typedef ImFileHandle = libc::CFile;
+typedef ImFontAtlasFlags = CInt;
+typedef ImGuiActivateFlags = CInt;
+typedef ImGuiBackendFlags = CInt;
+typedef ImGuiButtonFlags = CInt;
+typedef ImGuiChildFlags = CInt;
+typedef ImGuiCol = CInt;
+typedef ImGuiColorEditFlags = CInt;
+typedef ImGuiComboFlags = CInt;
+typedef ImGuiCond = CInt;
+typedef ImGuiConfigFlags = CInt;
+alias ImGuiContextHookCallback = fn void(ImGuiContext* ctx, ImGuiContextHook* hook);
+typedef ImGuiDataAuthority = CInt;
+typedef ImGuiDataType = CInt;
+typedef ImGuiDebugLogFlags = CInt;
+typedef ImGuiDockNodeFlags = CInt;
+typedef ImGuiDragDropFlags = CInt;
+alias ImGuiErrorCallback = fn void(ImGuiContext* ctx, void* user_data, char* msg);
+typedef ImGuiFocusRequestFlags = CInt;
+typedef ImGuiFocusedFlags = CInt;
+typedef ImGuiHoveredFlags = CInt;
+typedef ImGuiID = CUInt;
+typedef ImGuiInputFlags = CInt;
+alias ImGuiInputTextCallback = fn int(ImGuiInputTextCallbackData* data);
+typedef ImGuiInputTextFlags = CInt;
+typedef ImGuiItemFlags = CInt;
+typedef ImGuiItemStatusFlags = CInt;
+typedef ImGuiKeyChord = CInt;
+typedef ImGuiKeyRoutingIndex = ImS16;
+typedef ImGuiLayoutType = CInt;
+typedef ImGuiLogFlags = CInt;
+alias ImGuiMemAllocFunc = fn void*(usz sz, void* user_data);
+alias ImGuiMemFreeFunc = fn void(void* ptr, void* user_data);
+typedef ImGuiMouseButton = CInt;
+typedef ImGuiMouseCursor = CInt;
+typedef ImGuiMultiSelectFlags = CInt;
+typedef ImGuiNavMoveFlags = CInt;
+typedef ImGuiNavRenderCursorFlags = CInt;
+typedef ImGuiNextItemDataFlags = CInt;
+typedef ImGuiNextWindowDataFlags = CInt;
+typedef ImGuiOldColumnFlags = CInt;
+typedef ImGuiPopupFlags = CInt;
+typedef ImGuiScrollFlags = CInt;
+typedef ImGuiSelectableFlags = CInt;
+typedef ImGuiSelectionUserData = ImS64;
+typedef ImGuiSeparatorFlags = CInt;
+alias ImGuiSizeCallback = fn void(ImGuiSizeCallbackData* data);
+typedef ImGuiSliderFlags = CInt;
+typedef ImGuiStyleVar = CInt;
+typedef ImGuiTabBarFlags = CInt;
+typedef ImGuiTabItemFlags = CInt;
+typedef ImGuiTableBgTarget = CInt;
+typedef ImGuiTableColumnFlags = CInt;
+typedef ImGuiTableColumnIdx = ImS16;
+typedef ImGuiTableDrawChannelIdx = ImU16;
+typedef ImGuiTableFlags = CInt;
+typedef ImGuiTableRowFlags = CInt;
+typedef ImGuiTextFlags = CInt;
+typedef ImGuiTooltipFlags = CInt;
+typedef ImGuiTreeNodeFlags = CInt;
+typedef ImGuiTypingSelectFlags = CInt;
+typedef ImGuiViewportFlags = CInt;
+typedef ImGuiWindowFlags = CInt;
+typedef ImGuiWindowRefreshFlags = CInt;
+typedef ImPoolIdx = CInt;
+typedef ImTextureID = ImU64;
 module ig::draw_flags;
 const ImDrawFlags NONE = 0;  // 0
 const ImDrawFlags CLOSED = 1;  // 1 << 0
@@ -180,7 +180,7 @@ const ImGuiActivateFlags TRY_TO_PRESERVE_STATE = 4;  // 1 << 2
 const ImGuiActivateFlags FROM_TABBING = 8;  // 1 << 3
 const ImGuiActivateFlags FROM_SHORTCUT = 16;  // 1 << 4
 module ig;
-distinct ImGuiAxis = CInt;
+typedef ImGuiAxis = CInt;
 module ig::axis;
 const ImGuiAxis NONE = -1;  // -1
 const ImGuiAxis X = 0;  // 0
@@ -343,7 +343,7 @@ const ImGuiConfigFlags DPI_ENABLE_SCALE_FONTS = 32768;  // 1 << 15
 const ImGuiConfigFlags IS_SRGB = 1048576;  // 1 << 20
 const ImGuiConfigFlags IS_TOUCH_SCREEN = 2097152;  // 1 << 21
 module ig;
-distinct ImGuiContextHookType = CInt;
+typedef ImGuiContextHookType = CInt;
 module ig::context_hook_type;
 const ImGuiContextHookType NEW_FRAME_PRE = 0;  // 0
 const ImGuiContextHookType NEW_FRAME_POST = 1;  // 1
@@ -392,7 +392,7 @@ const ImGuiDebugLogFlags EVENT_MASK_ = 4095;  // ImGuiDebugLogFlags_EventError |
 const ImGuiDebugLogFlags OUTPUT_TO_TTY = 1048576;  // 1 << 20
 const ImGuiDebugLogFlags OUTPUT_TO_TEST_ENGINE = 2097152;  // 1 << 21
 module ig;
-distinct ImGuiDir = CInt;
+typedef ImGuiDir = CInt;
 module ig::dir;
 const ImGuiDir NONE = -1;  // -1
 const ImGuiDir LEFT = 0;  // 0
@@ -411,7 +411,7 @@ const ImGuiDockNodeFlags NO_RESIZE = 32;  // 1 << 5
 const ImGuiDockNodeFlags AUTO_HIDE_TAB_BAR = 64;  // 1 << 6
 const ImGuiDockNodeFlags NO_UNDOCKING = 128;  // 1 << 7
 module ig;
-distinct ImGuiDockNodeState = CInt;
+typedef ImGuiDockNodeState = CInt;
 module ig::dock_node_state;
 const ImGuiDockNodeState UNKNOWN = 0;  // 0
 const ImGuiDockNodeState HOST_WINDOW_HIDDEN_BECAUSE_SINGLE_WINDOW = 1;  // 1
@@ -447,7 +447,7 @@ const ImGuiFocusedFlags NO_POPUP_HIERARCHY = 8;  // 1 << 3
 const ImGuiFocusedFlags DOCK_HIERARCHY = 16;  // 1 << 4
 const ImGuiFocusedFlags ROOT_AND_CHILD_WINDOWS = 3;  // ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows
 module ig;
-distinct ImGuiFreeTypeBuilderFlags = CInt;
+typedef ImGuiFreeTypeBuilderFlags = CInt;
 module ig::free_type_builder_flags;
 const ImGuiFreeTypeBuilderFlags NO_HINTING = 1;  // 1 << 0
 const ImGuiFreeTypeBuilderFlags NO_AUTO_HINT = 2;  // 1 << 1
@@ -483,7 +483,7 @@ const ImGuiHoveredFlags DELAY_SHORT = 32768;  // 1 << 15
 const ImGuiHoveredFlags DELAY_NORMAL = 65536;  // 1 << 16
 const ImGuiHoveredFlags NO_SHARED_DELAY = 131072;  // 1 << 17
 module ig;
-distinct ImGuiInputEventType = CInt;
+typedef ImGuiInputEventType = CInt;
 module ig::input_event_type;
 const ImGuiInputEventType NONE = 0;  // 0
 const ImGuiInputEventType MOUSE_POS = 1;  // 1
@@ -508,7 +508,7 @@ const ImGuiInputFlags ROUTE_UNLESS_BG_FOCUSED = 65536;  // 1 << 16
 const ImGuiInputFlags ROUTE_FROM_ROOT_WINDOW = 131072;  // 1 << 17
 const ImGuiInputFlags TOOLTIP = 262144;  // 1 << 18
 module ig;
-distinct ImGuiInputSource = CInt;
+typedef ImGuiInputSource = CInt;
 module ig::input_source;
 const ImGuiInputSource NONE = 0;  // 0
 const ImGuiInputSource MOUSE = 1;  // 1
@@ -566,7 +566,7 @@ const ImGuiItemStatusFlags VISIBLE = 256;  // 1 << 8
 const ImGuiItemStatusFlags HAS_CLIP_RECT = 512;  // 1 << 9
 const ImGuiItemStatusFlags HAS_SHORTCUT = 1024;  // 1 << 10
 module ig;
-distinct ImGuiKey = CInt;
+typedef ImGuiKey = CInt;
 module ig::key;
 const ImGuiKey NONE = 0;  // 0
 const ImGuiKey NAMED_KEY_BEGIN = 512;  // 512
@@ -738,7 +738,7 @@ module ig::layout_type;
 const ImGuiLayoutType HORIZONTAL = 0;  // 0
 const ImGuiLayoutType VERTICAL = 1;  // 1
 module ig;
-distinct ImGuiLocKey = CInt;
+typedef ImGuiLocKey = CInt;
 module ig::loc_key;
 const ImGuiLocKey VERSION_STR = 0;  // 0
 const ImGuiLocKey TABLE_SIZE_ONE = 1;  // 1
@@ -784,7 +784,7 @@ const ImGuiMouseCursor PROGRESS = 9;  // 9
 const ImGuiMouseCursor NOT_ALLOWED = 10;  // 10
 const ImGuiMouseCursor COUNT = 11;  // 11
 module ig;
-distinct ImGuiMouseSource = CInt;
+typedef ImGuiMouseSource = CInt;
 module ig::mouse_source;
 const ImGuiMouseSource MOUSE = 0;  // 0
 const ImGuiMouseSource TOUCH_SCREEN = 1;  // 1
@@ -810,7 +810,7 @@ const ImGuiMultiSelectFlags SELECT_ON_CLICK = 8192;  // 1 << 13
 const ImGuiMultiSelectFlags SELECT_ON_CLICK_RELEASE = 16384;  // 1 << 14
 const ImGuiMultiSelectFlags NAV_WRAP_X = 65536;  // 1 << 16
 module ig;
-distinct ImGuiNavLayer = CInt;
+typedef ImGuiNavLayer = CInt;
 module ig::nav_layer;
 const ImGuiNavLayer MAIN = 0;  // 0
 const ImGuiNavLayer MENU = 1;  // 1
@@ -875,7 +875,7 @@ const ImGuiOldColumnFlags NO_PRESERVE_WIDTHS = 4;  // 1 << 2
 const ImGuiOldColumnFlags NO_FORCE_WITHIN_WINDOW = 8;  // 1 << 3
 const ImGuiOldColumnFlags GROW_PARENT_CONTENTS_SIZE = 16;  // 1 << 4
 module ig;
-distinct ImGuiPlotType = CInt;
+typedef ImGuiPlotType = CInt;
 module ig::plot_type;
 const ImGuiPlotType LINES = 0;  // 0
 const ImGuiPlotType HISTOGRAM = 1;  // 1
@@ -894,7 +894,7 @@ const ImGuiPopupFlags ANY_POPUP_ID = 1024;  // 1 << 10
 const ImGuiPopupFlags ANY_POPUP_LEVEL = 2048;  // 1 << 11
 const ImGuiPopupFlags ANY_POPUP = 3072;  // ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel
 module ig;
-distinct ImGuiPopupPositionPolicy = CInt;
+typedef ImGuiPopupPositionPolicy = CInt;
 module ig::popup_position_policy;
 const ImGuiPopupPositionPolicy DEFAULT = 0;  // 0
 const ImGuiPopupPositionPolicy COMBO_BOX = 1;  // 1
@@ -921,7 +921,7 @@ const ImGuiSelectableFlags DISABLED = 8;  // 1 << 3
 const ImGuiSelectableFlags ALLOW_OVERLAP = 16;  // 1 << 4
 const ImGuiSelectableFlags HIGHLIGHT = 32;  // 1 << 5
 module ig;
-distinct ImGuiSelectionRequestType = CInt;
+typedef ImGuiSelectionRequestType = CInt;
 module ig::selection_request_type;
 const ImGuiSelectionRequestType NONE = 0;  // 0
 const ImGuiSelectionRequestType SET_ALL = 1;  // 1
@@ -945,7 +945,7 @@ const ImGuiSliderFlags NO_SPEED_TWEAKS = 2048;  // 1 << 11
 const ImGuiSliderFlags ALWAYS_CLAMP = 1536;  // ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ClampZeroRange
 const ImGuiSliderFlags INVALID_MASK_ = 1879048207;  // 0x7000000F
 module ig;
-distinct ImGuiSortDirection = ImU8;
+typedef ImGuiSortDirection = ImU8;
 module ig::sort_direction;
 const ImGuiSortDirection NONE = 0;  // 0
 const ImGuiSortDirection ASCENDING = 1;  // 1
@@ -1145,7 +1145,7 @@ const ImGuiViewportFlags CAN_HOST_OTHER_WINDOWS = 2048;  // 1 << 11
 const ImGuiViewportFlags IS_MINIMIZED = 4096;  // 1 << 12
 const ImGuiViewportFlags IS_FOCUSED = 8192;  // 1 << 13
 module ig;
-distinct ImGuiWindowDockStyleCol = CInt;
+typedef ImGuiWindowDockStyleCol = CInt;
 module ig::window_dock_style_col;
 const ImGuiWindowDockStyleCol TEXT = 0;  // 0
 const ImGuiWindowDockStyleCol TAB_HOVERED = 1;  // 1
