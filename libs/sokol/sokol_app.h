@@ -310,6 +310,16 @@
             HWND has been cast to a void pointer in order to be tunneled
             through code which doesn't include Windows.h.
 
+        const void* sapp_x11_get_window(void)
+            On Linux, get the X11 Window, otherwise a null pointer. The
+            Window has been cast to a void pointer in order to be tunneled
+            through code which doesn't include X11/Xlib.h.
+
+        const void* sapp_x11_get_display(void)
+            On Linux, get the X11 Display, otherwise a null pointer. The
+            Display has been cast to a void pointer in order to be tunneled
+            through code which doesn't include X11/Xlib.h.
+
         const void* sapp_wgpu_get_device(void)
         const void* sapp_wgpu_get_render_view(void)
         const void* sapp_wgpu_get_resolve_view(void)
@@ -324,8 +334,9 @@
 
         int sapp_gl_get_major_version(void)
         int sapp_gl_get_minor_version(void)
-            Returns the major and minor version of the GL context
-            (only for SOKOL_GLCORE, all other backends return zero here, including SOKOL_GLES3)
+        bool sapp_gl_is_gles(void)
+            Returns the major and minor version of the GL context and
+            whether the GL context is a GLES context
 
         const void* sapp_android_get_native_activity(void);
             On Android, get the native activity ANativeActivity pointer, otherwise
@@ -1808,7 +1819,7 @@ typedef struct sapp_desc {
     sapp_logger logger;                 // logging callback override (default: NO LOGGING!)
 
     // backend-specific options
-    int gl_major_version;               // override GL major and minor version (the default GL version is 4.1 on macOS, 4.3 elsewhere)
+    int gl_major_version;               // override GL/GLES major and minor version (defaults: GL4.1 (macOS) or GL4.3, GLES3.1 (Android) or GLES3.0
     int gl_minor_version;
     bool win32_console_utf8;            // if true, set the output console codepage to UTF-8
     bool win32_console_create;          // if true, attach stdout/stderr to a new console window
@@ -2000,10 +2011,17 @@ SOKOL_APP_API_DECL const void* sapp_wgpu_get_depth_stencil_view(void);
 
 /* GL: get framebuffer object */
 SOKOL_APP_API_DECL uint32_t sapp_gl_get_framebuffer(void);
-/* GL: get major version (only valid for desktop GL) */
+/* GL: get major version */
 SOKOL_APP_API_DECL int sapp_gl_get_major_version(void);
-/* GL: get minor version (only valid for desktop GL) */
+/* GL: get minor version */
 SOKOL_APP_API_DECL int sapp_gl_get_minor_version(void);
+/* GL: return true if the context is GLES */
+SOKOL_APP_API_DECL bool sapp_gl_is_gles(void);
+
+/* X11: get Window */
+SOKOL_APP_API_DECL const void* sapp_x11_get_window(void);
+/* X11: get Display */
+SOKOL_APP_API_DECL const void* sapp_x11_get_display(void);
 
 /* Android: get native activity handle */
 SOKOL_APP_API_DECL const void* sapp_android_get_native_activity(void);
@@ -2657,7 +2675,10 @@ typedef struct {
         bool tracked;
         uint8_t capture_mask;
     } mouse;
-    uint8_t raw_input_data[256];
+    struct {
+        size_t size;
+        void* ptr;
+    } raw_input_data;
 } _sapp_win32_t;
 
 #if defined(SOKOL_GLCORE)
@@ -3201,17 +3222,21 @@ _SOKOL_PRIVATE sapp_desc _sapp_desc_defaults(const sapp_desc* desc) {
     sapp_desc res = *desc;
     res.sample_count = _sapp_def(res.sample_count, 1);
     res.swap_interval = _sapp_def(res.swap_interval, 1);
-    // NOTE: can't patch the default for gl_major_version and gl_minor_version
-    // independently, because a desired version 4.0 would be patched to 4.2
-    // (or expressed differently: zero is a valid value for gl_minor_version
-    // and can't be used to indicate 'default')
     if (0 == res.gl_major_version) {
-        #if defined(_SAPP_APPLE)
+        #if defined(SOKOL_GLCORE)
             res.gl_major_version = 4;
-            res.gl_minor_version = 1;
-        #else
-            res.gl_major_version = 4;
-            res.gl_minor_version = 3;
+            #if defined(_SAPP_APPLE)
+                res.gl_minor_version = 1;
+            #else
+                res.gl_minor_version = 3;
+            #endif
+        #elif defined(SOKOL_GLES3)
+            res.gl_major_version = 3;
+            #if defined(_SAPP_ANDROID) || defined(_SAPP_LINUX)
+                res.gl_minor_version = 1;
+            #else
+                res.gl_minor_version = 0;
+            #endif
         #endif
     }
     res.html5_canvas_selector = _sapp_def(res.html5_canvas_selector, "#canvas");
@@ -4072,11 +4097,11 @@ _SOKOL_PRIVATE void _sapp_macos_frame(void) {
     #endif
     [_sapp.macos.window center];
     _sapp.valid = true;
+    NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
     if (_sapp.fullscreen) {
         /* ^^^ on GL, this already toggles a rendered frame, so set the valid flag before */
         [_sapp.macos.window toggleFullScreen:self];
     }
-    NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
     [NSApp activateIgnoringOtherApps:YES];
     [_sapp.macos.window makeKeyAndOrderFront:nil];
     _sapp_macos_update_dimensions();
@@ -6599,19 +6624,20 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
     #if defined(SOKOL_DEBUG)
         create_flags |= D3D11_CREATE_DEVICE_DEBUG;
     #endif
-    D3D_FEATURE_LEVEL feature_level;
+    D3D_FEATURE_LEVEL requested_feature_levels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+    D3D_FEATURE_LEVEL result_feature_level;
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
         NULL,                           /* pAdapter (use default) */
         D3D_DRIVER_TYPE_HARDWARE,       /* DriverType */
         NULL,                           /* Software */
         create_flags,                   /* Flags */
-        NULL,                           /* pFeatureLevels */
-        0,                              /* FeatureLevels */
+        requested_feature_levels,       /* pFeatureLevels */
+        2,                              /* FeatureLevels */
         D3D11_SDK_VERSION,              /* SDKVersion */
         sc_desc,                        /* pSwapChainDesc */
         &_sapp.d3d11.swap_chain,        /* ppSwapChain */
         &_sapp.d3d11.device,            /* ppDevice */
-        &feature_level,                 /* pFeatureLevel */
+        &result_feature_level,          /* pFeatureLevel */
         &_sapp.d3d11.device_context);   /* ppImmediateContext */
     _SOKOL_UNUSED(hr);
     #if defined(SOKOL_DEBUG)
@@ -6632,13 +6658,13 @@ _SOKOL_PRIVATE void _sapp_d3d11_create_device_and_swapchain(void) {
             D3D_DRIVER_TYPE_HARDWARE,       /* DriverType */
             NULL,                           /* Software */
             create_flags,                   /* Flags */
-            NULL,                           /* pFeatureLevels */
-            0,                              /* FeatureLevels */
+            requested_feature_levels,       /* pFeatureLevels */
+            2,                              /* FeatureLevels */
             D3D11_SDK_VERSION,              /* SDKVersion */
             sc_desc,                        /* pSwapChainDesc */
             &_sapp.d3d11.swap_chain,        /* ppSwapChain */
             &_sapp.d3d11.device,            /* ppDevice */
-            &feature_level,                 /* pFeatureLevel */
+            &result_feature_level,          /* pFeatureLevel */
             &_sapp.d3d11.device_context);   /* ppImmediateContext */
     }
     #endif
@@ -7231,6 +7257,32 @@ _SOKOL_PRIVATE void _sapp_win32_lock_mouse(bool lock) {
     _sapp.win32.mouse.requested_lock = lock;
 }
 
+_SOKOL_PRIVATE void _sapp_win32_free_raw_input_data(void) {
+    if (_sapp.win32.raw_input_data.ptr) {
+        _sapp_free(_sapp.win32.raw_input_data.ptr);
+        _sapp.win32.raw_input_data.ptr = 0;
+        _sapp.win32.raw_input_data.size = 0;
+    }
+}
+
+_SOKOL_PRIVATE void _sapp_win32_alloc_raw_input_data(size_t size) {
+    SOKOL_ASSERT(!_sapp.win32.raw_input_data.ptr);
+    SOKOL_ASSERT(size > 0);
+    _sapp.win32.raw_input_data.ptr = _sapp_malloc(size);
+    _sapp.win32.raw_input_data.size = size;
+    SOKOL_ASSERT(_sapp.win32.raw_input_data.ptr);
+}
+
+_SOKOL_PRIVATE void* _sapp_win32_ensure_raw_input_data(size_t required_size) {
+    if (required_size > _sapp.win32.raw_input_data.size) {
+        _sapp_win32_free_raw_input_data();
+        _sapp_win32_alloc_raw_input_data(required_size);
+    }
+    // we expect that malloc() returns at least 8-byte aligned memory
+    SOKOL_ASSERT((((uintptr_t)_sapp.win32.raw_input_data.ptr) & 7) == 0);
+    return _sapp.win32.raw_input_data.ptr;
+}
+
 _SOKOL_PRIVATE void _sapp_win32_do_lock_mouse(void) {
     _sapp.mouse.locked = true;
 
@@ -7646,13 +7698,18 @@ _SOKOL_PRIVATE LRESULT CALLBACK _sapp_win32_wndproc(HWND hWnd, UINT uMsg, WPARAM
                 /* raw mouse input during mouse-lock */
                 if (_sapp.mouse.locked) {
                     HRAWINPUT ri = (HRAWINPUT) lParam;
-                    UINT size = sizeof(_sapp.win32.raw_input_data);
                     // see: https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getrawinputdata
-                    if ((UINT)-1 == GetRawInputData(ri, RID_INPUT, &_sapp.win32.raw_input_data, &size, sizeof(RAWINPUTHEADER))) {
+                    // also see: https://github.com/glfw/glfw/blob/e7ea71be039836da3a98cea55ae5569cb5eb885c/src/win32_window.c#L912-L924
+
+                    // first poll for required size to alloc/grow input buffer, then get the actual data
+                    UINT size = 0;
+                    GetRawInputData(ri, RID_INPUT, NULL, &size, sizeof(RAWINPUTHEADER));
+                    void* raw_input_data_ptr = _sapp_win32_ensure_raw_input_data(size);
+                    if ((UINT)-1 == GetRawInputData(ri, RID_INPUT, raw_input_data_ptr, &size, sizeof(RAWINPUTHEADER))) {
                         _SAPP_ERROR(WIN32_GET_RAW_INPUT_DATA_FAILED);
                         break;
                     }
-                    const RAWINPUT* raw_mouse_data = (const RAWINPUT*) &_sapp.win32.raw_input_data;
+                    const RAWINPUT* raw_mouse_data = (const RAWINPUT*) raw_input_data_ptr;
                     if (raw_mouse_data->data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE) {
                         /* mouse only reports absolute position
                            NOTE: This code is untested and will most likely behave wrong in Remote Desktop sessions.
@@ -8193,6 +8250,7 @@ _SOKOL_PRIVATE void _sapp_win32_run(const sapp_desc* desc) {
     _sapp_win32_destroy_window();
     _sapp_win32_destroy_icons();
     _sapp_win32_restore_console();
+    _sapp_win32_free_raw_input_data();
     _sapp_discard_state();
 }
 
@@ -8317,7 +8375,8 @@ _SOKOL_PRIVATE bool _sapp_android_init_egl(void) {
     }
 
     EGLint ctx_attributes[] = {
-        EGL_CONTEXT_CLIENT_VERSION, 3,
+        EGL_CONTEXT_MAJOR_VERSION, _sapp.desc.gl_major_version,
+        EGL_CONTEXT_MINOR_VERSION, _sapp.desc.gl_minor_version,
         EGL_NONE,
     };
     EGLContext context = eglCreateContext(display, config, EGL_NO_CONTEXT, ctx_attributes);
@@ -10771,27 +10830,18 @@ _SOKOL_PRIVATE void _sapp_x11_create_window(Visual* visual, int depth) {
 
     int display_width = DisplayWidth(_sapp.x11.display, _sapp.x11.screen);
     int display_height = DisplayHeight(_sapp.x11.display, _sapp.x11.screen);
-    int window_width = _sapp.window_width;
-    int window_height = _sapp.window_height;
+    int window_width = (int)(_sapp.window_width * _sapp.dpi_scale);
+    int window_height = (int)(_sapp.window_height * _sapp.dpi_scale);
     if (0 == window_width) {
         window_width = (display_width * 4) / 5;
     }
     if (0 == window_height) {
         window_height = (display_height * 4) / 5;
     }
-    int window_xpos = (display_width - window_width) / 2;
-    int window_ypos = (display_height - window_height) / 2;
-    if (window_xpos < 0) {
-        window_xpos = 0;
-    }
-    if (window_ypos < 0) {
-        window_ypos = 0;
-    }
     _sapp_x11_grab_error_handler();
     _sapp.x11.window = XCreateWindow(_sapp.x11.display,
                                      _sapp.x11.root,
-                                     window_xpos,
-                                     window_ypos,
+                                     0, 0,
                                      (uint32_t)window_width,
                                      (uint32_t)window_height,
                                      0,     /* border width */
@@ -10809,17 +10859,14 @@ _SOKOL_PRIVATE void _sapp_x11_create_window(Visual* visual, int depth) {
     };
     XSetWMProtocols(_sapp.x11.display, _sapp.x11.window, protocols, 1);
 
+    // NOTE: PPosition and PSize are obsolete and ignored
     XSizeHints* hints = XAllocSizeHints();
-    hints->flags = (PWinGravity | PPosition | PSize);
-    hints->win_gravity = StaticGravity;
-    hints->x = window_xpos;
-    hints->y = window_ypos;
-    hints->width = window_width;
-    hints->height = window_height;
+    hints->flags = PWinGravity;
+    hints->win_gravity = CenterGravity;
     XSetWMNormalHints(_sapp.x11.display, _sapp.x11.window, hints);
     XFree(hints);
 
-    /* announce support for drag'n'drop */
+    // announce support for drag'n'drop
     if (_sapp.drop.enabled) {
         const Atom version = _SAPP_X11_XDND_VERSION;
         XChangeProperty(_sapp.x11.display, _sapp.x11.window, _sapp.x11.xdnd.XdndAware, XA_ATOM, 32, PropModeReplace, (unsigned char*) &version, 1);
@@ -11354,6 +11401,9 @@ _SOKOL_PRIVATE void _sapp_x11_on_selectionnotify(XEvent* event) {
             XSendEvent(_sapp.x11.display, _sapp.x11.xdnd.source, False, NoEventMask, &reply);
             XFlush(_sapp.x11.display);
         }
+        if (data) {
+            XFree(data);
+        }
     }
 }
 
@@ -11630,12 +11680,10 @@ _SOKOL_PRIVATE void _sapp_egl_init(void) {
     }
 
     EGLint ctx_attrs[] = {
+        EGL_CONTEXT_MAJOR_VERSION, _sapp.desc.gl_major_version,
+        EGL_CONTEXT_MINOR_VERSION, _sapp.desc.gl_minor_version,
         #if defined(SOKOL_GLCORE)
-            EGL_CONTEXT_MAJOR_VERSION, _sapp.desc.gl_major_version,
-            EGL_CONTEXT_MINOR_VERSION, _sapp.desc.gl_minor_version,
             EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-        #elif defined(SOKOL_GLES3)
-            EGL_CONTEXT_CLIENT_VERSION, 3,
         #endif
         EGL_NONE,
     };
@@ -12356,7 +12404,7 @@ SOKOL_API_IMPL uint32_t sapp_gl_get_framebuffer(void) {
 
 SOKOL_API_IMPL int sapp_gl_get_major_version(void) {
     SOKOL_ASSERT(_sapp.valid);
-    #if defined(SOKOL_GLCORE)
+    #if defined(_SAPP_ANY_GL)
         return _sapp.desc.gl_major_version;
     #else
         return 0;
@@ -12365,8 +12413,32 @@ SOKOL_API_IMPL int sapp_gl_get_major_version(void) {
 
 SOKOL_API_IMPL int sapp_gl_get_minor_version(void) {
     SOKOL_ASSERT(_sapp.valid);
-    #if defined(SOKOL_GLCORE)
+    #if defined(_SAPP_ANY_GL)
         return _sapp.desc.gl_minor_version;
+    #else
+        return 0;
+    #endif
+}
+
+SOKOL_API_IMPL bool sapp_gl_is_gles(void) {
+    #if defined(SOKOL_GLES3)
+        return true;
+    #else
+        return false;
+    #endif
+}
+
+SOKOL_API_IMPL const void* sapp_x11_get_window(void) {
+    #if defined(_SAPP_LINUX)
+        return (void*)_sapp.x11.window;
+    #else
+        return 0;
+    #endif
+}
+
+SOKOL_API_IMPL const void* sapp_x11_get_display(void) {
+    #if defined(_SAPP_LINUX)
+        return (void*)_sapp.x11.display;
     #else
         return 0;
     #endif
