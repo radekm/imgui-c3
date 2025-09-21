@@ -1481,6 +1481,8 @@ struct ImTextureRect
 };
 typedef struct ImVector_ImTextureRect {int Size;int Capacity;ImTextureRect* Data;} ImVector_ImTextureRect;
 
+// Temporary hotfix.
+#undef Status // X11 headers are leaking this.
 struct ImTextureData
 {
     int UniqueID;
