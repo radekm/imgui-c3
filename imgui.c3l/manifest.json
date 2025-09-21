@@ -6,7 +6,7 @@
             "linked-libraries" : ["cimgui", "cimplot", "filedialog", "c++"]
         },
         "linux-x64": {
-            "linked-libraries" : ["cimgui", "cimplot", "filedialog", "stdc++"]
+            "linked-libraries" : ["cimgui", "cimplot", "filedialog", "m", "stdc++"]
         },
         "windows-x64": {
             "linked-libraries" : ["cimgui", "cimplot", "filedialog", "imm32"]
