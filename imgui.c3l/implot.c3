@@ -1,353 +1,349 @@
 module ipl;
-typedef ImAxis = CInt;
-typedef ImPlotAxisFlags = CInt;
-typedef ImPlotBarGroupsFlags = CInt;
-typedef ImPlotBarsFlags = CInt;
-typedef ImPlotBin = CInt;
-typedef ImPlotCol = CInt;
-typedef ImPlotColormap = CInt;
-typedef ImPlotColormapScaleFlags = CInt;
-typedef ImPlotCond = CInt;
-typedef ImPlotDateFmt = CInt;
-typedef ImPlotDigitalFlags = CInt;
-typedef ImPlotDragToolFlags = CInt;
-typedef ImPlotDummyFlags = CInt;
-typedef ImPlotErrorBarsFlags = CInt;
-typedef ImPlotFlags = CInt;
-alias ImPlotFormatter = fn int(double value, ZString buff, CInt size, void* user_data);
-alias ImPlotGetter = fn ImPlotPoint(CInt idx, void* user_data);
-typedef ImPlotHeatmapFlags = CInt;
-typedef ImPlotHistogramFlags = CInt;
-typedef ImPlotImageFlags = CInt;
-typedef ImPlotInfLinesFlags = CInt;
-typedef ImPlotItemFlags = CInt;
-typedef ImPlotLegendFlags = CInt;
-typedef ImPlotLineFlags = CInt;
-typedef ImPlotLocation = CInt;
-alias ImPlotLocator = fn void(ImPlotTicker* ticker, ImPlotRange* range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data);
-typedef ImPlotMarker = CInt;
-typedef ImPlotMouseTextFlags = CInt;
-typedef ImPlotPieChartFlags = CInt;
-typedef ImPlotScale = CInt;
-typedef ImPlotScatterFlags = CInt;
-typedef ImPlotShadedFlags = CInt;
-typedef ImPlotStairsFlags = CInt;
-typedef ImPlotStemsFlags = CInt;
-typedef ImPlotStyleVar = CInt;
-typedef ImPlotSubplotFlags = CInt;
-typedef ImPlotTextFlags = CInt;
-typedef ImPlotTimeFmt = CInt;
-typedef ImPlotTimeUnit = CInt;
-alias ImPlotTransform = fn double(double value, void* user_data);
-module ipl::axis;
-const ImAxis X1 = 0;  // 0
-const ImAxis X2 = 1;  // 1
-const ImAxis X3 = 2;  // 2
-const ImAxis Y1 = 3;  // 3
-const ImAxis Y2 = 4;  // 4
-const ImAxis Y3 = 5;  // 5
-const ImAxis COUNT = 6;  // 6
-module ipl;
-module ipl::axis_flags;
-const ImPlotAxisFlags NONE = 0;  // 0
-const ImPlotAxisFlags NO_LABEL = 1;  // 1 << 0
-const ImPlotAxisFlags NO_GRID_LINES = 2;  // 1 << 1
-const ImPlotAxisFlags NO_TICK_MARKS = 4;  // 1 << 2
-const ImPlotAxisFlags NO_TICK_LABELS = 8;  // 1 << 3
-const ImPlotAxisFlags NO_INITIAL_FIT = 16;  // 1 << 4
-const ImPlotAxisFlags NO_MENUS = 32;  // 1 << 5
-const ImPlotAxisFlags NO_SIDE_SWITCH = 64;  // 1 << 6
-const ImPlotAxisFlags NO_HIGHLIGHT = 128;  // 1 << 7
-const ImPlotAxisFlags OPPOSITE = 256;  // 1 << 8
-const ImPlotAxisFlags FOREGROUND = 512;  // 1 << 9
-const ImPlotAxisFlags INVERT = 1024;  // 1 << 10
-const ImPlotAxisFlags AUTO_FIT = 2048;  // 1 << 11
-const ImPlotAxisFlags RANGE_FIT = 4096;  // 1 << 12
-const ImPlotAxisFlags PAN_STRETCH = 8192;  // 1 << 13
-const ImPlotAxisFlags LOCK_MIN = 16384;  // 1 << 14
-const ImPlotAxisFlags LOCK_MAX = 32768;  // 1 << 15
-const ImPlotAxisFlags LOCK = 49152;  // ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax
-const ImPlotAxisFlags NO_DECORATIONS = 15;  // ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels
-const ImPlotAxisFlags AUX_DEFAULT = 258;  // ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_Opposite
-module ipl;
-module ipl::bar_groups_flags;
-const ImPlotBarGroupsFlags NONE = 0;  // 0
-const ImPlotBarGroupsFlags HORIZONTAL = 1024;  // 1 << 10
-const ImPlotBarGroupsFlags STACKED = 2048;  // 1 << 11
-module ipl;
-module ipl::bars_flags;
-const ImPlotBarsFlags NONE = 0;  // 0
-const ImPlotBarsFlags HORIZONTAL = 1024;  // 1 << 10
-module ipl;
-module ipl::bin;
-const ImPlotBin SQRT = -1;  // -1
-const ImPlotBin STURGES = -2;  // -2
-const ImPlotBin RICE = -3;  // -3
-const ImPlotBin SCOTT = -4;  // -4
-module ipl;
-module ipl::col;
-const ImPlotCol LINE = 0;  // 0
-const ImPlotCol FILL = 1;  // 1
-const ImPlotCol MARKER_OUTLINE = 2;  // 2
-const ImPlotCol MARKER_FILL = 3;  // 3
-const ImPlotCol ERROR_BAR = 4;  // 4
-const ImPlotCol FRAME_BG = 5;  // 5
-const ImPlotCol PLOT_BG = 6;  // 6
-const ImPlotCol PLOT_BORDER = 7;  // 7
-const ImPlotCol LEGEND_BG = 8;  // 8
-const ImPlotCol LEGEND_BORDER = 9;  // 9
-const ImPlotCol LEGEND_TEXT = 10;  // 10
-const ImPlotCol TITLE_TEXT = 11;  // 11
-const ImPlotCol INLAY_TEXT = 12;  // 12
-const ImPlotCol AXIS_TEXT = 13;  // 13
-const ImPlotCol AXIS_GRID = 14;  // 14
-const ImPlotCol AXIS_TICK = 15;  // 15
-const ImPlotCol AXIS_BG = 16;  // 16
-const ImPlotCol AXIS_BG_HOVERED = 17;  // 17
-const ImPlotCol AXIS_BG_ACTIVE = 18;  // 18
-const ImPlotCol SELECTION = 19;  // 19
-const ImPlotCol CROSSHAIRS = 20;  // 20
-const ImPlotCol COUNT = 21;  // 21
-module ipl;
-module ipl::colormap_scale_flags;
-const ImPlotColormapScaleFlags NONE = 0;  // 0
-const ImPlotColormapScaleFlags NO_LABEL = 1;  // 1 << 0
-const ImPlotColormapScaleFlags OPPOSITE = 2;  // 1 << 1
-const ImPlotColormapScaleFlags INVERT = 4;  // 1 << 2
-module ipl;
-module ipl::colormap;
-const ImPlotColormap DEEP = 0;  // 0
-const ImPlotColormap DARK = 1;  // 1
-const ImPlotColormap PASTEL = 2;  // 2
-const ImPlotColormap PAIRED = 3;  // 3
-const ImPlotColormap VIRIDIS = 4;  // 4
-const ImPlotColormap PLASMA = 5;  // 5
-const ImPlotColormap HOT = 6;  // 6
-const ImPlotColormap COOL = 7;  // 7
-const ImPlotColormap PINK = 8;  // 8
-const ImPlotColormap JET = 9;  // 9
-const ImPlotColormap TWILIGHT = 10;  // 10
-const ImPlotColormap RD_BU = 11;  // 11
-const ImPlotColormap BR_BG = 12;  // 12
-const ImPlotColormap PI_YG = 13;  // 13
-const ImPlotColormap SPECTRAL = 14;  // 14
-const ImPlotColormap GREYS = 15;  // 15
-module ipl;
-module ipl::cond;
-const ImPlotCond NONE = 0;  // ImGuiCond_None
-const ImPlotCond ALWAYS = 1;  // ImGuiCond_Always
-const ImPlotCond ONCE = 2;  // ImGuiCond_Once
-module ipl;
-module ipl::date_fmt;
-const ImPlotDateFmt NONE = 0;  // 0
-const ImPlotDateFmt DAY_MO = 1;  // 1
-const ImPlotDateFmt DAY_MO_YR = 2;  // 2
-const ImPlotDateFmt MO_YR = 3;  // 3
-const ImPlotDateFmt MO = 4;  // 4
-const ImPlotDateFmt YR = 5;  // 5
-module ipl;
-module ipl::digital_flags;
-const ImPlotDigitalFlags NONE = 0;  // 0
-module ipl;
-module ipl::drag_tool_flags;
-const ImPlotDragToolFlags NONE = 0;  // 0
-const ImPlotDragToolFlags NO_CURSORS = 1;  // 1 << 0
-const ImPlotDragToolFlags NO_FIT = 2;  // 1 << 1
-const ImPlotDragToolFlags NO_INPUTS = 4;  // 1 << 2
-const ImPlotDragToolFlags DELAYED = 8;  // 1 << 3
-module ipl;
-module ipl::dummy_flags;
-const ImPlotDummyFlags NONE = 0;  // 0
-module ipl;
-module ipl::error_bars_flags;
-const ImPlotErrorBarsFlags NONE = 0;  // 0
-const ImPlotErrorBarsFlags HORIZONTAL = 1024;  // 1 << 10
-module ipl;
-module ipl::flags;
-const ImPlotFlags NONE = 0;  // 0
-const ImPlotFlags NO_TITLE = 1;  // 1 << 0
-const ImPlotFlags NO_LEGEND = 2;  // 1 << 1
-const ImPlotFlags NO_MOUSE_TEXT = 4;  // 1 << 2
-const ImPlotFlags NO_INPUTS = 8;  // 1 << 3
-const ImPlotFlags NO_MENUS = 16;  // 1 << 4
-const ImPlotFlags NO_BOX_SELECT = 32;  // 1 << 5
-const ImPlotFlags NO_FRAME = 64;  // 1 << 6
-const ImPlotFlags EQUAL = 128;  // 1 << 7
-const ImPlotFlags CROSSHAIRS = 256;  // 1 << 8
-const ImPlotFlags CANVAS_ONLY = 55;  // ImPlotFlags_NoTitle | ImPlotFlags_NoLegend | ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText
-module ipl;
-module ipl::heatmap_flags;
-const ImPlotHeatmapFlags NONE = 0;  // 0
-const ImPlotHeatmapFlags COL_MAJOR = 1024;  // 1 << 10
-module ipl;
-module ipl::histogram_flags;
-const ImPlotHistogramFlags NONE = 0;  // 0
-const ImPlotHistogramFlags HORIZONTAL = 1024;  // 1 << 10
-const ImPlotHistogramFlags CUMULATIVE = 2048;  // 1 << 11
-const ImPlotHistogramFlags DENSITY = 4096;  // 1 << 12
-const ImPlotHistogramFlags NO_OUTLIERS = 8192;  // 1 << 13
-const ImPlotHistogramFlags COL_MAJOR = 16384;  // 1 << 14
-module ipl;
-module ipl::image_flags;
-const ImPlotImageFlags NONE = 0;  // 0
-module ipl;
-module ipl::inf_lines_flags;
-const ImPlotInfLinesFlags NONE = 0;  // 0
-const ImPlotInfLinesFlags HORIZONTAL = 1024;  // 1 << 10
-module ipl;
-module ipl::item_flags;
-const ImPlotItemFlags NONE = 0;  // 0
-const ImPlotItemFlags NO_LEGEND = 1;  // 1 << 0
-const ImPlotItemFlags NO_FIT = 2;  // 1 << 1
-module ipl;
-module ipl::legend_flags;
-const ImPlotLegendFlags NONE = 0;  // 0
-const ImPlotLegendFlags NO_BUTTONS = 1;  // 1 << 0
-const ImPlotLegendFlags NO_HIGHLIGHT_ITEM = 2;  // 1 << 1
-const ImPlotLegendFlags NO_HIGHLIGHT_AXIS = 4;  // 1 << 2
-const ImPlotLegendFlags NO_MENUS = 8;  // 1 << 3
-const ImPlotLegendFlags OUTSIDE = 16;  // 1 << 4
-const ImPlotLegendFlags HORIZONTAL = 32;  // 1 << 5
-const ImPlotLegendFlags SORT = 64;  // 1 << 6
-module ipl;
-module ipl::line_flags;
-const ImPlotLineFlags NONE = 0;  // 0
-const ImPlotLineFlags SEGMENTS = 1024;  // 1 << 10
-const ImPlotLineFlags LOOP = 2048;  // 1 << 11
-const ImPlotLineFlags SKIP_NA_N = 4096;  // 1 << 12
-const ImPlotLineFlags NO_CLIP = 8192;  // 1 << 13
-const ImPlotLineFlags SHADED = 16384;  // 1 << 14
-module ipl;
-module ipl::location;
-const ImPlotLocation CENTER = 0;  // 0
-const ImPlotLocation NORTH = 1;  // 1 << 0
-const ImPlotLocation SOUTH = 2;  // 1 << 1
-const ImPlotLocation WEST = 4;  // 1 << 2
-const ImPlotLocation EAST = 8;  // 1 << 3
-const ImPlotLocation NORTH_WEST = 5;  // ImPlotLocation_North | ImPlotLocation_West
-const ImPlotLocation NORTH_EAST = 9;  // ImPlotLocation_North | ImPlotLocation_East
-const ImPlotLocation SOUTH_WEST = 6;  // ImPlotLocation_South | ImPlotLocation_West
-const ImPlotLocation SOUTH_EAST = 10;  // ImPlotLocation_South | ImPlotLocation_East
-module ipl;
-module ipl::marker;
-const ImPlotMarker NONE = -1;  // -1
-const ImPlotMarker CIRCLE = 0;  // 0
-const ImPlotMarker SQUARE = 1;  // 1
-const ImPlotMarker DIAMOND = 2;  // 2
-const ImPlotMarker UP = 3;  // 3
-const ImPlotMarker DOWN = 4;  // 4
-const ImPlotMarker LEFT = 5;  // 5
-const ImPlotMarker RIGHT = 6;  // 6
-const ImPlotMarker CROSS = 7;  // 7
-const ImPlotMarker PLUS = 8;  // 8
-const ImPlotMarker ASTERISK = 9;  // 9
-const ImPlotMarker COUNT = 10;  // 10
-module ipl;
-module ipl::mouse_text_flags;
-const ImPlotMouseTextFlags NONE = 0;  // 0
-const ImPlotMouseTextFlags NO_AUX_AXES = 1;  // 1 << 0
-const ImPlotMouseTextFlags NO_FORMAT = 2;  // 1 << 1
-const ImPlotMouseTextFlags SHOW_ALWAYS = 4;  // 1 << 2
-module ipl;
-module ipl::pie_chart_flags;
-const ImPlotPieChartFlags NONE = 0;  // 0
-const ImPlotPieChartFlags NORMALIZE = 1024;  // 1 << 10
-const ImPlotPieChartFlags IGNORE_HIDDEN = 2048;  // 1 << 11
-const ImPlotPieChartFlags EXPLODING = 4096;  // 1 << 12
-module ipl;
-module ipl::scale;
-const ImPlotScale LINEAR = 0;  // 0
-const ImPlotScale TIME = 1;  // 1
-const ImPlotScale LOG10 = 2;  // 2
-const ImPlotScale SYM_LOG = 3;  // 3
-module ipl;
-module ipl::scatter_flags;
-const ImPlotScatterFlags NONE = 0;  // 0
-const ImPlotScatterFlags NO_CLIP = 1024;  // 1 << 10
-module ipl;
-module ipl::shaded_flags;
-const ImPlotShadedFlags NONE = 0;  // 0
-module ipl;
-module ipl::stairs_flags;
-const ImPlotStairsFlags NONE = 0;  // 0
-const ImPlotStairsFlags PRE_STEP = 1024;  // 1 << 10
-const ImPlotStairsFlags SHADED = 2048;  // 1 << 11
-module ipl;
-module ipl::stems_flags;
-const ImPlotStemsFlags NONE = 0;  // 0
-const ImPlotStemsFlags HORIZONTAL = 1024;  // 1 << 10
-module ipl;
-module ipl::style_var;
-const ImPlotStyleVar LINE_WEIGHT = 0;  // 0
-const ImPlotStyleVar MARKER = 1;  // 1
-const ImPlotStyleVar MARKER_SIZE = 2;  // 2
-const ImPlotStyleVar MARKER_WEIGHT = 3;  // 3
-const ImPlotStyleVar FILL_ALPHA = 4;  // 4
-const ImPlotStyleVar ERROR_BAR_SIZE = 5;  // 5
-const ImPlotStyleVar ERROR_BAR_WEIGHT = 6;  // 6
-const ImPlotStyleVar DIGITAL_BIT_HEIGHT = 7;  // 7
-const ImPlotStyleVar DIGITAL_BIT_GAP = 8;  // 8
-const ImPlotStyleVar PLOT_BORDER_SIZE = 9;  // 9
-const ImPlotStyleVar MINOR_ALPHA = 10;  // 10
-const ImPlotStyleVar MAJOR_TICK_LEN = 11;  // 11
-const ImPlotStyleVar MINOR_TICK_LEN = 12;  // 12
-const ImPlotStyleVar MAJOR_TICK_SIZE = 13;  // 13
-const ImPlotStyleVar MINOR_TICK_SIZE = 14;  // 14
-const ImPlotStyleVar MAJOR_GRID_SIZE = 15;  // 15
-const ImPlotStyleVar MINOR_GRID_SIZE = 16;  // 16
-const ImPlotStyleVar PLOT_PADDING = 17;  // 17
-const ImPlotStyleVar LABEL_PADDING = 18;  // 18
-const ImPlotStyleVar LEGEND_PADDING = 19;  // 19
-const ImPlotStyleVar LEGEND_INNER_PADDING = 20;  // 20
-const ImPlotStyleVar LEGEND_SPACING = 21;  // 21
-const ImPlotStyleVar MOUSE_POS_PADDING = 22;  // 22
-const ImPlotStyleVar ANNOTATION_PADDING = 23;  // 23
-const ImPlotStyleVar FIT_PADDING = 24;  // 24
-const ImPlotStyleVar PLOT_DEFAULT_SIZE = 25;  // 25
-const ImPlotStyleVar PLOT_MIN_SIZE = 26;  // 26
-const ImPlotStyleVar COUNT = 27;  // 27
-module ipl;
-module ipl::subplot_flags;
-const ImPlotSubplotFlags NONE = 0;  // 0
-const ImPlotSubplotFlags NO_TITLE = 1;  // 1 << 0
-const ImPlotSubplotFlags NO_LEGEND = 2;  // 1 << 1
-const ImPlotSubplotFlags NO_MENUS = 4;  // 1 << 2
-const ImPlotSubplotFlags NO_RESIZE = 8;  // 1 << 3
-const ImPlotSubplotFlags NO_ALIGN = 16;  // 1 << 4
-const ImPlotSubplotFlags SHARE_ITEMS = 32;  // 1 << 5
-const ImPlotSubplotFlags LINK_ROWS = 64;  // 1 << 6
-const ImPlotSubplotFlags LINK_COLS = 128;  // 1 << 7
-const ImPlotSubplotFlags LINK_ALL_X = 256;  // 1 << 8
-const ImPlotSubplotFlags LINK_ALL_Y = 512;  // 1 << 9
-const ImPlotSubplotFlags COL_MAJOR = 1024;  // 1 << 10
-module ipl;
-module ipl::text_flags;
-const ImPlotTextFlags NONE = 0;  // 0
-const ImPlotTextFlags VERTICAL = 1024;  // 1 << 10
-module ipl;
-module ipl::time_fmt;
-const ImPlotTimeFmt NONE = 0;  // 0
-const ImPlotTimeFmt US = 1;  // 1
-const ImPlotTimeFmt SUS = 2;  // 2
-const ImPlotTimeFmt SMS = 3;  // 3
-const ImPlotTimeFmt S = 4;  // 4
-const ImPlotTimeFmt MIN_SMS = 5;  // 5
-const ImPlotTimeFmt HR_MIN_SMS = 6;  // 6
-const ImPlotTimeFmt HR_MIN_S = 7;  // 7
-const ImPlotTimeFmt HR_MIN = 8;  // 8
-const ImPlotTimeFmt HR = 9;  // 9
-module ipl;
-module ipl::time_unit;
-const ImPlotTimeUnit US = 0;  // 0
-const ImPlotTimeUnit MS = 1;  // 1
-const ImPlotTimeUnit S = 2;  // 2
-const ImPlotTimeUnit MIN = 3;  // 3
-const ImPlotTimeUnit HR = 4;  // 4
-const ImPlotTimeUnit DAY = 5;  // 5
-const ImPlotTimeUnit MO = 6;  // 6
-const ImPlotTimeUnit YR = 7;  // 7
-const ImPlotTimeUnit COUNT = 8;  // 8
-module ipl;
+enum ImAxis : const CInt
+{
+    X1 = 0,  // 0
+    X2 = 1,  // 1
+    X3 = 2,  // 2
+    Y1 = 3,  // 3
+    Y2 = 4,  // 4
+    Y3 = 5,  // 5
+    COUNT = 6,  // 6
+}
+enum ImPlotAxisFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_LABEL = 1,  // 1 << 0
+    NO_GRID_LINES = 2,  // 1 << 1
+    NO_TICK_MARKS = 4,  // 1 << 2
+    NO_TICK_LABELS = 8,  // 1 << 3
+    NO_INITIAL_FIT = 16,  // 1 << 4
+    NO_MENUS = 32,  // 1 << 5
+    NO_SIDE_SWITCH = 64,  // 1 << 6
+    NO_HIGHLIGHT = 128,  // 1 << 7
+    OPPOSITE = 256,  // 1 << 8
+    FOREGROUND = 512,  // 1 << 9
+    INVERT = 1024,  // 1 << 10
+    AUTO_FIT = 2048,  // 1 << 11
+    RANGE_FIT = 4096,  // 1 << 12
+    PAN_STRETCH = 8192,  // 1 << 13
+    LOCK_MIN = 16384,  // 1 << 14
+    LOCK_MAX = 32768,  // 1 << 15
+    LOCK = 49152,  // ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax
+    NO_DECORATIONS = 15,  // ImPlotAxisFlags_NoLabel | ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_NoTickMarks | ImPlotAxisFlags_NoTickLabels
+    AUX_DEFAULT = 258,  // ImPlotAxisFlags_NoGridLines | ImPlotAxisFlags_Opposite
+}
+enum ImPlotBarGroupsFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+    STACKED = 2048,  // 1 << 11
+}
+enum ImPlotBarsFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+}
+enum ImPlotBin : const CInt
+{
+    SQRT = -1,  // -1
+    STURGES = -2,  // -2
+    RICE = -3,  // -3
+    SCOTT = -4,  // -4
+}
+enum ImPlotCol : const CInt
+{
+    LINE = 0,  // 0
+    FILL = 1,  // 1
+    MARKER_OUTLINE = 2,  // 2
+    MARKER_FILL = 3,  // 3
+    ERROR_BAR = 4,  // 4
+    FRAME_BG = 5,  // 5
+    PLOT_BG = 6,  // 6
+    PLOT_BORDER = 7,  // 7
+    LEGEND_BG = 8,  // 8
+    LEGEND_BORDER = 9,  // 9
+    LEGEND_TEXT = 10,  // 10
+    TITLE_TEXT = 11,  // 11
+    INLAY_TEXT = 12,  // 12
+    AXIS_TEXT = 13,  // 13
+    AXIS_GRID = 14,  // 14
+    AXIS_TICK = 15,  // 15
+    AXIS_BG = 16,  // 16
+    AXIS_BG_HOVERED = 17,  // 17
+    AXIS_BG_ACTIVE = 18,  // 18
+    SELECTION = 19,  // 19
+    CROSSHAIRS = 20,  // 20
+    COUNT = 21,  // 21
+}
+enum ImPlotColormapScaleFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_LABEL = 1,  // 1 << 0
+    OPPOSITE = 2,  // 1 << 1
+    INVERT = 4,  // 1 << 2
+}
+enum ImPlotColormap : const CInt
+{
+    DEEP = 0,  // 0
+    DARK = 1,  // 1
+    PASTEL = 2,  // 2
+    PAIRED = 3,  // 3
+    VIRIDIS = 4,  // 4
+    PLASMA = 5,  // 5
+    HOT = 6,  // 6
+    COOL = 7,  // 7
+    PINK = 8,  // 8
+    JET = 9,  // 9
+    TWILIGHT = 10,  // 10
+    RD_BU = 11,  // 11
+    BR_BG = 12,  // 12
+    PI_YG = 13,  // 13
+    SPECTRAL = 14,  // 14
+    GREYS = 15,  // 15
+}
+enum ImPlotCond : const CInt
+{
+    NONE = 0,  // ImGuiCond_None
+    ALWAYS = 1,  // ImGuiCond_Always
+    ONCE = 2,  // ImGuiCond_Once
+}
+enum ImPlotDateFmt : const CInt
+{
+    NONE = 0,  // 0
+    DAY_MO = 1,  // 1
+    DAY_MO_YR = 2,  // 2
+    MO_YR = 3,  // 3
+    MO = 4,  // 4
+    YR = 5,  // 5
+}
+enum ImPlotDigitalFlags : const CInt
+{
+    NONE = 0,  // 0
+}
+enum ImPlotDragToolFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_CURSORS = 1,  // 1 << 0
+    NO_FIT = 2,  // 1 << 1
+    NO_INPUTS = 4,  // 1 << 2
+    DELAYED = 8,  // 1 << 3
+}
+enum ImPlotDummyFlags : const CInt
+{
+    NONE = 0,  // 0
+}
+enum ImPlotErrorBarsFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+}
+enum ImPlotFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_TITLE = 1,  // 1 << 0
+    NO_LEGEND = 2,  // 1 << 1
+    NO_MOUSE_TEXT = 4,  // 1 << 2
+    NO_INPUTS = 8,  // 1 << 3
+    NO_MENUS = 16,  // 1 << 4
+    NO_BOX_SELECT = 32,  // 1 << 5
+    NO_FRAME = 64,  // 1 << 6
+    EQUAL = 128,  // 1 << 7
+    CROSSHAIRS = 256,  // 1 << 8
+    CANVAS_ONLY = 55,  // ImPlotFlags_NoTitle | ImPlotFlags_NoLegend | ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText
+}
+enum ImPlotHeatmapFlags : const CInt
+{
+    NONE = 0,  // 0
+    COL_MAJOR = 1024,  // 1 << 10
+}
+enum ImPlotHistogramFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+    CUMULATIVE = 2048,  // 1 << 11
+    DENSITY = 4096,  // 1 << 12
+    NO_OUTLIERS = 8192,  // 1 << 13
+    COL_MAJOR = 16384,  // 1 << 14
+}
+enum ImPlotImageFlags : const CInt
+{
+    NONE = 0,  // 0
+}
+enum ImPlotInfLinesFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+}
+enum ImPlotItemFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_LEGEND = 1,  // 1 << 0
+    NO_FIT = 2,  // 1 << 1
+}
+enum ImPlotLegendFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_BUTTONS = 1,  // 1 << 0
+    NO_HIGHLIGHT_ITEM = 2,  // 1 << 1
+    NO_HIGHLIGHT_AXIS = 4,  // 1 << 2
+    NO_MENUS = 8,  // 1 << 3
+    OUTSIDE = 16,  // 1 << 4
+    HORIZONTAL = 32,  // 1 << 5
+    SORT = 64,  // 1 << 6
+}
+enum ImPlotLineFlags : const CInt
+{
+    NONE = 0,  // 0
+    SEGMENTS = 1024,  // 1 << 10
+    LOOP = 2048,  // 1 << 11
+    SKIP_NA_N = 4096,  // 1 << 12
+    NO_CLIP = 8192,  // 1 << 13
+    SHADED = 16384,  // 1 << 14
+}
+enum ImPlotLocation : const CInt
+{
+    CENTER = 0,  // 0
+    NORTH = 1,  // 1 << 0
+    SOUTH = 2,  // 1 << 1
+    WEST = 4,  // 1 << 2
+    EAST = 8,  // 1 << 3
+    NORTH_WEST = 5,  // ImPlotLocation_North | ImPlotLocation_West
+    NORTH_EAST = 9,  // ImPlotLocation_North | ImPlotLocation_East
+    SOUTH_WEST = 6,  // ImPlotLocation_South | ImPlotLocation_West
+    SOUTH_EAST = 10,  // ImPlotLocation_South | ImPlotLocation_East
+}
+enum ImPlotMarker : const CInt
+{
+    NONE = -1,  // -1
+    CIRCLE = 0,  // 0
+    SQUARE = 1,  // 1
+    DIAMOND = 2,  // 2
+    UP = 3,  // 3
+    DOWN = 4,  // 4
+    LEFT = 5,  // 5
+    RIGHT = 6,  // 6
+    CROSS = 7,  // 7
+    PLUS = 8,  // 8
+    ASTERISK = 9,  // 9
+    COUNT = 10,  // 10
+}
+enum ImPlotMouseTextFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_AUX_AXES = 1,  // 1 << 0
+    NO_FORMAT = 2,  // 1 << 1
+    SHOW_ALWAYS = 4,  // 1 << 2
+}
+enum ImPlotPieChartFlags : const CInt
+{
+    NONE = 0,  // 0
+    NORMALIZE = 1024,  // 1 << 10
+    IGNORE_HIDDEN = 2048,  // 1 << 11
+    EXPLODING = 4096,  // 1 << 12
+}
+enum ImPlotScale : const CInt
+{
+    LINEAR = 0,  // 0
+    TIME = 1,  // 1
+    LOG10 = 2,  // 2
+    SYM_LOG = 3,  // 3
+}
+enum ImPlotScatterFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_CLIP = 1024,  // 1 << 10
+}
+enum ImPlotShadedFlags : const CInt
+{
+    NONE = 0,  // 0
+}
+enum ImPlotStairsFlags : const CInt
+{
+    NONE = 0,  // 0
+    PRE_STEP = 1024,  // 1 << 10
+    SHADED = 2048,  // 1 << 11
+}
+enum ImPlotStemsFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1024,  // 1 << 10
+}
+enum ImPlotStyleVar : const CInt
+{
+    LINE_WEIGHT = 0,  // 0
+    MARKER = 1,  // 1
+    MARKER_SIZE = 2,  // 2
+    MARKER_WEIGHT = 3,  // 3
+    FILL_ALPHA = 4,  // 4
+    ERROR_BAR_SIZE = 5,  // 5
+    ERROR_BAR_WEIGHT = 6,  // 6
+    DIGITAL_BIT_HEIGHT = 7,  // 7
+    DIGITAL_BIT_GAP = 8,  // 8
+    PLOT_BORDER_SIZE = 9,  // 9
+    MINOR_ALPHA = 10,  // 10
+    MAJOR_TICK_LEN = 11,  // 11
+    MINOR_TICK_LEN = 12,  // 12
+    MAJOR_TICK_SIZE = 13,  // 13
+    MINOR_TICK_SIZE = 14,  // 14
+    MAJOR_GRID_SIZE = 15,  // 15
+    MINOR_GRID_SIZE = 16,  // 16
+    PLOT_PADDING = 17,  // 17
+    LABEL_PADDING = 18,  // 18
+    LEGEND_PADDING = 19,  // 19
+    LEGEND_INNER_PADDING = 20,  // 20
+    LEGEND_SPACING = 21,  // 21
+    MOUSE_POS_PADDING = 22,  // 22
+    ANNOTATION_PADDING = 23,  // 23
+    FIT_PADDING = 24,  // 24
+    PLOT_DEFAULT_SIZE = 25,  // 25
+    PLOT_MIN_SIZE = 26,  // 26
+    COUNT = 27,  // 27
+}
+enum ImPlotSubplotFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_TITLE = 1,  // 1 << 0
+    NO_LEGEND = 2,  // 1 << 1
+    NO_MENUS = 4,  // 1 << 2
+    NO_RESIZE = 8,  // 1 << 3
+    NO_ALIGN = 16,  // 1 << 4
+    SHARE_ITEMS = 32,  // 1 << 5
+    LINK_ROWS = 64,  // 1 << 6
+    LINK_COLS = 128,  // 1 << 7
+    LINK_ALL_X = 256,  // 1 << 8
+    LINK_ALL_Y = 512,  // 1 << 9
+    COL_MAJOR = 1024,  // 1 << 10
+}
+enum ImPlotTextFlags : const CInt
+{
+    NONE = 0,  // 0
+    VERTICAL = 1024,  // 1 << 10
+}
+enum ImPlotTimeFmt : const CInt
+{
+    NONE = 0,  // 0
+    US = 1,  // 1
+    SUS = 2,  // 2
+    SMS = 3,  // 3
+    S = 4,  // 4
+    MIN_SMS = 5,  // 5
+    HR_MIN_SMS = 6,  // 6
+    HR_MIN_S = 7,  // 7
+    HR_MIN = 8,  // 8
+    HR = 9,  // 9
+}
+enum ImPlotTimeUnit : const CInt
+{
+    US = 0,  // 0
+    MS = 1,  // 1
+    S = 2,  // 2
+    MIN = 3,  // 3
+    HR = 4,  // 4
+    DAY = 5,  // 5
+    MO = 6,  // 6
+    YR = 7,  // 7
+    COUNT = 8,  // 8
+}
 import libc;
 import ig;
 struct Formatter_Time_Data
@@ -554,12 +550,12 @@ struct ImPlotNextItemData
 }
 struct ImPlotNextPlotData
 {
-    ImPlotCond[(usz)ipl::axis::COUNT] range_cond;
-    ImPlotRange[(usz)ipl::axis::COUNT] range;
-    bool[(usz)ipl::axis::COUNT] has_range;
-    bool[(usz)ipl::axis::COUNT] fit;
-    double*[(usz)ipl::axis::COUNT] linked_min;
-    double*[(usz)ipl::axis::COUNT] linked_max;
+    ImPlotCond[(usz)ImAxis.COUNT] range_cond;
+    ImPlotRange[(usz)ImAxis.COUNT] range;
+    bool[(usz)ImAxis.COUNT] has_range;
+    bool[(usz)ImAxis.COUNT] fit;
+    double*[(usz)ImAxis.COUNT] linked_min;
+    double*[(usz)ImAxis.COUNT] linked_max;
 }
 struct ImPlotPlot
 {
@@ -568,7 +564,7 @@ struct ImPlotPlot
     ImPlotFlags previous_flags;
     ImPlotLocation mouse_text_location;
     ImPlotMouseTextFlags mouse_text_flags;
-    ImPlotAxis[(usz)ipl::axis::COUNT] axes;
+    ImPlotAxis[(usz)ImAxis.COUNT] axes;
     ImGuiTextBuffer text_buffer;
     ImPlotItemGroup items;
     ImAxis current_x;
@@ -641,7 +637,7 @@ struct ImPlotStyle
     ImVec2 fit_padding;
     ImVec2 plot_default_size;
     ImVec2 plot_min_size;
-    ImVec4[(usz)ipl::col::COUNT] colors;
+    ImVec4[(usz)ImPlotCol.COUNT] colors;
     ImPlotColormap colormap;
     bool use_local_time;
     bool use_iso8601;
@@ -707,6 +703,10 @@ struct ImPlotTime
     libc::Time_t s;
     CInt us;
 }
+alias ImPlotFormatter = fn int(double value, ZString buff, CInt size, void* user_data);
+alias ImPlotGetter = fn ImPlotPoint(CInt idx, void* user_data);
+alias ImPlotLocator = fn void(ImPlotTicker* ticker, ImPlotRange* range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data);
+alias ImPlotTransform = fn double(double value, void* user_data);
 extern fn void ImPlotAlignmentData.begin(ImPlotAlignmentData* self) @extern("ImPlotAlignmentData_Begin");
 extern fn void ImPlotAlignmentData.end(ImPlotAlignmentData* self) @extern("ImPlotAlignmentData_End");
 extern fn ImPlotAlignmentData* new_im_plot_alignment_data() @extern("ImPlotAlignmentData_ImPlotAlignmentData");

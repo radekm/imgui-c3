@@ -5,7 +5,7 @@ typedef ImStbTexteditState = void;
 // It should be kept in sync.
 struct ImBitArrayForNamedKeys
 {
-    ImU32[((usz)key::NAMED_KEY_COUNT + 31) >> 5] storage;
+    ImU32[((usz)ImGuiKey.NAMED_KEY_COUNT + 31) >> 5] storage;
 }
 // Following templated types are defined manually.
 // Hopefully their layout is same.
@@ -72,1129 +72,1111 @@ alias SelectionStorage_AdapterSetItemSelectedFn = fn void(ImGuiSelectionExternal
 alias GetZStringByIndexFn = fn ZString(void* user_data, CInt idx);
 alias CompareFn = fn CInt(void*, void*);
 alias GetFloatByIndexFn = fn float(void* data, CInt idx);
-typedef ImBitArrayPtr = ImU32*;
-alias ImDrawCallback = fn void(ImDrawList* parent_list, ImDrawCmd* cmd);
-typedef ImDrawFlags = CInt;
-typedef ImDrawIdx = CUShort;
-typedef ImDrawListFlags = CInt;
-typedef ImFileHandle = libc::CFile;
-typedef ImFontAtlasFlags = CInt;
-typedef ImGuiActivateFlags = CInt;
-typedef ImGuiBackendFlags = CInt;
-typedef ImGuiButtonFlags = CInt;
-typedef ImGuiChildFlags = CInt;
-typedef ImGuiCol = CInt;
-typedef ImGuiColorEditFlags = CInt;
-typedef ImGuiComboFlags = CInt;
-typedef ImGuiCond = CInt;
-typedef ImGuiConfigFlags = CInt;
-alias ImGuiContextHookCallback = fn void(ImGuiContext* ctx, ImGuiContextHook* hook);
-typedef ImGuiDataAuthority = CInt;
-typedef ImGuiDataType = CInt;
-typedef ImGuiDebugLogFlags = CInt;
-typedef ImGuiDockNodeFlags = CInt;
-typedef ImGuiDragDropFlags = CInt;
-alias ImGuiErrorCallback = fn void(ImGuiContext* ctx, void* user_data, char* msg);
-typedef ImGuiFocusRequestFlags = CInt;
-typedef ImGuiFocusedFlags = CInt;
-typedef ImGuiHoveredFlags = CInt;
-typedef ImGuiID = CUInt;
-typedef ImGuiInputFlags = CInt;
-alias ImGuiInputTextCallback = fn int(ImGuiInputTextCallbackData* data);
-typedef ImGuiInputTextFlags = CInt;
-typedef ImGuiItemFlags = CInt;
-typedef ImGuiItemStatusFlags = CInt;
-typedef ImGuiKeyChord = CInt;
-typedef ImGuiKeyRoutingIndex = ImS16;
-typedef ImGuiLayoutType = CInt;
-typedef ImGuiLogFlags = CInt;
-alias ImGuiMemAllocFunc = fn void*(usz sz, void* user_data);
-alias ImGuiMemFreeFunc = fn void(void* ptr, void* user_data);
-typedef ImGuiMouseButton = CInt;
-typedef ImGuiMouseCursor = CInt;
-typedef ImGuiMultiSelectFlags = CInt;
-typedef ImGuiNavMoveFlags = CInt;
-typedef ImGuiNavRenderCursorFlags = CInt;
-typedef ImGuiNextItemDataFlags = CInt;
-typedef ImGuiNextWindowDataFlags = CInt;
-typedef ImGuiOldColumnFlags = CInt;
-typedef ImGuiPopupFlags = CInt;
-typedef ImGuiScrollFlags = CInt;
-typedef ImGuiSelectableFlags = CInt;
-typedef ImGuiSelectionUserData = ImS64;
-typedef ImGuiSeparatorFlags = CInt;
-alias ImGuiSizeCallback = fn void(ImGuiSizeCallbackData* data);
-typedef ImGuiSliderFlags = CInt;
-typedef ImGuiStyleVar = CInt;
-typedef ImGuiTabBarFlags = CInt;
-typedef ImGuiTabItemFlags = CInt;
-typedef ImGuiTableBgTarget = CInt;
-typedef ImGuiTableColumnFlags = CInt;
-typedef ImGuiTableColumnIdx = ImS16;
-typedef ImGuiTableDrawChannelIdx = ImU16;
-typedef ImGuiTableFlags = CInt;
-typedef ImGuiTableRowFlags = CInt;
-typedef ImGuiTextFlags = CInt;
-typedef ImGuiTooltipFlags = CInt;
-typedef ImGuiTreeNodeFlags = CInt;
-typedef ImGuiTypingSelectFlags = CInt;
-typedef ImGuiViewportFlags = CInt;
-typedef ImGuiWindowFlags = CInt;
-typedef ImGuiWindowRefreshFlags = CInt;
-typedef ImPoolIdx = CInt;
-typedef ImTextureID = ImU64;
-module ig::draw_flags;
-const ImDrawFlags NONE = 0;  // 0
-const ImDrawFlags CLOSED = 1;  // 1 << 0
-const ImDrawFlags ROUND_CORNERS_TOP_LEFT = 16;  // 1 << 4
-const ImDrawFlags ROUND_CORNERS_TOP_RIGHT = 32;  // 1 << 5
-const ImDrawFlags ROUND_CORNERS_BOTTOM_LEFT = 64;  // 1 << 6
-const ImDrawFlags ROUND_CORNERS_BOTTOM_RIGHT = 128;  // 1 << 7
-const ImDrawFlags ROUND_CORNERS_NONE = 256;  // 1 << 8
-const ImDrawFlags ROUND_CORNERS_TOP = 48;  // ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight
-const ImDrawFlags ROUND_CORNERS_BOTTOM = 192;  // ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight
-const ImDrawFlags ROUND_CORNERS_LEFT = 80;  // ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopLeft
-const ImDrawFlags ROUND_CORNERS_RIGHT = 160;  // ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopRight
-const ImDrawFlags ROUND_CORNERS_ALL = 240;  // ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight
-const ImDrawFlags ROUND_CORNERS_DEFAULT_ = 240;  // ImDrawFlags_RoundCornersAll
-const ImDrawFlags ROUND_CORNERS_MASK_ = 496;  // ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone
-module ig;
-module ig::draw_list_flags;
-const ImDrawListFlags NONE = 0;  // 0
-const ImDrawListFlags ANTI_ALIASED_LINES = 1;  // 1 << 0
-const ImDrawListFlags ANTI_ALIASED_LINES_USE_TEX = 2;  // 1 << 1
-const ImDrawListFlags ANTI_ALIASED_FILL = 4;  // 1 << 2
-const ImDrawListFlags ALLOW_VTX_OFFSET = 8;  // 1 << 3
-module ig;
-module ig::font_atlas_flags;
-const ImFontAtlasFlags NONE = 0;  // 0
-const ImFontAtlasFlags NO_POWER_OF_TWO_HEIGHT = 1;  // 1 << 0
-const ImFontAtlasFlags NO_MOUSE_CURSORS = 2;  // 1 << 1
-const ImFontAtlasFlags NO_BAKED_LINES = 4;  // 1 << 2
-module ig;
-module ig::activate_flags;
-const ImGuiActivateFlags NONE = 0;  // 0
-const ImGuiActivateFlags PREFER_INPUT = 1;  // 1 << 0
-const ImGuiActivateFlags PREFER_TWEAK = 2;  // 1 << 1
-const ImGuiActivateFlags TRY_TO_PRESERVE_STATE = 4;  // 1 << 2
-const ImGuiActivateFlags FROM_TABBING = 8;  // 1 << 3
-const ImGuiActivateFlags FROM_SHORTCUT = 16;  // 1 << 4
-module ig;
-typedef ImGuiAxis = CInt;
-module ig::axis;
-const ImGuiAxis NONE = -1;  // -1
-const ImGuiAxis X = 0;  // 0
-const ImGuiAxis Y = 1;  // 1
-module ig;
-module ig::backend_flags;
-const ImGuiBackendFlags NONE = 0;  // 0
-const ImGuiBackendFlags HAS_GAMEPAD = 1;  // 1 << 0
-const ImGuiBackendFlags HAS_MOUSE_CURSORS = 2;  // 1 << 1
-const ImGuiBackendFlags HAS_SET_MOUSE_POS = 4;  // 1 << 2
-const ImGuiBackendFlags RENDERER_HAS_VTX_OFFSET = 8;  // 1 << 3
-const ImGuiBackendFlags PLATFORM_HAS_VIEWPORTS = 1024;  // 1 << 10
-const ImGuiBackendFlags HAS_MOUSE_HOVERED_VIEWPORT = 2048;  // 1 << 11
-const ImGuiBackendFlags RENDERER_HAS_VIEWPORTS = 4096;  // 1 << 12
-module ig;
-module ig::button_flags;
-const ImGuiButtonFlags NONE = 0;  // 0
-const ImGuiButtonFlags MOUSE_BUTTON_LEFT = 1;  // 1 << 0
-const ImGuiButtonFlags MOUSE_BUTTON_RIGHT = 2;  // 1 << 1
-const ImGuiButtonFlags MOUSE_BUTTON_MIDDLE = 4;  // 1 << 2
-const ImGuiButtonFlags MOUSE_BUTTON_MASK_ = 7;  // ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight | ImGuiButtonFlags_MouseButtonMiddle
-const ImGuiButtonFlags ENABLE_NAV = 8;  // 1 << 3
-module ig;
-module ig::child_flags;
-const ImGuiChildFlags NONE = 0;  // 0
-const ImGuiChildFlags BORDERS = 1;  // 1 << 0
-const ImGuiChildFlags ALWAYS_USE_WINDOW_PADDING = 2;  // 1 << 1
-const ImGuiChildFlags RESIZE_X = 4;  // 1 << 2
-const ImGuiChildFlags RESIZE_Y = 8;  // 1 << 3
-const ImGuiChildFlags AUTO_RESIZE_X = 16;  // 1 << 4
-const ImGuiChildFlags AUTO_RESIZE_Y = 32;  // 1 << 5
-const ImGuiChildFlags ALWAYS_AUTO_RESIZE = 64;  // 1 << 6
-const ImGuiChildFlags FRAME_STYLE = 128;  // 1 << 7
-const ImGuiChildFlags NAV_FLATTENED = 256;  // 1 << 8
-module ig;
-module ig::col;
-const ImGuiCol TEXT = 0;  // 0
-const ImGuiCol TEXT_DISABLED = 1;  // 1
-const ImGuiCol WINDOW_BG = 2;  // 2
-const ImGuiCol CHILD_BG = 3;  // 3
-const ImGuiCol POPUP_BG = 4;  // 4
-const ImGuiCol BORDER = 5;  // 5
-const ImGuiCol BORDER_SHADOW = 6;  // 6
-const ImGuiCol FRAME_BG = 7;  // 7
-const ImGuiCol FRAME_BG_HOVERED = 8;  // 8
-const ImGuiCol FRAME_BG_ACTIVE = 9;  // 9
-const ImGuiCol TITLE_BG = 10;  // 10
-const ImGuiCol TITLE_BG_ACTIVE = 11;  // 11
-const ImGuiCol TITLE_BG_COLLAPSED = 12;  // 12
-const ImGuiCol MENU_BAR_BG = 13;  // 13
-const ImGuiCol SCROLLBAR_BG = 14;  // 14
-const ImGuiCol SCROLLBAR_GRAB = 15;  // 15
-const ImGuiCol SCROLLBAR_GRAB_HOVERED = 16;  // 16
-const ImGuiCol SCROLLBAR_GRAB_ACTIVE = 17;  // 17
-const ImGuiCol CHECK_MARK = 18;  // 18
-const ImGuiCol SLIDER_GRAB = 19;  // 19
-const ImGuiCol SLIDER_GRAB_ACTIVE = 20;  // 20
-const ImGuiCol BUTTON = 21;  // 21
-const ImGuiCol BUTTON_HOVERED = 22;  // 22
-const ImGuiCol BUTTON_ACTIVE = 23;  // 23
-const ImGuiCol HEADER = 24;  // 24
-const ImGuiCol HEADER_HOVERED = 25;  // 25
-const ImGuiCol HEADER_ACTIVE = 26;  // 26
-const ImGuiCol SEPARATOR = 27;  // 27
-const ImGuiCol SEPARATOR_HOVERED = 28;  // 28
-const ImGuiCol SEPARATOR_ACTIVE = 29;  // 29
-const ImGuiCol RESIZE_GRIP = 30;  // 30
-const ImGuiCol RESIZE_GRIP_HOVERED = 31;  // 31
-const ImGuiCol RESIZE_GRIP_ACTIVE = 32;  // 32
-const ImGuiCol TAB_HOVERED = 33;  // 33
-const ImGuiCol TAB = 34;  // 34
-const ImGuiCol TAB_SELECTED = 35;  // 35
-const ImGuiCol TAB_SELECTED_OVERLINE = 36;  // 36
-const ImGuiCol TAB_DIMMED = 37;  // 37
-const ImGuiCol TAB_DIMMED_SELECTED = 38;  // 38
-const ImGuiCol TAB_DIMMED_SELECTED_OVERLINE = 39;  // 39
-const ImGuiCol DOCKING_PREVIEW = 40;  // 40
-const ImGuiCol DOCKING_EMPTY_BG = 41;  // 41
-const ImGuiCol PLOT_LINES = 42;  // 42
-const ImGuiCol PLOT_LINES_HOVERED = 43;  // 43
-const ImGuiCol PLOT_HISTOGRAM = 44;  // 44
-const ImGuiCol PLOT_HISTOGRAM_HOVERED = 45;  // 45
-const ImGuiCol TABLE_HEADER_BG = 46;  // 46
-const ImGuiCol TABLE_BORDER_STRONG = 47;  // 47
-const ImGuiCol TABLE_BORDER_LIGHT = 48;  // 48
-const ImGuiCol TABLE_ROW_BG = 49;  // 49
-const ImGuiCol TABLE_ROW_BG_ALT = 50;  // 50
-const ImGuiCol TEXT_LINK = 51;  // 51
-const ImGuiCol TEXT_SELECTED_BG = 52;  // 52
-const ImGuiCol DRAG_DROP_TARGET = 53;  // 53
-const ImGuiCol NAV_CURSOR = 54;  // 54
-const ImGuiCol NAV_WINDOWING_HIGHLIGHT = 55;  // 55
-const ImGuiCol NAV_WINDOWING_DIM_BG = 56;  // 56
-const ImGuiCol MODAL_WINDOW_DIM_BG = 57;  // 57
-const ImGuiCol COUNT = 58;  // 58
-module ig;
-module ig::color_edit_flags;
-const ImGuiColorEditFlags NONE = 0;  // 0
-const ImGuiColorEditFlags NO_ALPHA = 2;  // 1 << 1
-const ImGuiColorEditFlags NO_PICKER = 4;  // 1 << 2
-const ImGuiColorEditFlags NO_OPTIONS = 8;  // 1 << 3
-const ImGuiColorEditFlags NO_SMALL_PREVIEW = 16;  // 1 << 4
-const ImGuiColorEditFlags NO_INPUTS = 32;  // 1 << 5
-const ImGuiColorEditFlags NO_TOOLTIP = 64;  // 1 << 6
-const ImGuiColorEditFlags NO_LABEL = 128;  // 1 << 7
-const ImGuiColorEditFlags NO_SIDE_PREVIEW = 256;  // 1 << 8
-const ImGuiColorEditFlags NO_DRAG_DROP = 512;  // 1 << 9
-const ImGuiColorEditFlags NO_BORDER = 1024;  // 1 << 10
-const ImGuiColorEditFlags ALPHA_OPAQUE = 2048;  // 1 << 11
-const ImGuiColorEditFlags ALPHA_NO_BG = 4096;  // 1 << 12
-const ImGuiColorEditFlags ALPHA_PREVIEW_HALF = 8192;  // 1 << 13
-const ImGuiColorEditFlags ALPHA_BAR = 65536;  // 1 << 16
-const ImGuiColorEditFlags HDR = 524288;  // 1 << 19
-const ImGuiColorEditFlags DISPLAY_RGB = 1048576;  // 1 << 20
-const ImGuiColorEditFlags DISPLAY_HSV = 2097152;  // 1 << 21
-const ImGuiColorEditFlags DISPLAY_HEX = 4194304;  // 1 << 22
-const ImGuiColorEditFlags UINT8 = 8388608;  // 1 << 23
-const ImGuiColorEditFlags FLOAT = 16777216;  // 1 << 24
-const ImGuiColorEditFlags PICKER_HUE_BAR = 33554432;  // 1 << 25
-const ImGuiColorEditFlags PICKER_HUE_WHEEL = 67108864;  // 1 << 26
-const ImGuiColorEditFlags INPUT_RGB = 134217728;  // 1 << 27
-const ImGuiColorEditFlags INPUT_HSV = 268435456;  // 1 << 28
-const ImGuiColorEditFlags DEFAULT_OPTIONS_ = 177209344;  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar
-const ImGuiColorEditFlags ALPHA_MASK_ = 14338;  // ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaOpaque | ImGuiColorEditFlags_AlphaNoBg | ImGuiColorEditFlags_AlphaPreviewHalf
-const ImGuiColorEditFlags DISPLAY_MASK_ = 7340032;  // ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex
-const ImGuiColorEditFlags DATA_TYPE_MASK_ = 25165824;  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float
-const ImGuiColorEditFlags PICKER_MASK_ = 100663296;  // ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar
-const ImGuiColorEditFlags INPUT_MASK_ = 402653184;  // ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV
-module ig;
-module ig::combo_flags;
-const ImGuiComboFlags NONE = 0;  // 0
-const ImGuiComboFlags POPUP_ALIGN_LEFT = 1;  // 1 << 0
-const ImGuiComboFlags HEIGHT_SMALL = 2;  // 1 << 1
-const ImGuiComboFlags HEIGHT_REGULAR = 4;  // 1 << 2
-const ImGuiComboFlags HEIGHT_LARGE = 8;  // 1 << 3
-const ImGuiComboFlags HEIGHT_LARGEST = 16;  // 1 << 4
-const ImGuiComboFlags NO_ARROW_BUTTON = 32;  // 1 << 5
-const ImGuiComboFlags NO_PREVIEW = 64;  // 1 << 6
-const ImGuiComboFlags WIDTH_FIT_PREVIEW = 128;  // 1 << 7
-const ImGuiComboFlags HEIGHT_MASK_ = 30;  // ImGuiComboFlags_HeightSmall | ImGuiComboFlags_HeightRegular | ImGuiComboFlags_HeightLarge | ImGuiComboFlags_HeightLargest
-module ig;
-module ig::cond;
-const ImGuiCond NONE = 0;  // 0
-const ImGuiCond ALWAYS = 1;  // 1 << 0
-const ImGuiCond ONCE = 2;  // 1 << 1
-const ImGuiCond FIRST_USE_EVER = 4;  // 1 << 2
-const ImGuiCond APPEARING = 8;  // 1 << 3
-module ig;
-module ig::config_flags;
-const ImGuiConfigFlags NONE = 0;  // 0
-const ImGuiConfigFlags NAV_ENABLE_KEYBOARD = 1;  // 1 << 0
-const ImGuiConfigFlags NAV_ENABLE_GAMEPAD = 2;  // 1 << 1
-const ImGuiConfigFlags NO_MOUSE = 16;  // 1 << 4
-const ImGuiConfigFlags NO_MOUSE_CURSOR_CHANGE = 32;  // 1 << 5
-const ImGuiConfigFlags NO_KEYBOARD = 64;  // 1 << 6
-const ImGuiConfigFlags DOCKING_ENABLE = 128;  // 1 << 7
-const ImGuiConfigFlags VIEWPORTS_ENABLE = 1024;  // 1 << 10
-const ImGuiConfigFlags DPI_ENABLE_SCALE_VIEWPORTS = 16384;  // 1 << 14
-const ImGuiConfigFlags DPI_ENABLE_SCALE_FONTS = 32768;  // 1 << 15
-const ImGuiConfigFlags IS_SRGB = 1048576;  // 1 << 20
-const ImGuiConfigFlags IS_TOUCH_SCREEN = 2097152;  // 1 << 21
-module ig;
-typedef ImGuiContextHookType = CInt;
-module ig::context_hook_type;
-const ImGuiContextHookType NEW_FRAME_PRE = 0;  // 0
-const ImGuiContextHookType NEW_FRAME_POST = 1;  // 1
-const ImGuiContextHookType END_FRAME_PRE = 2;  // 2
-const ImGuiContextHookType END_FRAME_POST = 3;  // 3
-const ImGuiContextHookType RENDER_PRE = 4;  // 4
-const ImGuiContextHookType RENDER_POST = 5;  // 5
-const ImGuiContextHookType SHUTDOWN = 6;  // 6
-const ImGuiContextHookType PENDING_REMOVAL_ = 7;  // 7
-module ig;
-module ig::data_authority;
-const ImGuiDataAuthority AUTO = 0;  // 0
-const ImGuiDataAuthority DOCK_NODE = 1;  // 1
-const ImGuiDataAuthority WINDOW = 2;  // 2
-module ig;
-module ig::data_type;
-const ImGuiDataType S8 = 0;  // 0
-const ImGuiDataType U8 = 1;  // 1
-const ImGuiDataType S16 = 2;  // 2
-const ImGuiDataType U16 = 3;  // 3
-const ImGuiDataType S32 = 4;  // 4
-const ImGuiDataType U32 = 5;  // 5
-const ImGuiDataType S64 = 6;  // 6
-const ImGuiDataType U64 = 7;  // 7
-const ImGuiDataType FLOAT = 8;  // 8
-const ImGuiDataType DOUBLE = 9;  // 9
-const ImGuiDataType BOOL = 10;  // 10
-const ImGuiDataType STRING = 11;  // 11
-const ImGuiDataType COUNT = 12;  // 12
-module ig;
-module ig::debug_log_flags;
-const ImGuiDebugLogFlags NONE = 0;  // 0
-const ImGuiDebugLogFlags EVENT_ERROR = 1;  // 1 << 0
-const ImGuiDebugLogFlags EVENT_ACTIVE_ID = 2;  // 1 << 1
-const ImGuiDebugLogFlags EVENT_FOCUS = 4;  // 1 << 2
-const ImGuiDebugLogFlags EVENT_POPUP = 8;  // 1 << 3
-const ImGuiDebugLogFlags EVENT_NAV = 16;  // 1 << 4
-const ImGuiDebugLogFlags EVENT_CLIPPER = 32;  // 1 << 5
-const ImGuiDebugLogFlags EVENT_SELECTION = 64;  // 1 << 6
-const ImGuiDebugLogFlags EVENT_IO = 128;  // 1 << 7
-const ImGuiDebugLogFlags EVENT_FONT = 256;  // 1 << 8
-const ImGuiDebugLogFlags EVENT_INPUT_ROUTING = 512;  // 1 << 9
-const ImGuiDebugLogFlags EVENT_DOCKING = 1024;  // 1 << 10
-const ImGuiDebugLogFlags EVENT_VIEWPORT = 2048;  // 1 << 11
-const ImGuiDebugLogFlags EVENT_MASK_ = 4095;  // ImGuiDebugLogFlags_EventError | ImGuiDebugLogFlags_EventActiveId | ImGuiDebugLogFlags_EventFocus | ImGuiDebugLogFlags_EventPopup | ImGuiDebugLogFlags_EventNav | ImGuiDebugLogFlags_EventClipper | ImGuiDebugLogFlags_EventSelection | ImGuiDebugLogFlags_EventIO | ImGuiDebugLogFlags_EventFont | ImGuiDebugLogFlags_EventInputRouting | ImGuiDebugLogFlags_EventDocking | ImGuiDebugLogFlags_EventViewport
-const ImGuiDebugLogFlags OUTPUT_TO_TTY = 1048576;  // 1 << 20
-const ImGuiDebugLogFlags OUTPUT_TO_TEST_ENGINE = 2097152;  // 1 << 21
-module ig;
-typedef ImGuiDir = CInt;
-module ig::dir;
-const ImGuiDir NONE = -1;  // -1
-const ImGuiDir LEFT = 0;  // 0
-const ImGuiDir RIGHT = 1;  // 1
-const ImGuiDir UP = 2;  // 2
-const ImGuiDir DOWN = 3;  // 3
-const ImGuiDir COUNT = 4;  // 4
-module ig;
-module ig::dock_node_flags;
-const ImGuiDockNodeFlags NONE = 0;  // 0
-const ImGuiDockNodeFlags KEEP_ALIVE_ONLY = 1;  // 1 << 0
-const ImGuiDockNodeFlags NO_DOCKING_OVER_CENTRAL_NODE = 4;  // 1 << 2
-const ImGuiDockNodeFlags PASSTHRU_CENTRAL_NODE = 8;  // 1 << 3
-const ImGuiDockNodeFlags NO_DOCKING_SPLIT = 16;  // 1 << 4
-const ImGuiDockNodeFlags NO_RESIZE = 32;  // 1 << 5
-const ImGuiDockNodeFlags AUTO_HIDE_TAB_BAR = 64;  // 1 << 6
-const ImGuiDockNodeFlags NO_UNDOCKING = 128;  // 1 << 7
-module ig;
-typedef ImGuiDockNodeState = CInt;
-module ig::dock_node_state;
-const ImGuiDockNodeState UNKNOWN = 0;  // 0
-const ImGuiDockNodeState HOST_WINDOW_HIDDEN_BECAUSE_SINGLE_WINDOW = 1;  // 1
-const ImGuiDockNodeState HOST_WINDOW_HIDDEN_BECAUSE_WINDOWS_ARE_RESIZING = 2;  // 2
-const ImGuiDockNodeState HOST_WINDOW_VISIBLE = 3;  // 3
-module ig;
-module ig::drag_drop_flags;
-const ImGuiDragDropFlags NONE = 0;  // 0
-const ImGuiDragDropFlags SOURCE_NO_PREVIEW_TOOLTIP = 1;  // 1 << 0
-const ImGuiDragDropFlags SOURCE_NO_DISABLE_HOVER = 2;  // 1 << 1
-const ImGuiDragDropFlags SOURCE_NO_HOLD_TO_OPEN_OTHERS = 4;  // 1 << 2
-const ImGuiDragDropFlags SOURCE_ALLOW_NULL_ID = 8;  // 1 << 3
-const ImGuiDragDropFlags SOURCE_EXTERN = 16;  // 1 << 4
-const ImGuiDragDropFlags PAYLOAD_AUTO_EXPIRE = 32;  // 1 << 5
-const ImGuiDragDropFlags PAYLOAD_NO_CROSS_CONTEXT = 64;  // 1 << 6
-const ImGuiDragDropFlags PAYLOAD_NO_CROSS_PROCESS = 128;  // 1 << 7
-const ImGuiDragDropFlags ACCEPT_BEFORE_DELIVERY = 1024;  // 1 << 10
-const ImGuiDragDropFlags ACCEPT_NO_DRAW_DEFAULT_RECT = 2048;  // 1 << 11
-const ImGuiDragDropFlags ACCEPT_NO_PREVIEW_TOOLTIP = 4096;  // 1 << 12
-const ImGuiDragDropFlags ACCEPT_PEEK_ONLY = 3072;  // ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect
-module ig;
-module ig::focus_request_flags;
-const ImGuiFocusRequestFlags NONE = 0;  // 0
-const ImGuiFocusRequestFlags RESTORE_FOCUSED_CHILD = 1;  // 1 << 0
-const ImGuiFocusRequestFlags UNLESS_BELOW_MODAL = 2;  // 1 << 1
-module ig;
-module ig::focused_flags;
-const ImGuiFocusedFlags NONE = 0;  // 0
-const ImGuiFocusedFlags CHILD_WINDOWS = 1;  // 1 << 0
-const ImGuiFocusedFlags ROOT_WINDOW = 2;  // 1 << 1
-const ImGuiFocusedFlags ANY_WINDOW = 4;  // 1 << 2
-const ImGuiFocusedFlags NO_POPUP_HIERARCHY = 8;  // 1 << 3
-const ImGuiFocusedFlags DOCK_HIERARCHY = 16;  // 1 << 4
-const ImGuiFocusedFlags ROOT_AND_CHILD_WINDOWS = 3;  // ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows
-module ig;
-typedef ImGuiFreeTypeBuilderFlags = CInt;
-module ig::free_type_builder_flags;
-const ImGuiFreeTypeBuilderFlags NO_HINTING = 1;  // 1 << 0
-const ImGuiFreeTypeBuilderFlags NO_AUTO_HINT = 2;  // 1 << 1
-const ImGuiFreeTypeBuilderFlags FORCE_AUTO_HINT = 4;  // 1 << 2
-const ImGuiFreeTypeBuilderFlags LIGHT_HINTING = 8;  // 1 << 3
-const ImGuiFreeTypeBuilderFlags MONO_HINTING = 16;  // 1 << 4
-const ImGuiFreeTypeBuilderFlags BOLD = 32;  // 1 << 5
-const ImGuiFreeTypeBuilderFlags OBLIQUE = 64;  // 1 << 6
-const ImGuiFreeTypeBuilderFlags MONOCHROME = 128;  // 1 << 7
-const ImGuiFreeTypeBuilderFlags LOAD_COLOR = 256;  // 1 << 8
-const ImGuiFreeTypeBuilderFlags BITMAP = 512;  // 1 << 9
-module ig;
-module ig::hovered_flags;
-const ImGuiHoveredFlags NONE = 0;  // 0
-const ImGuiHoveredFlags CHILD_WINDOWS = 1;  // 1 << 0
-const ImGuiHoveredFlags ROOT_WINDOW = 2;  // 1 << 1
-const ImGuiHoveredFlags ANY_WINDOW = 4;  // 1 << 2
-const ImGuiHoveredFlags NO_POPUP_HIERARCHY = 8;  // 1 << 3
-const ImGuiHoveredFlags DOCK_HIERARCHY = 16;  // 1 << 4
-const ImGuiHoveredFlags ALLOW_WHEN_BLOCKED_BY_POPUP = 32;  // 1 << 5
-const ImGuiHoveredFlags ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = 128;  // 1 << 7
-const ImGuiHoveredFlags ALLOW_WHEN_OVERLAPPED_BY_ITEM = 256;  // 1 << 8
-const ImGuiHoveredFlags ALLOW_WHEN_OVERLAPPED_BY_WINDOW = 512;  // 1 << 9
-const ImGuiHoveredFlags ALLOW_WHEN_DISABLED = 1024;  // 1 << 10
-const ImGuiHoveredFlags NO_NAV_OVERRIDE = 2048;  // 1 << 11
-const ImGuiHoveredFlags ALLOW_WHEN_OVERLAPPED = 768;  // ImGuiHoveredFlags_AllowWhenOverlappedByItem | ImGuiHoveredFlags_AllowWhenOverlappedByWindow
-const ImGuiHoveredFlags RECT_ONLY = 928;  // ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_AllowWhenOverlapped
-const ImGuiHoveredFlags ROOT_AND_CHILD_WINDOWS = 3;  // ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
-const ImGuiHoveredFlags FOR_TOOLTIP = 4096;  // 1 << 12
-const ImGuiHoveredFlags STATIONARY = 8192;  // 1 << 13
-const ImGuiHoveredFlags DELAY_NONE = 16384;  // 1 << 14
-const ImGuiHoveredFlags DELAY_SHORT = 32768;  // 1 << 15
-const ImGuiHoveredFlags DELAY_NORMAL = 65536;  // 1 << 16
-const ImGuiHoveredFlags NO_SHARED_DELAY = 131072;  // 1 << 17
-module ig;
-typedef ImGuiInputEventType = CInt;
-module ig::input_event_type;
-const ImGuiInputEventType NONE = 0;  // 0
-const ImGuiInputEventType MOUSE_POS = 1;  // 1
-const ImGuiInputEventType MOUSE_WHEEL = 2;  // 2
-const ImGuiInputEventType MOUSE_BUTTON = 3;  // 3
-const ImGuiInputEventType MOUSE_VIEWPORT = 4;  // 4
-const ImGuiInputEventType KEY = 5;  // 5
-const ImGuiInputEventType TEXT = 6;  // 6
-const ImGuiInputEventType FOCUS = 7;  // 7
-const ImGuiInputEventType COUNT = 8;  // 8
-module ig;
-module ig::input_flags;
-const ImGuiInputFlags NONE = 0;  // 0
-const ImGuiInputFlags REPEAT = 1;  // 1 << 0
-const ImGuiInputFlags ROUTE_ACTIVE = 1024;  // 1 << 10
-const ImGuiInputFlags ROUTE_FOCUSED = 2048;  // 1 << 11
-const ImGuiInputFlags ROUTE_GLOBAL = 4096;  // 1 << 12
-const ImGuiInputFlags ROUTE_ALWAYS = 8192;  // 1 << 13
-const ImGuiInputFlags ROUTE_OVER_FOCUSED = 16384;  // 1 << 14
-const ImGuiInputFlags ROUTE_OVER_ACTIVE = 32768;  // 1 << 15
-const ImGuiInputFlags ROUTE_UNLESS_BG_FOCUSED = 65536;  // 1 << 16
-const ImGuiInputFlags ROUTE_FROM_ROOT_WINDOW = 131072;  // 1 << 17
-const ImGuiInputFlags TOOLTIP = 262144;  // 1 << 18
-module ig;
-typedef ImGuiInputSource = CInt;
-module ig::input_source;
-const ImGuiInputSource NONE = 0;  // 0
-const ImGuiInputSource MOUSE = 1;  // 1
-const ImGuiInputSource KEYBOARD = 2;  // 2
-const ImGuiInputSource GAMEPAD = 3;  // 3
-const ImGuiInputSource COUNT = 4;  // 4
-module ig;
-module ig::input_text_flags;
-const ImGuiInputTextFlags NONE = 0;  // 0
-const ImGuiInputTextFlags CHARS_DECIMAL = 1;  // 1 << 0
-const ImGuiInputTextFlags CHARS_HEXADECIMAL = 2;  // 1 << 1
-const ImGuiInputTextFlags CHARS_SCIENTIFIC = 4;  // 1 << 2
-const ImGuiInputTextFlags CHARS_UPPERCASE = 8;  // 1 << 3
-const ImGuiInputTextFlags CHARS_NO_BLANK = 16;  // 1 << 4
-const ImGuiInputTextFlags ALLOW_TAB_INPUT = 32;  // 1 << 5
-const ImGuiInputTextFlags ENTER_RETURNS_TRUE = 64;  // 1 << 6
-const ImGuiInputTextFlags ESCAPE_CLEARS_ALL = 128;  // 1 << 7
-const ImGuiInputTextFlags CTRL_ENTER_FOR_NEW_LINE = 256;  // 1 << 8
-const ImGuiInputTextFlags READ_ONLY = 512;  // 1 << 9
-const ImGuiInputTextFlags PASSWORD = 1024;  // 1 << 10
-const ImGuiInputTextFlags ALWAYS_OVERWRITE = 2048;  // 1 << 11
-const ImGuiInputTextFlags AUTO_SELECT_ALL = 4096;  // 1 << 12
-const ImGuiInputTextFlags PARSE_EMPTY_REF_VAL = 8192;  // 1 << 13
-const ImGuiInputTextFlags DISPLAY_EMPTY_REF_VAL = 16384;  // 1 << 14
-const ImGuiInputTextFlags NO_HORIZONTAL_SCROLL = 32768;  // 1 << 15
-const ImGuiInputTextFlags NO_UNDO_REDO = 65536;  // 1 << 16
-const ImGuiInputTextFlags ELIDE_LEFT = 131072;  // 1 << 17
-const ImGuiInputTextFlags CALLBACK_COMPLETION = 262144;  // 1 << 18
-const ImGuiInputTextFlags CALLBACK_HISTORY = 524288;  // 1 << 19
-const ImGuiInputTextFlags CALLBACK_ALWAYS = 1048576;  // 1 << 20
-const ImGuiInputTextFlags CALLBACK_CHAR_FILTER = 2097152;  // 1 << 21
-const ImGuiInputTextFlags CALLBACK_RESIZE = 4194304;  // 1 << 22
-const ImGuiInputTextFlags CALLBACK_EDIT = 8388608;  // 1 << 23
-module ig;
-module ig::item_flags;
-const ImGuiItemFlags NONE = 0;  // 0
-const ImGuiItemFlags NO_TAB_STOP = 1;  // 1 << 0
-const ImGuiItemFlags NO_NAV = 2;  // 1 << 1
-const ImGuiItemFlags NO_NAV_DEFAULT_FOCUS = 4;  // 1 << 2
-const ImGuiItemFlags BUTTON_REPEAT = 8;  // 1 << 3
-const ImGuiItemFlags AUTO_CLOSE_POPUPS = 16;  // 1 << 4
-const ImGuiItemFlags ALLOW_DUPLICATE_ID = 32;  // 1 << 5
-module ig;
-module ig::item_status_flags;
-const ImGuiItemStatusFlags NONE = 0;  // 0
-const ImGuiItemStatusFlags HOVERED_RECT = 1;  // 1 << 0
-const ImGuiItemStatusFlags HAS_DISPLAY_RECT = 2;  // 1 << 1
-const ImGuiItemStatusFlags EDITED = 4;  // 1 << 2
-const ImGuiItemStatusFlags TOGGLED_SELECTION = 8;  // 1 << 3
-const ImGuiItemStatusFlags TOGGLED_OPEN = 16;  // 1 << 4
-const ImGuiItemStatusFlags HAS_DEACTIVATED = 32;  // 1 << 5
-const ImGuiItemStatusFlags DEACTIVATED = 64;  // 1 << 6
-const ImGuiItemStatusFlags HOVERED_WINDOW = 128;  // 1 << 7
-const ImGuiItemStatusFlags VISIBLE = 256;  // 1 << 8
-const ImGuiItemStatusFlags HAS_CLIP_RECT = 512;  // 1 << 9
-const ImGuiItemStatusFlags HAS_SHORTCUT = 1024;  // 1 << 10
-module ig;
-typedef ImGuiKey = CInt;
-module ig::key;
-const ImGuiKey NONE = 0;  // 0
-const ImGuiKey NAMED_KEY_BEGIN = 512;  // 512
-const ImGuiKey TAB = 512;  // 512
-const ImGuiKey LEFT_ARROW = 513;  // 513
-const ImGuiKey RIGHT_ARROW = 514;  // 514
-const ImGuiKey UP_ARROW = 515;  // 515
-const ImGuiKey DOWN_ARROW = 516;  // 516
-const ImGuiKey PAGE_UP = 517;  // 517
-const ImGuiKey PAGE_DOWN = 518;  // 518
-const ImGuiKey HOME = 519;  // 519
-const ImGuiKey END = 520;  // 520
-const ImGuiKey INSERT = 521;  // 521
-const ImGuiKey DELETE = 522;  // 522
-const ImGuiKey BACKSPACE = 523;  // 523
-const ImGuiKey SPACE = 524;  // 524
-const ImGuiKey ENTER = 525;  // 525
-const ImGuiKey ESCAPE = 526;  // 526
-const ImGuiKey LEFT_CTRL = 527;  // 527
-const ImGuiKey LEFT_SHIFT = 528;  // 528
-const ImGuiKey LEFT_ALT = 529;  // 529
-const ImGuiKey LEFT_SUPER = 530;  // 530
-const ImGuiKey RIGHT_CTRL = 531;  // 531
-const ImGuiKey RIGHT_SHIFT = 532;  // 532
-const ImGuiKey RIGHT_ALT = 533;  // 533
-const ImGuiKey RIGHT_SUPER = 534;  // 534
-const ImGuiKey MENU = 535;  // 535
-const ImGuiKey KEY_0 = 536;  // 536
-const ImGuiKey KEY_1 = 537;  // 537
-const ImGuiKey KEY_2 = 538;  // 538
-const ImGuiKey KEY_3 = 539;  // 539
-const ImGuiKey KEY_4 = 540;  // 540
-const ImGuiKey KEY_5 = 541;  // 541
-const ImGuiKey KEY_6 = 542;  // 542
-const ImGuiKey KEY_7 = 543;  // 543
-const ImGuiKey KEY_8 = 544;  // 544
-const ImGuiKey KEY_9 = 545;  // 545
-const ImGuiKey A = 546;  // 546
-const ImGuiKey B = 547;  // 547
-const ImGuiKey C = 548;  // 548
-const ImGuiKey D = 549;  // 549
-const ImGuiKey E = 550;  // 550
-const ImGuiKey F = 551;  // 551
-const ImGuiKey G = 552;  // 552
-const ImGuiKey H = 553;  // 553
-const ImGuiKey I = 554;  // 554
-const ImGuiKey J = 555;  // 555
-const ImGuiKey K = 556;  // 556
-const ImGuiKey L = 557;  // 557
-const ImGuiKey M = 558;  // 558
-const ImGuiKey N = 559;  // 559
-const ImGuiKey O = 560;  // 560
-const ImGuiKey P = 561;  // 561
-const ImGuiKey Q = 562;  // 562
-const ImGuiKey R = 563;  // 563
-const ImGuiKey S = 564;  // 564
-const ImGuiKey T = 565;  // 565
-const ImGuiKey U = 566;  // 566
-const ImGuiKey V = 567;  // 567
-const ImGuiKey W = 568;  // 568
-const ImGuiKey X = 569;  // 569
-const ImGuiKey Y = 570;  // 570
-const ImGuiKey Z = 571;  // 571
-const ImGuiKey F1 = 572;  // 572
-const ImGuiKey F2 = 573;  // 573
-const ImGuiKey F3 = 574;  // 574
-const ImGuiKey F4 = 575;  // 575
-const ImGuiKey F5 = 576;  // 576
-const ImGuiKey F6 = 577;  // 577
-const ImGuiKey F7 = 578;  // 578
-const ImGuiKey F8 = 579;  // 579
-const ImGuiKey F9 = 580;  // 580
-const ImGuiKey F10 = 581;  // 581
-const ImGuiKey F11 = 582;  // 582
-const ImGuiKey F12 = 583;  // 583
-const ImGuiKey F13 = 584;  // 584
-const ImGuiKey F14 = 585;  // 585
-const ImGuiKey F15 = 586;  // 586
-const ImGuiKey F16 = 587;  // 587
-const ImGuiKey F17 = 588;  // 588
-const ImGuiKey F18 = 589;  // 589
-const ImGuiKey F19 = 590;  // 590
-const ImGuiKey F20 = 591;  // 591
-const ImGuiKey F21 = 592;  // 592
-const ImGuiKey F22 = 593;  // 593
-const ImGuiKey F23 = 594;  // 594
-const ImGuiKey F24 = 595;  // 595
-const ImGuiKey APOSTROPHE = 596;  // 596
-const ImGuiKey COMMA = 597;  // 597
-const ImGuiKey MINUS = 598;  // 598
-const ImGuiKey PERIOD = 599;  // 599
-const ImGuiKey SLASH = 600;  // 600
-const ImGuiKey SEMICOLON = 601;  // 601
-const ImGuiKey EQUAL = 602;  // 602
-const ImGuiKey LEFT_BRACKET = 603;  // 603
-const ImGuiKey BACKSLASH = 604;  // 604
-const ImGuiKey RIGHT_BRACKET = 605;  // 605
-const ImGuiKey GRAVE_ACCENT = 606;  // 606
-const ImGuiKey CAPS_LOCK = 607;  // 607
-const ImGuiKey SCROLL_LOCK = 608;  // 608
-const ImGuiKey NUM_LOCK = 609;  // 609
-const ImGuiKey PRINT_SCREEN = 610;  // 610
-const ImGuiKey PAUSE = 611;  // 611
-const ImGuiKey KEYPAD0 = 612;  // 612
-const ImGuiKey KEYPAD1 = 613;  // 613
-const ImGuiKey KEYPAD2 = 614;  // 614
-const ImGuiKey KEYPAD3 = 615;  // 615
-const ImGuiKey KEYPAD4 = 616;  // 616
-const ImGuiKey KEYPAD5 = 617;  // 617
-const ImGuiKey KEYPAD6 = 618;  // 618
-const ImGuiKey KEYPAD7 = 619;  // 619
-const ImGuiKey KEYPAD8 = 620;  // 620
-const ImGuiKey KEYPAD9 = 621;  // 621
-const ImGuiKey KEYPAD_DECIMAL = 622;  // 622
-const ImGuiKey KEYPAD_DIVIDE = 623;  // 623
-const ImGuiKey KEYPAD_MULTIPLY = 624;  // 624
-const ImGuiKey KEYPAD_SUBTRACT = 625;  // 625
-const ImGuiKey KEYPAD_ADD = 626;  // 626
-const ImGuiKey KEYPAD_ENTER = 627;  // 627
-const ImGuiKey KEYPAD_EQUAL = 628;  // 628
-const ImGuiKey APP_BACK = 629;  // 629
-const ImGuiKey APP_FORWARD = 630;  // 630
-const ImGuiKey OEM102 = 631;  // 631
-const ImGuiKey GAMEPAD_START = 632;  // 632
-const ImGuiKey GAMEPAD_BACK = 633;  // 633
-const ImGuiKey GAMEPAD_FACE_LEFT = 634;  // 634
-const ImGuiKey GAMEPAD_FACE_RIGHT = 635;  // 635
-const ImGuiKey GAMEPAD_FACE_UP = 636;  // 636
-const ImGuiKey GAMEPAD_FACE_DOWN = 637;  // 637
-const ImGuiKey GAMEPAD_DPAD_LEFT = 638;  // 638
-const ImGuiKey GAMEPAD_DPAD_RIGHT = 639;  // 639
-const ImGuiKey GAMEPAD_DPAD_UP = 640;  // 640
-const ImGuiKey GAMEPAD_DPAD_DOWN = 641;  // 641
-const ImGuiKey GAMEPAD_L1 = 642;  // 642
-const ImGuiKey GAMEPAD_R1 = 643;  // 643
-const ImGuiKey GAMEPAD_L2 = 644;  // 644
-const ImGuiKey GAMEPAD_R2 = 645;  // 645
-const ImGuiKey GAMEPAD_L3 = 646;  // 646
-const ImGuiKey GAMEPAD_R3 = 647;  // 647
-const ImGuiKey GAMEPAD_LSTICK_LEFT = 648;  // 648
-const ImGuiKey GAMEPAD_LSTICK_RIGHT = 649;  // 649
-const ImGuiKey GAMEPAD_LSTICK_UP = 650;  // 650
-const ImGuiKey GAMEPAD_LSTICK_DOWN = 651;  // 651
-const ImGuiKey GAMEPAD_RSTICK_LEFT = 652;  // 652
-const ImGuiKey GAMEPAD_RSTICK_RIGHT = 653;  // 653
-const ImGuiKey GAMEPAD_RSTICK_UP = 654;  // 654
-const ImGuiKey GAMEPAD_RSTICK_DOWN = 655;  // 655
-const ImGuiKey MOUSE_LEFT = 656;  // 656
-const ImGuiKey MOUSE_RIGHT = 657;  // 657
-const ImGuiKey MOUSE_MIDDLE = 658;  // 658
-const ImGuiKey MOUSE_X1 = 659;  // 659
-const ImGuiKey MOUSE_X2 = 660;  // 660
-const ImGuiKey MOUSE_WHEEL_X = 661;  // 661
-const ImGuiKey MOUSE_WHEEL_Y = 662;  // 662
-const ImGuiKey RESERVED_FOR_MOD_CTRL = 663;  // 663
-const ImGuiKey RESERVED_FOR_MOD_SHIFT = 664;  // 664
-const ImGuiKey RESERVED_FOR_MOD_ALT = 665;  // 665
-const ImGuiKey RESERVED_FOR_MOD_SUPER = 666;  // 666
-const ImGuiKey NAMED_KEY_END = 667;  // 667
-const ImGuiKey MOD_NONE = 0;  // 0
-const ImGuiKey MOD_CTRL = 4096;  // 1 << 12
-const ImGuiKey MOD_SHIFT = 8192;  // 1 << 13
-const ImGuiKey MOD_ALT = 16384;  // 1 << 14
-const ImGuiKey MOD_SUPER = 32768;  // 1 << 15
-const ImGuiKey MOD_MASK_ = 61440;  // 0xF000
-const ImGuiKey NAMED_KEY_COUNT = 155;  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
-module ig;
-module ig::layout_type;
-const ImGuiLayoutType HORIZONTAL = 0;  // 0
-const ImGuiLayoutType VERTICAL = 1;  // 1
-module ig;
-typedef ImGuiLocKey = CInt;
-module ig::loc_key;
-const ImGuiLocKey VERSION_STR = 0;  // 0
-const ImGuiLocKey TABLE_SIZE_ONE = 1;  // 1
-const ImGuiLocKey TABLE_SIZE_ALL_FIT = 2;  // 2
-const ImGuiLocKey TABLE_SIZE_ALL_DEFAULT = 3;  // 3
-const ImGuiLocKey TABLE_RESET_ORDER = 4;  // 4
-const ImGuiLocKey WINDOWING_MAIN_MENU_BAR = 5;  // 5
-const ImGuiLocKey WINDOWING_POPUP = 6;  // 6
-const ImGuiLocKey WINDOWING_UNTITLED = 7;  // 7
-const ImGuiLocKey OPEN_LINK_S = 8;  // 8
-const ImGuiLocKey COPY_LINK = 9;  // 9
-const ImGuiLocKey DOCKING_HIDE_TAB_BAR = 10;  // 10
-const ImGuiLocKey DOCKING_HOLD_SHIFT_TO_DOCK = 11;  // 11
-const ImGuiLocKey DOCKING_DRAG_TO_UNDOCK_OR_MOVE_NODE = 12;  // 12
-const ImGuiLocKey COUNT = 13;  // 13
-module ig;
-module ig::log_flags;
-const ImGuiLogFlags NONE = 0;  // 0
-const ImGuiLogFlags OUTPUT_TTY = 1;  // 1 << 0
-const ImGuiLogFlags OUTPUT_FILE = 2;  // 1 << 1
-const ImGuiLogFlags OUTPUT_BUFFER = 4;  // 1 << 2
-const ImGuiLogFlags OUTPUT_CLIPBOARD = 8;  // 1 << 3
-const ImGuiLogFlags OUTPUT_MASK_ = 15;  // ImGuiLogFlags_OutputTTY | ImGuiLogFlags_OutputFile | ImGuiLogFlags_OutputBuffer | ImGuiLogFlags_OutputClipboard
-module ig;
-module ig::mouse_button;
-const ImGuiMouseButton LEFT = 0;  // 0
-const ImGuiMouseButton RIGHT = 1;  // 1
-const ImGuiMouseButton MIDDLE = 2;  // 2
-const ImGuiMouseButton COUNT = 5;  // 5
-module ig;
-module ig::mouse_cursor;
-const ImGuiMouseCursor NONE = -1;  // -1
-const ImGuiMouseCursor ARROW = 0;  // 0
-const ImGuiMouseCursor TEXT_INPUT = 1;  // 1
-const ImGuiMouseCursor RESIZE_ALL = 2;  // 2
-const ImGuiMouseCursor RESIZE_NS = 3;  // 3
-const ImGuiMouseCursor RESIZE_EW = 4;  // 4
-const ImGuiMouseCursor RESIZE_NESW = 5;  // 5
-const ImGuiMouseCursor RESIZE_NWSE = 6;  // 6
-const ImGuiMouseCursor HAND = 7;  // 7
-const ImGuiMouseCursor WAIT = 8;  // 8
-const ImGuiMouseCursor PROGRESS = 9;  // 9
-const ImGuiMouseCursor NOT_ALLOWED = 10;  // 10
-const ImGuiMouseCursor COUNT = 11;  // 11
-module ig;
-typedef ImGuiMouseSource = CInt;
-module ig::mouse_source;
-const ImGuiMouseSource MOUSE = 0;  // 0
-const ImGuiMouseSource TOUCH_SCREEN = 1;  // 1
-const ImGuiMouseSource PEN = 2;  // 2
-const ImGuiMouseSource COUNT = 3;  // 3
-module ig;
-module ig::multi_select_flags;
-const ImGuiMultiSelectFlags NONE = 0;  // 0
-const ImGuiMultiSelectFlags SINGLE_SELECT = 1;  // 1 << 0
-const ImGuiMultiSelectFlags NO_SELECT_ALL = 2;  // 1 << 1
-const ImGuiMultiSelectFlags NO_RANGE_SELECT = 4;  // 1 << 2
-const ImGuiMultiSelectFlags NO_AUTO_SELECT = 8;  // 1 << 3
-const ImGuiMultiSelectFlags NO_AUTO_CLEAR = 16;  // 1 << 4
-const ImGuiMultiSelectFlags NO_AUTO_CLEAR_ON_RESELECT = 32;  // 1 << 5
-const ImGuiMultiSelectFlags BOX_SELECT1D = 64;  // 1 << 6
-const ImGuiMultiSelectFlags BOX_SELECT2D = 128;  // 1 << 7
-const ImGuiMultiSelectFlags BOX_SELECT_NO_SCROLL = 256;  // 1 << 8
-const ImGuiMultiSelectFlags CLEAR_ON_ESCAPE = 512;  // 1 << 9
-const ImGuiMultiSelectFlags CLEAR_ON_CLICK_VOID = 1024;  // 1 << 10
-const ImGuiMultiSelectFlags SCOPE_WINDOW = 2048;  // 1 << 11
-const ImGuiMultiSelectFlags SCOPE_RECT = 4096;  // 1 << 12
-const ImGuiMultiSelectFlags SELECT_ON_CLICK = 8192;  // 1 << 13
-const ImGuiMultiSelectFlags SELECT_ON_CLICK_RELEASE = 16384;  // 1 << 14
-const ImGuiMultiSelectFlags NAV_WRAP_X = 65536;  // 1 << 16
-module ig;
-typedef ImGuiNavLayer = CInt;
-module ig::nav_layer;
-const ImGuiNavLayer MAIN = 0;  // 0
-const ImGuiNavLayer MENU = 1;  // 1
-const ImGuiNavLayer COUNT = 2;  // 2
-module ig;
-module ig::nav_move_flags;
-const ImGuiNavMoveFlags NONE = 0;  // 0
-const ImGuiNavMoveFlags LOOP_X = 1;  // 1 << 0
-const ImGuiNavMoveFlags LOOP_Y = 2;  // 1 << 1
-const ImGuiNavMoveFlags WRAP_X = 4;  // 1 << 2
-const ImGuiNavMoveFlags WRAP_Y = 8;  // 1 << 3
-const ImGuiNavMoveFlags WRAP_MASK_ = 15;  // ImGuiNavMoveFlags_LoopX | ImGuiNavMoveFlags_LoopY | ImGuiNavMoveFlags_WrapX | ImGuiNavMoveFlags_WrapY
-const ImGuiNavMoveFlags ALLOW_CURRENT_NAV_ID = 16;  // 1 << 4
-const ImGuiNavMoveFlags ALSO_SCORE_VISIBLE_SET = 32;  // 1 << 5
-const ImGuiNavMoveFlags SCROLL_TO_EDGE_Y = 64;  // 1 << 6
-const ImGuiNavMoveFlags FORWARDED = 128;  // 1 << 7
-const ImGuiNavMoveFlags DEBUG_NO_RESULT = 256;  // 1 << 8
-const ImGuiNavMoveFlags FOCUS_API = 512;  // 1 << 9
-const ImGuiNavMoveFlags IS_TABBING = 1024;  // 1 << 10
-const ImGuiNavMoveFlags IS_PAGE_MOVE = 2048;  // 1 << 11
-const ImGuiNavMoveFlags ACTIVATE = 4096;  // 1 << 12
-const ImGuiNavMoveFlags NO_SELECT = 8192;  // 1 << 13
-const ImGuiNavMoveFlags NO_SET_NAV_CURSOR_VISIBLE = 16384;  // 1 << 14
-const ImGuiNavMoveFlags NO_CLEAR_ACTIVE_ID = 32768;  // 1 << 15
-module ig;
-module ig::nav_render_cursor_flags;
-const ImGuiNavRenderCursorFlags NONE = 0;  // 0
-const ImGuiNavRenderCursorFlags COMPACT = 2;  // 1 << 1
-const ImGuiNavRenderCursorFlags ALWAYS_DRAW = 4;  // 1 << 2
-const ImGuiNavRenderCursorFlags NO_ROUNDING = 8;  // 1 << 3
-module ig;
-module ig::next_item_data_flags;
-const ImGuiNextItemDataFlags NONE = 0;  // 0
-const ImGuiNextItemDataFlags HAS_WIDTH = 1;  // 1 << 0
-const ImGuiNextItemDataFlags HAS_OPEN = 2;  // 1 << 1
-const ImGuiNextItemDataFlags HAS_SHORTCUT = 4;  // 1 << 2
-const ImGuiNextItemDataFlags HAS_REF_VAL = 8;  // 1 << 3
-const ImGuiNextItemDataFlags HAS_STORAGE_ID = 16;  // 1 << 4
-module ig;
-module ig::next_window_data_flags;
-const ImGuiNextWindowDataFlags NONE = 0;  // 0
-const ImGuiNextWindowDataFlags HAS_POS = 1;  // 1 << 0
-const ImGuiNextWindowDataFlags HAS_SIZE = 2;  // 1 << 1
-const ImGuiNextWindowDataFlags HAS_CONTENT_SIZE = 4;  // 1 << 2
-const ImGuiNextWindowDataFlags HAS_COLLAPSED = 8;  // 1 << 3
-const ImGuiNextWindowDataFlags HAS_SIZE_CONSTRAINT = 16;  // 1 << 4
-const ImGuiNextWindowDataFlags HAS_FOCUS = 32;  // 1 << 5
-const ImGuiNextWindowDataFlags HAS_BG_ALPHA = 64;  // 1 << 6
-const ImGuiNextWindowDataFlags HAS_SCROLL = 128;  // 1 << 7
-const ImGuiNextWindowDataFlags HAS_WINDOW_FLAGS = 256;  // 1 << 8
-const ImGuiNextWindowDataFlags HAS_CHILD_FLAGS = 512;  // 1 << 9
-const ImGuiNextWindowDataFlags HAS_REFRESH_POLICY = 1024;  // 1 << 10
-const ImGuiNextWindowDataFlags HAS_VIEWPORT = 2048;  // 1 << 11
-const ImGuiNextWindowDataFlags HAS_DOCK = 4096;  // 1 << 12
-const ImGuiNextWindowDataFlags HAS_WINDOW_CLASS = 8192;  // 1 << 13
-module ig;
-module ig::old_column_flags;
-const ImGuiOldColumnFlags NONE = 0;  // 0
-const ImGuiOldColumnFlags NO_BORDER = 1;  // 1 << 0
-const ImGuiOldColumnFlags NO_RESIZE = 2;  // 1 << 1
-const ImGuiOldColumnFlags NO_PRESERVE_WIDTHS = 4;  // 1 << 2
-const ImGuiOldColumnFlags NO_FORCE_WITHIN_WINDOW = 8;  // 1 << 3
-const ImGuiOldColumnFlags GROW_PARENT_CONTENTS_SIZE = 16;  // 1 << 4
-module ig;
-typedef ImGuiPlotType = CInt;
-module ig::plot_type;
-const ImGuiPlotType LINES = 0;  // 0
-const ImGuiPlotType HISTOGRAM = 1;  // 1
-module ig;
-module ig::popup_flags;
-const ImGuiPopupFlags NONE = 0;  // 0
-const ImGuiPopupFlags MOUSE_BUTTON_LEFT = 0;  // 0
-const ImGuiPopupFlags MOUSE_BUTTON_RIGHT = 1;  // 1
-const ImGuiPopupFlags MOUSE_BUTTON_MIDDLE = 2;  // 2
-const ImGuiPopupFlags MOUSE_BUTTON_MASK_ = 31;  // 0x1F
-const ImGuiPopupFlags MOUSE_BUTTON_DEFAULT_ = 1;  // 1
-const ImGuiPopupFlags NO_REOPEN = 32;  // 1 << 5
-const ImGuiPopupFlags NO_OPEN_OVER_EXISTING_POPUP = 128;  // 1 << 7
-const ImGuiPopupFlags NO_OPEN_OVER_ITEMS = 256;  // 1 << 8
-const ImGuiPopupFlags ANY_POPUP_ID = 1024;  // 1 << 10
-const ImGuiPopupFlags ANY_POPUP_LEVEL = 2048;  // 1 << 11
-const ImGuiPopupFlags ANY_POPUP = 3072;  // ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel
-module ig;
-typedef ImGuiPopupPositionPolicy = CInt;
-module ig::popup_position_policy;
-const ImGuiPopupPositionPolicy DEFAULT = 0;  // 0
-const ImGuiPopupPositionPolicy COMBO_BOX = 1;  // 1
-const ImGuiPopupPositionPolicy TOOLTIP = 2;  // 2
-module ig;
-module ig::scroll_flags;
-const ImGuiScrollFlags NONE = 0;  // 0
-const ImGuiScrollFlags KEEP_VISIBLE_EDGE_X = 1;  // 1 << 0
-const ImGuiScrollFlags KEEP_VISIBLE_EDGE_Y = 2;  // 1 << 1
-const ImGuiScrollFlags KEEP_VISIBLE_CENTER_X = 4;  // 1 << 2
-const ImGuiScrollFlags KEEP_VISIBLE_CENTER_Y = 8;  // 1 << 3
-const ImGuiScrollFlags ALWAYS_CENTER_X = 16;  // 1 << 4
-const ImGuiScrollFlags ALWAYS_CENTER_Y = 32;  // 1 << 5
-const ImGuiScrollFlags NO_SCROLL_PARENT = 64;  // 1 << 6
-const ImGuiScrollFlags MASK_X = 21;  // ImGuiScrollFlags_KeepVisibleEdgeX | ImGuiScrollFlags_KeepVisibleCenterX | ImGuiScrollFlags_AlwaysCenterX
-const ImGuiScrollFlags MASK_Y = 42;  // ImGuiScrollFlags_KeepVisibleEdgeY | ImGuiScrollFlags_KeepVisibleCenterY | ImGuiScrollFlags_AlwaysCenterY
-module ig;
-module ig::selectable_flags;
-const ImGuiSelectableFlags NONE = 0;  // 0
-const ImGuiSelectableFlags NO_AUTO_CLOSE_POPUPS = 1;  // 1 << 0
-const ImGuiSelectableFlags SPAN_ALL_COLUMNS = 2;  // 1 << 1
-const ImGuiSelectableFlags ALLOW_DOUBLE_CLICK = 4;  // 1 << 2
-const ImGuiSelectableFlags DISABLED = 8;  // 1 << 3
-const ImGuiSelectableFlags ALLOW_OVERLAP = 16;  // 1 << 4
-const ImGuiSelectableFlags HIGHLIGHT = 32;  // 1 << 5
-module ig;
-typedef ImGuiSelectionRequestType = CInt;
-module ig::selection_request_type;
-const ImGuiSelectionRequestType NONE = 0;  // 0
-const ImGuiSelectionRequestType SET_ALL = 1;  // 1
-const ImGuiSelectionRequestType SET_RANGE = 2;  // 2
-module ig;
-module ig::separator_flags;
-const ImGuiSeparatorFlags NONE = 0;  // 0
-const ImGuiSeparatorFlags HORIZONTAL = 1;  // 1 << 0
-const ImGuiSeparatorFlags VERTICAL = 2;  // 1 << 1
-const ImGuiSeparatorFlags SPAN_ALL_COLUMNS = 4;  // 1 << 2
-module ig;
-module ig::slider_flags;
-const ImGuiSliderFlags NONE = 0;  // 0
-const ImGuiSliderFlags LOGARITHMIC = 32;  // 1 << 5
-const ImGuiSliderFlags NO_ROUND_TO_FORMAT = 64;  // 1 << 6
-const ImGuiSliderFlags NO_INPUT = 128;  // 1 << 7
-const ImGuiSliderFlags WRAP_AROUND = 256;  // 1 << 8
-const ImGuiSliderFlags CLAMP_ON_INPUT = 512;  // 1 << 9
-const ImGuiSliderFlags CLAMP_ZERO_RANGE = 1024;  // 1 << 10
-const ImGuiSliderFlags NO_SPEED_TWEAKS = 2048;  // 1 << 11
-const ImGuiSliderFlags ALWAYS_CLAMP = 1536;  // ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ClampZeroRange
-const ImGuiSliderFlags INVALID_MASK_ = 1879048207;  // 0x7000000F
-module ig;
-typedef ImGuiSortDirection = ImU8;
-module ig::sort_direction;
-const ImGuiSortDirection NONE = 0;  // 0
-const ImGuiSortDirection ASCENDING = 1;  // 1
-const ImGuiSortDirection DESCENDING = 2;  // 2
-module ig;
-module ig::style_var;
-const ImGuiStyleVar ALPHA = 0;  // 0
-const ImGuiStyleVar DISABLED_ALPHA = 1;  // 1
-const ImGuiStyleVar WINDOW_PADDING = 2;  // 2
-const ImGuiStyleVar WINDOW_ROUNDING = 3;  // 3
-const ImGuiStyleVar WINDOW_BORDER_SIZE = 4;  // 4
-const ImGuiStyleVar WINDOW_MIN_SIZE = 5;  // 5
-const ImGuiStyleVar WINDOW_TITLE_ALIGN = 6;  // 6
-const ImGuiStyleVar CHILD_ROUNDING = 7;  // 7
-const ImGuiStyleVar CHILD_BORDER_SIZE = 8;  // 8
-const ImGuiStyleVar POPUP_ROUNDING = 9;  // 9
-const ImGuiStyleVar POPUP_BORDER_SIZE = 10;  // 10
-const ImGuiStyleVar FRAME_PADDING = 11;  // 11
-const ImGuiStyleVar FRAME_ROUNDING = 12;  // 12
-const ImGuiStyleVar FRAME_BORDER_SIZE = 13;  // 13
-const ImGuiStyleVar ITEM_SPACING = 14;  // 14
-const ImGuiStyleVar ITEM_INNER_SPACING = 15;  // 15
-const ImGuiStyleVar INDENT_SPACING = 16;  // 16
-const ImGuiStyleVar CELL_PADDING = 17;  // 17
-const ImGuiStyleVar SCROLLBAR_SIZE = 18;  // 18
-const ImGuiStyleVar SCROLLBAR_ROUNDING = 19;  // 19
-const ImGuiStyleVar GRAB_MIN_SIZE = 20;  // 20
-const ImGuiStyleVar GRAB_ROUNDING = 21;  // 21
-const ImGuiStyleVar IMAGE_BORDER_SIZE = 22;  // 22
-const ImGuiStyleVar TAB_ROUNDING = 23;  // 23
-const ImGuiStyleVar TAB_BORDER_SIZE = 24;  // 24
-const ImGuiStyleVar TAB_BAR_BORDER_SIZE = 25;  // 25
-const ImGuiStyleVar TAB_BAR_OVERLINE_SIZE = 26;  // 26
-const ImGuiStyleVar TABLE_ANGLED_HEADERS_ANGLE = 27;  // 27
-const ImGuiStyleVar TABLE_ANGLED_HEADERS_TEXT_ALIGN = 28;  // 28
-const ImGuiStyleVar BUTTON_TEXT_ALIGN = 29;  // 29
-const ImGuiStyleVar SELECTABLE_TEXT_ALIGN = 30;  // 30
-const ImGuiStyleVar SEPARATOR_TEXT_BORDER_SIZE = 31;  // 31
-const ImGuiStyleVar SEPARATOR_TEXT_ALIGN = 32;  // 32
-const ImGuiStyleVar SEPARATOR_TEXT_PADDING = 33;  // 33
-const ImGuiStyleVar DOCKING_SEPARATOR_SIZE = 34;  // 34
-const ImGuiStyleVar COUNT = 35;  // 35
-module ig;
-module ig::tab_bar_flags;
-const ImGuiTabBarFlags NONE = 0;  // 0
-const ImGuiTabBarFlags REORDERABLE = 1;  // 1 << 0
-const ImGuiTabBarFlags AUTO_SELECT_NEW_TABS = 2;  // 1 << 1
-const ImGuiTabBarFlags TAB_LIST_POPUP_BUTTON = 4;  // 1 << 2
-const ImGuiTabBarFlags NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = 8;  // 1 << 3
-const ImGuiTabBarFlags NO_TAB_LIST_SCROLLING_BUTTONS = 16;  // 1 << 4
-const ImGuiTabBarFlags NO_TOOLTIP = 32;  // 1 << 5
-const ImGuiTabBarFlags DRAW_SELECTED_OVERLINE = 64;  // 1 << 6
-const ImGuiTabBarFlags FITTING_POLICY_RESIZE_DOWN = 128;  // 1 << 7
-const ImGuiTabBarFlags FITTING_POLICY_SCROLL = 256;  // 1 << 8
-const ImGuiTabBarFlags FITTING_POLICY_MASK_ = 384;  // ImGuiTabBarFlags_FittingPolicyResizeDown | ImGuiTabBarFlags_FittingPolicyScroll
-const ImGuiTabBarFlags FITTING_POLICY_DEFAULT_ = 128;  // ImGuiTabBarFlags_FittingPolicyResizeDown
-module ig;
-module ig::tab_item_flags;
-const ImGuiTabItemFlags NONE = 0;  // 0
-const ImGuiTabItemFlags UNSAVED_DOCUMENT = 1;  // 1 << 0
-const ImGuiTabItemFlags SET_SELECTED = 2;  // 1 << 1
-const ImGuiTabItemFlags NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = 4;  // 1 << 2
-const ImGuiTabItemFlags NO_PUSH_ID = 8;  // 1 << 3
-const ImGuiTabItemFlags NO_TOOLTIP = 16;  // 1 << 4
-const ImGuiTabItemFlags NO_REORDER = 32;  // 1 << 5
-const ImGuiTabItemFlags LEADING = 64;  // 1 << 6
-const ImGuiTabItemFlags TRAILING = 128;  // 1 << 7
-const ImGuiTabItemFlags NO_ASSUMED_CLOSURE = 256;  // 1 << 8
-module ig;
-module ig::table_bg_target;
-const ImGuiTableBgTarget NONE = 0;  // 0
-const ImGuiTableBgTarget ROW_BG0 = 1;  // 1
-const ImGuiTableBgTarget ROW_BG1 = 2;  // 2
-const ImGuiTableBgTarget CELL_BG = 3;  // 3
-module ig;
-module ig::table_column_flags;
-const ImGuiTableColumnFlags NONE = 0;  // 0
-const ImGuiTableColumnFlags DISABLED = 1;  // 1 << 0
-const ImGuiTableColumnFlags DEFAULT_HIDE = 2;  // 1 << 1
-const ImGuiTableColumnFlags DEFAULT_SORT = 4;  // 1 << 2
-const ImGuiTableColumnFlags WIDTH_STRETCH = 8;  // 1 << 3
-const ImGuiTableColumnFlags WIDTH_FIXED = 16;  // 1 << 4
-const ImGuiTableColumnFlags NO_RESIZE = 32;  // 1 << 5
-const ImGuiTableColumnFlags NO_REORDER = 64;  // 1 << 6
-const ImGuiTableColumnFlags NO_HIDE = 128;  // 1 << 7
-const ImGuiTableColumnFlags NO_CLIP = 256;  // 1 << 8
-const ImGuiTableColumnFlags NO_SORT = 512;  // 1 << 9
-const ImGuiTableColumnFlags NO_SORT_ASCENDING = 1024;  // 1 << 10
-const ImGuiTableColumnFlags NO_SORT_DESCENDING = 2048;  // 1 << 11
-const ImGuiTableColumnFlags NO_HEADER_LABEL = 4096;  // 1 << 12
-const ImGuiTableColumnFlags NO_HEADER_WIDTH = 8192;  // 1 << 13
-const ImGuiTableColumnFlags PREFER_SORT_ASCENDING = 16384;  // 1 << 14
-const ImGuiTableColumnFlags PREFER_SORT_DESCENDING = 32768;  // 1 << 15
-const ImGuiTableColumnFlags INDENT_ENABLE = 65536;  // 1 << 16
-const ImGuiTableColumnFlags INDENT_DISABLE = 131072;  // 1 << 17
-const ImGuiTableColumnFlags ANGLED_HEADER = 262144;  // 1 << 18
-const ImGuiTableColumnFlags IS_ENABLED = 16777216;  // 1 << 24
-const ImGuiTableColumnFlags IS_VISIBLE = 33554432;  // 1 << 25
-const ImGuiTableColumnFlags IS_SORTED = 67108864;  // 1 << 26
-const ImGuiTableColumnFlags IS_HOVERED = 134217728;  // 1 << 27
-const ImGuiTableColumnFlags WIDTH_MASK_ = 24;  // ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_WidthFixed
-const ImGuiTableColumnFlags INDENT_MASK_ = 196608;  // ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_IndentDisable
-const ImGuiTableColumnFlags STATUS_MASK_ = 251658240;  // ImGuiTableColumnFlags_IsEnabled | ImGuiTableColumnFlags_IsVisible | ImGuiTableColumnFlags_IsSorted | ImGuiTableColumnFlags_IsHovered
-const ImGuiTableColumnFlags NO_DIRECT_RESIZE_ = 1073741824;  // 1 << 30
-module ig;
-module ig::table_flags;
-const ImGuiTableFlags NONE = 0;  // 0
-const ImGuiTableFlags RESIZABLE = 1;  // 1 << 0
-const ImGuiTableFlags REORDERABLE = 2;  // 1 << 1
-const ImGuiTableFlags HIDEABLE = 4;  // 1 << 2
-const ImGuiTableFlags SORTABLE = 8;  // 1 << 3
-const ImGuiTableFlags NO_SAVED_SETTINGS = 16;  // 1 << 4
-const ImGuiTableFlags CONTEXT_MENU_IN_BODY = 32;  // 1 << 5
-const ImGuiTableFlags ROW_BG = 64;  // 1 << 6
-const ImGuiTableFlags BORDERS_INNER_H = 128;  // 1 << 7
-const ImGuiTableFlags BORDERS_OUTER_H = 256;  // 1 << 8
-const ImGuiTableFlags BORDERS_INNER_V = 512;  // 1 << 9
-const ImGuiTableFlags BORDERS_OUTER_V = 1024;  // 1 << 10
-const ImGuiTableFlags BORDERS_H = 384;  // ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersOuterH
-const ImGuiTableFlags BORDERS_V = 1536;  // ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuterV
-const ImGuiTableFlags BORDERS_INNER = 640;  // ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH
-const ImGuiTableFlags BORDERS_OUTER = 1280;  // ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_BordersOuterH
-const ImGuiTableFlags BORDERS = 1920;  // ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter
-const ImGuiTableFlags NO_BORDERS_IN_BODY = 2048;  // 1 << 11
-const ImGuiTableFlags NO_BORDERS_IN_BODY_UNTIL_RESIZE = 4096;  // 1 << 12
-const ImGuiTableFlags SIZING_FIXED_FIT = 8192;  // 1 << 13
-const ImGuiTableFlags SIZING_FIXED_SAME = 16384;  // 2 << 13
-const ImGuiTableFlags SIZING_STRETCH_PROP = 24576;  // 3 << 13
-const ImGuiTableFlags SIZING_STRETCH_SAME = 32768;  // 4 << 13
-const ImGuiTableFlags NO_HOST_EXTEND_X = 65536;  // 1 << 16
-const ImGuiTableFlags NO_HOST_EXTEND_Y = 131072;  // 1 << 17
-const ImGuiTableFlags NO_KEEP_COLUMNS_VISIBLE = 262144;  // 1 << 18
-const ImGuiTableFlags PRECISE_WIDTHS = 524288;  // 1 << 19
-const ImGuiTableFlags NO_CLIP = 1048576;  // 1 << 20
-const ImGuiTableFlags PAD_OUTER_X = 2097152;  // 1 << 21
-const ImGuiTableFlags NO_PAD_OUTER_X = 4194304;  // 1 << 22
-const ImGuiTableFlags NO_PAD_INNER_X = 8388608;  // 1 << 23
-const ImGuiTableFlags SCROLL_X = 16777216;  // 1 << 24
-const ImGuiTableFlags SCROLL_Y = 33554432;  // 1 << 25
-const ImGuiTableFlags SORT_MULTI = 67108864;  // 1 << 26
-const ImGuiTableFlags SORT_TRISTATE = 134217728;  // 1 << 27
-const ImGuiTableFlags HIGHLIGHT_HOVERED_COLUMN = 268435456;  // 1 << 28
-const ImGuiTableFlags SIZING_MASK_ = 57344;  // ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingStretchSame
-module ig;
-module ig::table_row_flags;
-const ImGuiTableRowFlags NONE = 0;  // 0
-const ImGuiTableRowFlags HEADERS = 1;  // 1 << 0
-module ig;
-module ig::text_flags;
-const ImGuiTextFlags NONE = 0;  // 0
-const ImGuiTextFlags NO_WIDTH_FOR_LARGE_CLIPPED_TEXT = 1;  // 1 << 0
-module ig;
-module ig::tooltip_flags;
-const ImGuiTooltipFlags NONE = 0;  // 0
-const ImGuiTooltipFlags OVERRIDE_PREVIOUS = 2;  // 1 << 1
-module ig;
-module ig::tree_node_flags;
-const ImGuiTreeNodeFlags NONE = 0;  // 0
-const ImGuiTreeNodeFlags SELECTED = 1;  // 1 << 0
-const ImGuiTreeNodeFlags FRAMED = 2;  // 1 << 1
-const ImGuiTreeNodeFlags ALLOW_OVERLAP = 4;  // 1 << 2
-const ImGuiTreeNodeFlags NO_TREE_PUSH_ON_OPEN = 8;  // 1 << 3
-const ImGuiTreeNodeFlags NO_AUTO_OPEN_ON_LOG = 16;  // 1 << 4
-const ImGuiTreeNodeFlags DEFAULT_OPEN = 32;  // 1 << 5
-const ImGuiTreeNodeFlags OPEN_ON_DOUBLE_CLICK = 64;  // 1 << 6
-const ImGuiTreeNodeFlags OPEN_ON_ARROW = 128;  // 1 << 7
-const ImGuiTreeNodeFlags LEAF = 256;  // 1 << 8
-const ImGuiTreeNodeFlags BULLET = 512;  // 1 << 9
-const ImGuiTreeNodeFlags FRAME_PADDING = 1024;  // 1 << 10
-const ImGuiTreeNodeFlags SPAN_AVAIL_WIDTH = 2048;  // 1 << 11
-const ImGuiTreeNodeFlags SPAN_FULL_WIDTH = 4096;  // 1 << 12
-const ImGuiTreeNodeFlags SPAN_LABEL_WIDTH = 8192;  // 1 << 13
-const ImGuiTreeNodeFlags SPAN_ALL_COLUMNS = 16384;  // 1 << 14
-const ImGuiTreeNodeFlags LABEL_SPAN_ALL_COLUMNS = 32768;  // 1 << 15
-const ImGuiTreeNodeFlags NAV_LEFT_JUMPS_BACK_HERE = 131072;  // 1 << 17
-const ImGuiTreeNodeFlags COLLAPSING_HEADER = 26;  // ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
-module ig;
-module ig::typing_select_flags;
-const ImGuiTypingSelectFlags NONE = 0;  // 0
-const ImGuiTypingSelectFlags ALLOW_BACKSPACE = 1;  // 1 << 0
-const ImGuiTypingSelectFlags ALLOW_SINGLE_CHAR_MODE = 2;  // 1 << 1
-module ig;
-module ig::viewport_flags;
-const ImGuiViewportFlags NONE = 0;  // 0
-const ImGuiViewportFlags IS_PLATFORM_WINDOW = 1;  // 1 << 0
-const ImGuiViewportFlags IS_PLATFORM_MONITOR = 2;  // 1 << 1
-const ImGuiViewportFlags OWNED_BY_APP = 4;  // 1 << 2
-const ImGuiViewportFlags NO_DECORATION = 8;  // 1 << 3
-const ImGuiViewportFlags NO_TASK_BAR_ICON = 16;  // 1 << 4
-const ImGuiViewportFlags NO_FOCUS_ON_APPEARING = 32;  // 1 << 5
-const ImGuiViewportFlags NO_FOCUS_ON_CLICK = 64;  // 1 << 6
-const ImGuiViewportFlags NO_INPUTS = 128;  // 1 << 7
-const ImGuiViewportFlags NO_RENDERER_CLEAR = 256;  // 1 << 8
-const ImGuiViewportFlags NO_AUTO_MERGE = 512;  // 1 << 9
-const ImGuiViewportFlags TOP_MOST = 1024;  // 1 << 10
-const ImGuiViewportFlags CAN_HOST_OTHER_WINDOWS = 2048;  // 1 << 11
-const ImGuiViewportFlags IS_MINIMIZED = 4096;  // 1 << 12
-const ImGuiViewportFlags IS_FOCUSED = 8192;  // 1 << 13
-module ig;
-typedef ImGuiWindowDockStyleCol = CInt;
-module ig::window_dock_style_col;
-const ImGuiWindowDockStyleCol TEXT = 0;  // 0
-const ImGuiWindowDockStyleCol TAB_HOVERED = 1;  // 1
-const ImGuiWindowDockStyleCol TAB_FOCUSED = 2;  // 2
-const ImGuiWindowDockStyleCol TAB_SELECTED = 3;  // 3
-const ImGuiWindowDockStyleCol TAB_SELECTED_OVERLINE = 4;  // 4
-const ImGuiWindowDockStyleCol TAB_DIMMED = 5;  // 5
-const ImGuiWindowDockStyleCol TAB_DIMMED_SELECTED = 6;  // 6
-const ImGuiWindowDockStyleCol TAB_DIMMED_SELECTED_OVERLINE = 7;  // 7
-const ImGuiWindowDockStyleCol COUNT = 8;  // 8
-module ig;
-module ig::window_flags;
-const ImGuiWindowFlags NONE = 0;  // 0
-const ImGuiWindowFlags NO_TITLE_BAR = 1;  // 1 << 0
-const ImGuiWindowFlags NO_RESIZE = 2;  // 1 << 1
-const ImGuiWindowFlags NO_MOVE = 4;  // 1 << 2
-const ImGuiWindowFlags NO_SCROLLBAR = 8;  // 1 << 3
-const ImGuiWindowFlags NO_SCROLL_WITH_MOUSE = 16;  // 1 << 4
-const ImGuiWindowFlags NO_COLLAPSE = 32;  // 1 << 5
-const ImGuiWindowFlags ALWAYS_AUTO_RESIZE = 64;  // 1 << 6
-const ImGuiWindowFlags NO_BACKGROUND = 128;  // 1 << 7
-const ImGuiWindowFlags NO_SAVED_SETTINGS = 256;  // 1 << 8
-const ImGuiWindowFlags NO_MOUSE_INPUTS = 512;  // 1 << 9
-const ImGuiWindowFlags MENU_BAR = 1024;  // 1 << 10
-const ImGuiWindowFlags HORIZONTAL_SCROLLBAR = 2048;  // 1 << 11
-const ImGuiWindowFlags NO_FOCUS_ON_APPEARING = 4096;  // 1 << 12
-const ImGuiWindowFlags NO_BRING_TO_FRONT_ON_FOCUS = 8192;  // 1 << 13
-const ImGuiWindowFlags ALWAYS_VERTICAL_SCROLLBAR = 16384;  // 1 << 14
-const ImGuiWindowFlags ALWAYS_HORIZONTAL_SCROLLBAR = 32768;  // 1<< 15
-const ImGuiWindowFlags NO_NAV_INPUTS = 65536;  // 1 << 16
-const ImGuiWindowFlags NO_NAV_FOCUS = 131072;  // 1 << 17
-const ImGuiWindowFlags UNSAVED_DOCUMENT = 262144;  // 1 << 18
-const ImGuiWindowFlags NO_DOCKING = 524288;  // 1 << 19
-const ImGuiWindowFlags NO_NAV = 196608;  // ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
-const ImGuiWindowFlags NO_DECORATION = 43;  // ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse
-const ImGuiWindowFlags NO_INPUTS = 197120;  // ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
-const ImGuiWindowFlags DOCK_NODE_HOST = 8388608;  // 1 << 23
-const ImGuiWindowFlags CHILD_WINDOW = 16777216;  // 1 << 24
-const ImGuiWindowFlags TOOLTIP = 33554432;  // 1 << 25
-const ImGuiWindowFlags POPUP = 67108864;  // 1 << 26
-const ImGuiWindowFlags MODAL = 134217728;  // 1 << 27
-const ImGuiWindowFlags CHILD_MENU = 268435456;  // 1 << 28
-module ig;
-module ig::window_refresh_flags;
-const ImGuiWindowRefreshFlags NONE = 0;  // 0
-const ImGuiWindowRefreshFlags TRY_TO_AVOID_REFRESH = 1;  // 1 << 0
-const ImGuiWindowRefreshFlags REFRESH_ON_HOVER = 2;  // 1 << 1
-const ImGuiWindowRefreshFlags REFRESH_ON_FOCUS = 4;  // 1 << 2
-module ig;
+enum ImDrawFlags : const CInt
+{
+    NONE = 0,  // 0
+    CLOSED = 1,  // 1 << 0
+    ROUND_CORNERS_TOP_LEFT = 16,  // 1 << 4
+    ROUND_CORNERS_TOP_RIGHT = 32,  // 1 << 5
+    ROUND_CORNERS_BOTTOM_LEFT = 64,  // 1 << 6
+    ROUND_CORNERS_BOTTOM_RIGHT = 128,  // 1 << 7
+    ROUND_CORNERS_NONE = 256,  // 1 << 8
+    ROUND_CORNERS_TOP = 48,  // ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight
+    ROUND_CORNERS_BOTTOM = 192,  // ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight
+    ROUND_CORNERS_LEFT = 80,  // ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersTopLeft
+    ROUND_CORNERS_RIGHT = 160,  // ImDrawFlags_RoundCornersBottomRight | ImDrawFlags_RoundCornersTopRight
+    ROUND_CORNERS_ALL = 240,  // ImDrawFlags_RoundCornersTopLeft | ImDrawFlags_RoundCornersTopRight | ImDrawFlags_RoundCornersBottomLeft | ImDrawFlags_RoundCornersBottomRight
+    ROUND_CORNERS_DEFAULT_ = 240,  // ImDrawFlags_RoundCornersAll
+    ROUND_CORNERS_MASK_ = 496,  // ImDrawFlags_RoundCornersAll | ImDrawFlags_RoundCornersNone
+}
+enum ImDrawListFlags : const CInt
+{
+    NONE = 0,  // 0
+    ANTI_ALIASED_LINES = 1,  // 1 << 0
+    ANTI_ALIASED_LINES_USE_TEX = 2,  // 1 << 1
+    ANTI_ALIASED_FILL = 4,  // 1 << 2
+    ALLOW_VTX_OFFSET = 8,  // 1 << 3
+}
+enum ImFontAtlasFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_POWER_OF_TWO_HEIGHT = 1,  // 1 << 0
+    NO_MOUSE_CURSORS = 2,  // 1 << 1
+    NO_BAKED_LINES = 4,  // 1 << 2
+}
+enum ImGuiActivateFlags : const CInt
+{
+    NONE = 0,  // 0
+    PREFER_INPUT = 1,  // 1 << 0
+    PREFER_TWEAK = 2,  // 1 << 1
+    TRY_TO_PRESERVE_STATE = 4,  // 1 << 2
+    FROM_TABBING = 8,  // 1 << 3
+    FROM_SHORTCUT = 16,  // 1 << 4
+}
+enum ImGuiAxis : const CInt
+{
+    NONE = -1,  // -1
+    X = 0,  // 0
+    Y = 1,  // 1
+}
+enum ImGuiBackendFlags : const CInt
+{
+    NONE = 0,  // 0
+    HAS_GAMEPAD = 1,  // 1 << 0
+    HAS_MOUSE_CURSORS = 2,  // 1 << 1
+    HAS_SET_MOUSE_POS = 4,  // 1 << 2
+    RENDERER_HAS_VTX_OFFSET = 8,  // 1 << 3
+    PLATFORM_HAS_VIEWPORTS = 1024,  // 1 << 10
+    HAS_MOUSE_HOVERED_VIEWPORT = 2048,  // 1 << 11
+    RENDERER_HAS_VIEWPORTS = 4096,  // 1 << 12
+}
+enum ImGuiButtonFlags : const CInt
+{
+    NONE = 0,  // 0
+    MOUSE_BUTTON_LEFT = 1,  // 1 << 0
+    MOUSE_BUTTON_RIGHT = 2,  // 1 << 1
+    MOUSE_BUTTON_MIDDLE = 4,  // 1 << 2
+    MOUSE_BUTTON_MASK_ = 7,  // ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight | ImGuiButtonFlags_MouseButtonMiddle
+    ENABLE_NAV = 8,  // 1 << 3
+}
+enum ImGuiChildFlags : const CInt
+{
+    NONE = 0,  // 0
+    BORDERS = 1,  // 1 << 0
+    ALWAYS_USE_WINDOW_PADDING = 2,  // 1 << 1
+    RESIZE_X = 4,  // 1 << 2
+    RESIZE_Y = 8,  // 1 << 3
+    AUTO_RESIZE_X = 16,  // 1 << 4
+    AUTO_RESIZE_Y = 32,  // 1 << 5
+    ALWAYS_AUTO_RESIZE = 64,  // 1 << 6
+    FRAME_STYLE = 128,  // 1 << 7
+    NAV_FLATTENED = 256,  // 1 << 8
+}
+enum ImGuiCol : const CInt
+{
+    TEXT = 0,  // 0
+    TEXT_DISABLED = 1,  // 1
+    WINDOW_BG = 2,  // 2
+    CHILD_BG = 3,  // 3
+    POPUP_BG = 4,  // 4
+    BORDER = 5,  // 5
+    BORDER_SHADOW = 6,  // 6
+    FRAME_BG = 7,  // 7
+    FRAME_BG_HOVERED = 8,  // 8
+    FRAME_BG_ACTIVE = 9,  // 9
+    TITLE_BG = 10,  // 10
+    TITLE_BG_ACTIVE = 11,  // 11
+    TITLE_BG_COLLAPSED = 12,  // 12
+    MENU_BAR_BG = 13,  // 13
+    SCROLLBAR_BG = 14,  // 14
+    SCROLLBAR_GRAB = 15,  // 15
+    SCROLLBAR_GRAB_HOVERED = 16,  // 16
+    SCROLLBAR_GRAB_ACTIVE = 17,  // 17
+    CHECK_MARK = 18,  // 18
+    SLIDER_GRAB = 19,  // 19
+    SLIDER_GRAB_ACTIVE = 20,  // 20
+    BUTTON = 21,  // 21
+    BUTTON_HOVERED = 22,  // 22
+    BUTTON_ACTIVE = 23,  // 23
+    HEADER = 24,  // 24
+    HEADER_HOVERED = 25,  // 25
+    HEADER_ACTIVE = 26,  // 26
+    SEPARATOR = 27,  // 27
+    SEPARATOR_HOVERED = 28,  // 28
+    SEPARATOR_ACTIVE = 29,  // 29
+    RESIZE_GRIP = 30,  // 30
+    RESIZE_GRIP_HOVERED = 31,  // 31
+    RESIZE_GRIP_ACTIVE = 32,  // 32
+    TAB_HOVERED = 33,  // 33
+    TAB = 34,  // 34
+    TAB_SELECTED = 35,  // 35
+    TAB_SELECTED_OVERLINE = 36,  // 36
+    TAB_DIMMED = 37,  // 37
+    TAB_DIMMED_SELECTED = 38,  // 38
+    TAB_DIMMED_SELECTED_OVERLINE = 39,  // 39
+    DOCKING_PREVIEW = 40,  // 40
+    DOCKING_EMPTY_BG = 41,  // 41
+    PLOT_LINES = 42,  // 42
+    PLOT_LINES_HOVERED = 43,  // 43
+    PLOT_HISTOGRAM = 44,  // 44
+    PLOT_HISTOGRAM_HOVERED = 45,  // 45
+    TABLE_HEADER_BG = 46,  // 46
+    TABLE_BORDER_STRONG = 47,  // 47
+    TABLE_BORDER_LIGHT = 48,  // 48
+    TABLE_ROW_BG = 49,  // 49
+    TABLE_ROW_BG_ALT = 50,  // 50
+    TEXT_LINK = 51,  // 51
+    TEXT_SELECTED_BG = 52,  // 52
+    DRAG_DROP_TARGET = 53,  // 53
+    NAV_CURSOR = 54,  // 54
+    NAV_WINDOWING_HIGHLIGHT = 55,  // 55
+    NAV_WINDOWING_DIM_BG = 56,  // 56
+    MODAL_WINDOW_DIM_BG = 57,  // 57
+    COUNT = 58,  // 58
+}
+enum ImGuiColorEditFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_ALPHA = 2,  // 1 << 1
+    NO_PICKER = 4,  // 1 << 2
+    NO_OPTIONS = 8,  // 1 << 3
+    NO_SMALL_PREVIEW = 16,  // 1 << 4
+    NO_INPUTS = 32,  // 1 << 5
+    NO_TOOLTIP = 64,  // 1 << 6
+    NO_LABEL = 128,  // 1 << 7
+    NO_SIDE_PREVIEW = 256,  // 1 << 8
+    NO_DRAG_DROP = 512,  // 1 << 9
+    NO_BORDER = 1024,  // 1 << 10
+    ALPHA_OPAQUE = 2048,  // 1 << 11
+    ALPHA_NO_BG = 4096,  // 1 << 12
+    ALPHA_PREVIEW_HALF = 8192,  // 1 << 13
+    ALPHA_BAR = 65536,  // 1 << 16
+    HDR = 524288,  // 1 << 19
+    DISPLAY_RGB = 1048576,  // 1 << 20
+    DISPLAY_HSV = 2097152,  // 1 << 21
+    DISPLAY_HEX = 4194304,  // 1 << 22
+    UINT8 = 8388608,  // 1 << 23
+    FLOAT = 16777216,  // 1 << 24
+    PICKER_HUE_BAR = 33554432,  // 1 << 25
+    PICKER_HUE_WHEEL = 67108864,  // 1 << 26
+    INPUT_RGB = 134217728,  // 1 << 27
+    INPUT_HSV = 268435456,  // 1 << 28
+    DEFAULT_OPTIONS_ = 177209344,  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_PickerHueBar
+    ALPHA_MASK_ = 14338,  // ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaOpaque | ImGuiColorEditFlags_AlphaNoBg | ImGuiColorEditFlags_AlphaPreviewHalf
+    DISPLAY_MASK_ = 7340032,  // ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_DisplayHex
+    DATA_TYPE_MASK_ = 25165824,  // ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_Float
+    PICKER_MASK_ = 100663296,  // ImGuiColorEditFlags_PickerHueWheel | ImGuiColorEditFlags_PickerHueBar
+    INPUT_MASK_ = 402653184,  // ImGuiColorEditFlags_InputRGB | ImGuiColorEditFlags_InputHSV
+}
+enum ImGuiComboFlags : const CInt
+{
+    NONE = 0,  // 0
+    POPUP_ALIGN_LEFT = 1,  // 1 << 0
+    HEIGHT_SMALL = 2,  // 1 << 1
+    HEIGHT_REGULAR = 4,  // 1 << 2
+    HEIGHT_LARGE = 8,  // 1 << 3
+    HEIGHT_LARGEST = 16,  // 1 << 4
+    NO_ARROW_BUTTON = 32,  // 1 << 5
+    NO_PREVIEW = 64,  // 1 << 6
+    WIDTH_FIT_PREVIEW = 128,  // 1 << 7
+    HEIGHT_MASK_ = 30,  // ImGuiComboFlags_HeightSmall | ImGuiComboFlags_HeightRegular | ImGuiComboFlags_HeightLarge | ImGuiComboFlags_HeightLargest
+}
+enum ImGuiCond : const CInt
+{
+    NONE = 0,  // 0
+    ALWAYS = 1,  // 1 << 0
+    ONCE = 2,  // 1 << 1
+    FIRST_USE_EVER = 4,  // 1 << 2
+    APPEARING = 8,  // 1 << 3
+}
+enum ImGuiConfigFlags : const CInt
+{
+    NONE = 0,  // 0
+    NAV_ENABLE_KEYBOARD = 1,  // 1 << 0
+    NAV_ENABLE_GAMEPAD = 2,  // 1 << 1
+    NO_MOUSE = 16,  // 1 << 4
+    NO_MOUSE_CURSOR_CHANGE = 32,  // 1 << 5
+    NO_KEYBOARD = 64,  // 1 << 6
+    DOCKING_ENABLE = 128,  // 1 << 7
+    VIEWPORTS_ENABLE = 1024,  // 1 << 10
+    DPI_ENABLE_SCALE_VIEWPORTS = 16384,  // 1 << 14
+    DPI_ENABLE_SCALE_FONTS = 32768,  // 1 << 15
+    IS_SRGB = 1048576,  // 1 << 20
+    IS_TOUCH_SCREEN = 2097152,  // 1 << 21
+}
+enum ImGuiContextHookType : const CInt
+{
+    NEW_FRAME_PRE = 0,  // 0
+    NEW_FRAME_POST = 1,  // 1
+    END_FRAME_PRE = 2,  // 2
+    END_FRAME_POST = 3,  // 3
+    RENDER_PRE = 4,  // 4
+    RENDER_POST = 5,  // 5
+    SHUTDOWN = 6,  // 6
+    PENDING_REMOVAL_ = 7,  // 7
+}
+enum ImGuiDataAuthority : const CInt
+{
+    AUTO = 0,  // 0
+    DOCK_NODE = 1,  // 1
+    WINDOW = 2,  // 2
+}
+enum ImGuiDataType : const CInt
+{
+    S8 = 0,  // 0
+    U8 = 1,  // 1
+    S16 = 2,  // 2
+    U16 = 3,  // 3
+    S32 = 4,  // 4
+    U32 = 5,  // 5
+    S64 = 6,  // 6
+    U64 = 7,  // 7
+    FLOAT = 8,  // 8
+    DOUBLE = 9,  // 9
+    BOOL = 10,  // 10
+    STRING = 11,  // 11
+    COUNT = 12,  // 12
+}
+enum ImGuiDebugLogFlags : const CInt
+{
+    NONE = 0,  // 0
+    EVENT_ERROR = 1,  // 1 << 0
+    EVENT_ACTIVE_ID = 2,  // 1 << 1
+    EVENT_FOCUS = 4,  // 1 << 2
+    EVENT_POPUP = 8,  // 1 << 3
+    EVENT_NAV = 16,  // 1 << 4
+    EVENT_CLIPPER = 32,  // 1 << 5
+    EVENT_SELECTION = 64,  // 1 << 6
+    EVENT_IO = 128,  // 1 << 7
+    EVENT_FONT = 256,  // 1 << 8
+    EVENT_INPUT_ROUTING = 512,  // 1 << 9
+    EVENT_DOCKING = 1024,  // 1 << 10
+    EVENT_VIEWPORT = 2048,  // 1 << 11
+    EVENT_MASK_ = 4095,  // ImGuiDebugLogFlags_EventError | ImGuiDebugLogFlags_EventActiveId | ImGuiDebugLogFlags_EventFocus | ImGuiDebugLogFlags_EventPopup | ImGuiDebugLogFlags_EventNav | ImGuiDebugLogFlags_EventClipper | ImGuiDebugLogFlags_EventSelection | ImGuiDebugLogFlags_EventIO | ImGuiDebugLogFlags_EventFont | ImGuiDebugLogFlags_EventInputRouting | ImGuiDebugLogFlags_EventDocking | ImGuiDebugLogFlags_EventViewport
+    OUTPUT_TO_TTY = 1048576,  // 1 << 20
+    OUTPUT_TO_TEST_ENGINE = 2097152,  // 1 << 21
+}
+enum ImGuiDir : const CInt
+{
+    NONE = -1,  // -1
+    LEFT = 0,  // 0
+    RIGHT = 1,  // 1
+    UP = 2,  // 2
+    DOWN = 3,  // 3
+    COUNT = 4,  // 4
+}
+enum ImGuiDockNodeFlags : const CInt
+{
+    NONE = 0,  // 0
+    KEEP_ALIVE_ONLY = 1,  // 1 << 0
+    NO_DOCKING_OVER_CENTRAL_NODE = 4,  // 1 << 2
+    PASSTHRU_CENTRAL_NODE = 8,  // 1 << 3
+    NO_DOCKING_SPLIT = 16,  // 1 << 4
+    NO_RESIZE = 32,  // 1 << 5
+    AUTO_HIDE_TAB_BAR = 64,  // 1 << 6
+    NO_UNDOCKING = 128,  // 1 << 7
+}
+enum ImGuiDockNodeState : const CInt
+{
+    UNKNOWN = 0,  // 0
+    HOST_WINDOW_HIDDEN_BECAUSE_SINGLE_WINDOW = 1,  // 1
+    HOST_WINDOW_HIDDEN_BECAUSE_WINDOWS_ARE_RESIZING = 2,  // 2
+    HOST_WINDOW_VISIBLE = 3,  // 3
+}
+enum ImGuiDragDropFlags : const CInt
+{
+    NONE = 0,  // 0
+    SOURCE_NO_PREVIEW_TOOLTIP = 1,  // 1 << 0
+    SOURCE_NO_DISABLE_HOVER = 2,  // 1 << 1
+    SOURCE_NO_HOLD_TO_OPEN_OTHERS = 4,  // 1 << 2
+    SOURCE_ALLOW_NULL_ID = 8,  // 1 << 3
+    SOURCE_EXTERN = 16,  // 1 << 4
+    PAYLOAD_AUTO_EXPIRE = 32,  // 1 << 5
+    PAYLOAD_NO_CROSS_CONTEXT = 64,  // 1 << 6
+    PAYLOAD_NO_CROSS_PROCESS = 128,  // 1 << 7
+    ACCEPT_BEFORE_DELIVERY = 1024,  // 1 << 10
+    ACCEPT_NO_DRAW_DEFAULT_RECT = 2048,  // 1 << 11
+    ACCEPT_NO_PREVIEW_TOOLTIP = 4096,  // 1 << 12
+    ACCEPT_PEEK_ONLY = 3072,  // ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect
+}
+enum ImGuiFocusRequestFlags : const CInt
+{
+    NONE = 0,  // 0
+    RESTORE_FOCUSED_CHILD = 1,  // 1 << 0
+    UNLESS_BELOW_MODAL = 2,  // 1 << 1
+}
+enum ImGuiFocusedFlags : const CInt
+{
+    NONE = 0,  // 0
+    CHILD_WINDOWS = 1,  // 1 << 0
+    ROOT_WINDOW = 2,  // 1 << 1
+    ANY_WINDOW = 4,  // 1 << 2
+    NO_POPUP_HIERARCHY = 8,  // 1 << 3
+    DOCK_HIERARCHY = 16,  // 1 << 4
+    ROOT_AND_CHILD_WINDOWS = 3,  // ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows
+}
+enum ImGuiFreeTypeBuilderFlags : const CInt
+{
+    NO_HINTING = 1,  // 1 << 0
+    NO_AUTO_HINT = 2,  // 1 << 1
+    FORCE_AUTO_HINT = 4,  // 1 << 2
+    LIGHT_HINTING = 8,  // 1 << 3
+    MONO_HINTING = 16,  // 1 << 4
+    BOLD = 32,  // 1 << 5
+    OBLIQUE = 64,  // 1 << 6
+    MONOCHROME = 128,  // 1 << 7
+    LOAD_COLOR = 256,  // 1 << 8
+    BITMAP = 512,  // 1 << 9
+}
+enum ImGuiHoveredFlags : const CInt
+{
+    NONE = 0,  // 0
+    CHILD_WINDOWS = 1,  // 1 << 0
+    ROOT_WINDOW = 2,  // 1 << 1
+    ANY_WINDOW = 4,  // 1 << 2
+    NO_POPUP_HIERARCHY = 8,  // 1 << 3
+    DOCK_HIERARCHY = 16,  // 1 << 4
+    ALLOW_WHEN_BLOCKED_BY_POPUP = 32,  // 1 << 5
+    ALLOW_WHEN_BLOCKED_BY_ACTIVE_ITEM = 128,  // 1 << 7
+    ALLOW_WHEN_OVERLAPPED_BY_ITEM = 256,  // 1 << 8
+    ALLOW_WHEN_OVERLAPPED_BY_WINDOW = 512,  // 1 << 9
+    ALLOW_WHEN_DISABLED = 1024,  // 1 << 10
+    NO_NAV_OVERRIDE = 2048,  // 1 << 11
+    ALLOW_WHEN_OVERLAPPED = 768,  // ImGuiHoveredFlags_AllowWhenOverlappedByItem | ImGuiHoveredFlags_AllowWhenOverlappedByWindow
+    RECT_ONLY = 928,  // ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_AllowWhenOverlapped
+    ROOT_AND_CHILD_WINDOWS = 3,  // ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
+    FOR_TOOLTIP = 4096,  // 1 << 12
+    STATIONARY = 8192,  // 1 << 13
+    DELAY_NONE = 16384,  // 1 << 14
+    DELAY_SHORT = 32768,  // 1 << 15
+    DELAY_NORMAL = 65536,  // 1 << 16
+    NO_SHARED_DELAY = 131072,  // 1 << 17
+}
+enum ImGuiInputEventType : const CInt
+{
+    NONE = 0,  // 0
+    MOUSE_POS = 1,  // 1
+    MOUSE_WHEEL = 2,  // 2
+    MOUSE_BUTTON = 3,  // 3
+    MOUSE_VIEWPORT = 4,  // 4
+    KEY = 5,  // 5
+    TEXT = 6,  // 6
+    FOCUS = 7,  // 7
+    COUNT = 8,  // 8
+}
+enum ImGuiInputFlags : const CInt
+{
+    NONE = 0,  // 0
+    REPEAT = 1,  // 1 << 0
+    ROUTE_ACTIVE = 1024,  // 1 << 10
+    ROUTE_FOCUSED = 2048,  // 1 << 11
+    ROUTE_GLOBAL = 4096,  // 1 << 12
+    ROUTE_ALWAYS = 8192,  // 1 << 13
+    ROUTE_OVER_FOCUSED = 16384,  // 1 << 14
+    ROUTE_OVER_ACTIVE = 32768,  // 1 << 15
+    ROUTE_UNLESS_BG_FOCUSED = 65536,  // 1 << 16
+    ROUTE_FROM_ROOT_WINDOW = 131072,  // 1 << 17
+    TOOLTIP = 262144,  // 1 << 18
+}
+enum ImGuiInputSource : const CInt
+{
+    NONE = 0,  // 0
+    MOUSE = 1,  // 1
+    KEYBOARD = 2,  // 2
+    GAMEPAD = 3,  // 3
+    COUNT = 4,  // 4
+}
+enum ImGuiInputTextFlags : const CInt
+{
+    NONE = 0,  // 0
+    CHARS_DECIMAL = 1,  // 1 << 0
+    CHARS_HEXADECIMAL = 2,  // 1 << 1
+    CHARS_SCIENTIFIC = 4,  // 1 << 2
+    CHARS_UPPERCASE = 8,  // 1 << 3
+    CHARS_NO_BLANK = 16,  // 1 << 4
+    ALLOW_TAB_INPUT = 32,  // 1 << 5
+    ENTER_RETURNS_TRUE = 64,  // 1 << 6
+    ESCAPE_CLEARS_ALL = 128,  // 1 << 7
+    CTRL_ENTER_FOR_NEW_LINE = 256,  // 1 << 8
+    READ_ONLY = 512,  // 1 << 9
+    PASSWORD = 1024,  // 1 << 10
+    ALWAYS_OVERWRITE = 2048,  // 1 << 11
+    AUTO_SELECT_ALL = 4096,  // 1 << 12
+    PARSE_EMPTY_REF_VAL = 8192,  // 1 << 13
+    DISPLAY_EMPTY_REF_VAL = 16384,  // 1 << 14
+    NO_HORIZONTAL_SCROLL = 32768,  // 1 << 15
+    NO_UNDO_REDO = 65536,  // 1 << 16
+    ELIDE_LEFT = 131072,  // 1 << 17
+    CALLBACK_COMPLETION = 262144,  // 1 << 18
+    CALLBACK_HISTORY = 524288,  // 1 << 19
+    CALLBACK_ALWAYS = 1048576,  // 1 << 20
+    CALLBACK_CHAR_FILTER = 2097152,  // 1 << 21
+    CALLBACK_RESIZE = 4194304,  // 1 << 22
+    CALLBACK_EDIT = 8388608,  // 1 << 23
+}
+enum ImGuiItemFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_TAB_STOP = 1,  // 1 << 0
+    NO_NAV = 2,  // 1 << 1
+    NO_NAV_DEFAULT_FOCUS = 4,  // 1 << 2
+    BUTTON_REPEAT = 8,  // 1 << 3
+    AUTO_CLOSE_POPUPS = 16,  // 1 << 4
+    ALLOW_DUPLICATE_ID = 32,  // 1 << 5
+}
+enum ImGuiItemStatusFlags : const CInt
+{
+    NONE = 0,  // 0
+    HOVERED_RECT = 1,  // 1 << 0
+    HAS_DISPLAY_RECT = 2,  // 1 << 1
+    EDITED = 4,  // 1 << 2
+    TOGGLED_SELECTION = 8,  // 1 << 3
+    TOGGLED_OPEN = 16,  // 1 << 4
+    HAS_DEACTIVATED = 32,  // 1 << 5
+    DEACTIVATED = 64,  // 1 << 6
+    HOVERED_WINDOW = 128,  // 1 << 7
+    VISIBLE = 256,  // 1 << 8
+    HAS_CLIP_RECT = 512,  // 1 << 9
+    HAS_SHORTCUT = 1024,  // 1 << 10
+}
+enum ImGuiKey : const CInt
+{
+    NONE = 0,  // 0
+    NAMED_KEY_BEGIN = 512,  // 512
+    TAB = 512,  // 512
+    LEFT_ARROW = 513,  // 513
+    RIGHT_ARROW = 514,  // 514
+    UP_ARROW = 515,  // 515
+    DOWN_ARROW = 516,  // 516
+    PAGE_UP = 517,  // 517
+    PAGE_DOWN = 518,  // 518
+    HOME = 519,  // 519
+    END = 520,  // 520
+    INSERT = 521,  // 521
+    DELETE = 522,  // 522
+    BACKSPACE = 523,  // 523
+    SPACE = 524,  // 524
+    ENTER = 525,  // 525
+    ESCAPE = 526,  // 526
+    LEFT_CTRL = 527,  // 527
+    LEFT_SHIFT = 528,  // 528
+    LEFT_ALT = 529,  // 529
+    LEFT_SUPER = 530,  // 530
+    RIGHT_CTRL = 531,  // 531
+    RIGHT_SHIFT = 532,  // 532
+    RIGHT_ALT = 533,  // 533
+    RIGHT_SUPER = 534,  // 534
+    MENU = 535,  // 535
+    KEY_0 = 536,  // 536
+    KEY_1 = 537,  // 537
+    KEY_2 = 538,  // 538
+    KEY_3 = 539,  // 539
+    KEY_4 = 540,  // 540
+    KEY_5 = 541,  // 541
+    KEY_6 = 542,  // 542
+    KEY_7 = 543,  // 543
+    KEY_8 = 544,  // 544
+    KEY_9 = 545,  // 545
+    A = 546,  // 546
+    B = 547,  // 547
+    C = 548,  // 548
+    D = 549,  // 549
+    E = 550,  // 550
+    F = 551,  // 551
+    G = 552,  // 552
+    H = 553,  // 553
+    I = 554,  // 554
+    J = 555,  // 555
+    K = 556,  // 556
+    L = 557,  // 557
+    M = 558,  // 558
+    N = 559,  // 559
+    O = 560,  // 560
+    P = 561,  // 561
+    Q = 562,  // 562
+    R = 563,  // 563
+    S = 564,  // 564
+    T = 565,  // 565
+    U = 566,  // 566
+    V = 567,  // 567
+    W = 568,  // 568
+    X = 569,  // 569
+    Y = 570,  // 570
+    Z = 571,  // 571
+    F1 = 572,  // 572
+    F2 = 573,  // 573
+    F3 = 574,  // 574
+    F4 = 575,  // 575
+    F5 = 576,  // 576
+    F6 = 577,  // 577
+    F7 = 578,  // 578
+    F8 = 579,  // 579
+    F9 = 580,  // 580
+    F10 = 581,  // 581
+    F11 = 582,  // 582
+    F12 = 583,  // 583
+    F13 = 584,  // 584
+    F14 = 585,  // 585
+    F15 = 586,  // 586
+    F16 = 587,  // 587
+    F17 = 588,  // 588
+    F18 = 589,  // 589
+    F19 = 590,  // 590
+    F20 = 591,  // 591
+    F21 = 592,  // 592
+    F22 = 593,  // 593
+    F23 = 594,  // 594
+    F24 = 595,  // 595
+    APOSTROPHE = 596,  // 596
+    COMMA = 597,  // 597
+    MINUS = 598,  // 598
+    PERIOD = 599,  // 599
+    SLASH = 600,  // 600
+    SEMICOLON = 601,  // 601
+    EQUAL = 602,  // 602
+    LEFT_BRACKET = 603,  // 603
+    BACKSLASH = 604,  // 604
+    RIGHT_BRACKET = 605,  // 605
+    GRAVE_ACCENT = 606,  // 606
+    CAPS_LOCK = 607,  // 607
+    SCROLL_LOCK = 608,  // 608
+    NUM_LOCK = 609,  // 609
+    PRINT_SCREEN = 610,  // 610
+    PAUSE = 611,  // 611
+    KEYPAD0 = 612,  // 612
+    KEYPAD1 = 613,  // 613
+    KEYPAD2 = 614,  // 614
+    KEYPAD3 = 615,  // 615
+    KEYPAD4 = 616,  // 616
+    KEYPAD5 = 617,  // 617
+    KEYPAD6 = 618,  // 618
+    KEYPAD7 = 619,  // 619
+    KEYPAD8 = 620,  // 620
+    KEYPAD9 = 621,  // 621
+    KEYPAD_DECIMAL = 622,  // 622
+    KEYPAD_DIVIDE = 623,  // 623
+    KEYPAD_MULTIPLY = 624,  // 624
+    KEYPAD_SUBTRACT = 625,  // 625
+    KEYPAD_ADD = 626,  // 626
+    KEYPAD_ENTER = 627,  // 627
+    KEYPAD_EQUAL = 628,  // 628
+    APP_BACK = 629,  // 629
+    APP_FORWARD = 630,  // 630
+    OEM102 = 631,  // 631
+    GAMEPAD_START = 632,  // 632
+    GAMEPAD_BACK = 633,  // 633
+    GAMEPAD_FACE_LEFT = 634,  // 634
+    GAMEPAD_FACE_RIGHT = 635,  // 635
+    GAMEPAD_FACE_UP = 636,  // 636
+    GAMEPAD_FACE_DOWN = 637,  // 637
+    GAMEPAD_DPAD_LEFT = 638,  // 638
+    GAMEPAD_DPAD_RIGHT = 639,  // 639
+    GAMEPAD_DPAD_UP = 640,  // 640
+    GAMEPAD_DPAD_DOWN = 641,  // 641
+    GAMEPAD_L1 = 642,  // 642
+    GAMEPAD_R1 = 643,  // 643
+    GAMEPAD_L2 = 644,  // 644
+    GAMEPAD_R2 = 645,  // 645
+    GAMEPAD_L3 = 646,  // 646
+    GAMEPAD_R3 = 647,  // 647
+    GAMEPAD_LSTICK_LEFT = 648,  // 648
+    GAMEPAD_LSTICK_RIGHT = 649,  // 649
+    GAMEPAD_LSTICK_UP = 650,  // 650
+    GAMEPAD_LSTICK_DOWN = 651,  // 651
+    GAMEPAD_RSTICK_LEFT = 652,  // 652
+    GAMEPAD_RSTICK_RIGHT = 653,  // 653
+    GAMEPAD_RSTICK_UP = 654,  // 654
+    GAMEPAD_RSTICK_DOWN = 655,  // 655
+    MOUSE_LEFT = 656,  // 656
+    MOUSE_RIGHT = 657,  // 657
+    MOUSE_MIDDLE = 658,  // 658
+    MOUSE_X1 = 659,  // 659
+    MOUSE_X2 = 660,  // 660
+    MOUSE_WHEEL_X = 661,  // 661
+    MOUSE_WHEEL_Y = 662,  // 662
+    RESERVED_FOR_MOD_CTRL = 663,  // 663
+    RESERVED_FOR_MOD_SHIFT = 664,  // 664
+    RESERVED_FOR_MOD_ALT = 665,  // 665
+    RESERVED_FOR_MOD_SUPER = 666,  // 666
+    NAMED_KEY_END = 667,  // 667
+    MOD_NONE = 0,  // 0
+    MOD_CTRL = 4096,  // 1 << 12
+    MOD_SHIFT = 8192,  // 1 << 13
+    MOD_ALT = 16384,  // 1 << 14
+    MOD_SUPER = 32768,  // 1 << 15
+    MOD_MASK_ = 61440,  // 0xF000
+    NAMED_KEY_COUNT = 155,  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
+}
+enum ImGuiLayoutType : const CInt
+{
+    HORIZONTAL = 0,  // 0
+    VERTICAL = 1,  // 1
+}
+enum ImGuiLocKey : const CInt
+{
+    VERSION_STR = 0,  // 0
+    TABLE_SIZE_ONE = 1,  // 1
+    TABLE_SIZE_ALL_FIT = 2,  // 2
+    TABLE_SIZE_ALL_DEFAULT = 3,  // 3
+    TABLE_RESET_ORDER = 4,  // 4
+    WINDOWING_MAIN_MENU_BAR = 5,  // 5
+    WINDOWING_POPUP = 6,  // 6
+    WINDOWING_UNTITLED = 7,  // 7
+    OPEN_LINK_S = 8,  // 8
+    COPY_LINK = 9,  // 9
+    DOCKING_HIDE_TAB_BAR = 10,  // 10
+    DOCKING_HOLD_SHIFT_TO_DOCK = 11,  // 11
+    DOCKING_DRAG_TO_UNDOCK_OR_MOVE_NODE = 12,  // 12
+    COUNT = 13,  // 13
+}
+enum ImGuiLogFlags : const CInt
+{
+    NONE = 0,  // 0
+    OUTPUT_TTY = 1,  // 1 << 0
+    OUTPUT_FILE = 2,  // 1 << 1
+    OUTPUT_BUFFER = 4,  // 1 << 2
+    OUTPUT_CLIPBOARD = 8,  // 1 << 3
+    OUTPUT_MASK_ = 15,  // ImGuiLogFlags_OutputTTY | ImGuiLogFlags_OutputFile | ImGuiLogFlags_OutputBuffer | ImGuiLogFlags_OutputClipboard
+}
+enum ImGuiMouseButton : const CInt
+{
+    LEFT = 0,  // 0
+    RIGHT = 1,  // 1
+    MIDDLE = 2,  // 2
+    COUNT = 5,  // 5
+}
+enum ImGuiMouseCursor : const CInt
+{
+    NONE = -1,  // -1
+    ARROW = 0,  // 0
+    TEXT_INPUT = 1,  // 1
+    RESIZE_ALL = 2,  // 2
+    RESIZE_NS = 3,  // 3
+    RESIZE_EW = 4,  // 4
+    RESIZE_NESW = 5,  // 5
+    RESIZE_NWSE = 6,  // 6
+    HAND = 7,  // 7
+    WAIT = 8,  // 8
+    PROGRESS = 9,  // 9
+    NOT_ALLOWED = 10,  // 10
+    COUNT = 11,  // 11
+}
+enum ImGuiMouseSource : const CInt
+{
+    MOUSE = 0,  // 0
+    TOUCH_SCREEN = 1,  // 1
+    PEN = 2,  // 2
+    COUNT = 3,  // 3
+}
+enum ImGuiMultiSelectFlags : const CInt
+{
+    NONE = 0,  // 0
+    SINGLE_SELECT = 1,  // 1 << 0
+    NO_SELECT_ALL = 2,  // 1 << 1
+    NO_RANGE_SELECT = 4,  // 1 << 2
+    NO_AUTO_SELECT = 8,  // 1 << 3
+    NO_AUTO_CLEAR = 16,  // 1 << 4
+    NO_AUTO_CLEAR_ON_RESELECT = 32,  // 1 << 5
+    BOX_SELECT1D = 64,  // 1 << 6
+    BOX_SELECT2D = 128,  // 1 << 7
+    BOX_SELECT_NO_SCROLL = 256,  // 1 << 8
+    CLEAR_ON_ESCAPE = 512,  // 1 << 9
+    CLEAR_ON_CLICK_VOID = 1024,  // 1 << 10
+    SCOPE_WINDOW = 2048,  // 1 << 11
+    SCOPE_RECT = 4096,  // 1 << 12
+    SELECT_ON_CLICK = 8192,  // 1 << 13
+    SELECT_ON_CLICK_RELEASE = 16384,  // 1 << 14
+    NAV_WRAP_X = 65536,  // 1 << 16
+}
+enum ImGuiNavLayer : const CInt
+{
+    MAIN = 0,  // 0
+    MENU = 1,  // 1
+    COUNT = 2,  // 2
+}
+enum ImGuiNavMoveFlags : const CInt
+{
+    NONE = 0,  // 0
+    LOOP_X = 1,  // 1 << 0
+    LOOP_Y = 2,  // 1 << 1
+    WRAP_X = 4,  // 1 << 2
+    WRAP_Y = 8,  // 1 << 3
+    WRAP_MASK_ = 15,  // ImGuiNavMoveFlags_LoopX | ImGuiNavMoveFlags_LoopY | ImGuiNavMoveFlags_WrapX | ImGuiNavMoveFlags_WrapY
+    ALLOW_CURRENT_NAV_ID = 16,  // 1 << 4
+    ALSO_SCORE_VISIBLE_SET = 32,  // 1 << 5
+    SCROLL_TO_EDGE_Y = 64,  // 1 << 6
+    FORWARDED = 128,  // 1 << 7
+    DEBUG_NO_RESULT = 256,  // 1 << 8
+    FOCUS_API = 512,  // 1 << 9
+    IS_TABBING = 1024,  // 1 << 10
+    IS_PAGE_MOVE = 2048,  // 1 << 11
+    ACTIVATE = 4096,  // 1 << 12
+    NO_SELECT = 8192,  // 1 << 13
+    NO_SET_NAV_CURSOR_VISIBLE = 16384,  // 1 << 14
+    NO_CLEAR_ACTIVE_ID = 32768,  // 1 << 15
+}
+enum ImGuiNavRenderCursorFlags : const CInt
+{
+    NONE = 0,  // 0
+    COMPACT = 2,  // 1 << 1
+    ALWAYS_DRAW = 4,  // 1 << 2
+    NO_ROUNDING = 8,  // 1 << 3
+}
+enum ImGuiNextItemDataFlags : const CInt
+{
+    NONE = 0,  // 0
+    HAS_WIDTH = 1,  // 1 << 0
+    HAS_OPEN = 2,  // 1 << 1
+    HAS_SHORTCUT = 4,  // 1 << 2
+    HAS_REF_VAL = 8,  // 1 << 3
+    HAS_STORAGE_ID = 16,  // 1 << 4
+}
+enum ImGuiNextWindowDataFlags : const CInt
+{
+    NONE = 0,  // 0
+    HAS_POS = 1,  // 1 << 0
+    HAS_SIZE = 2,  // 1 << 1
+    HAS_CONTENT_SIZE = 4,  // 1 << 2
+    HAS_COLLAPSED = 8,  // 1 << 3
+    HAS_SIZE_CONSTRAINT = 16,  // 1 << 4
+    HAS_FOCUS = 32,  // 1 << 5
+    HAS_BG_ALPHA = 64,  // 1 << 6
+    HAS_SCROLL = 128,  // 1 << 7
+    HAS_WINDOW_FLAGS = 256,  // 1 << 8
+    HAS_CHILD_FLAGS = 512,  // 1 << 9
+    HAS_REFRESH_POLICY = 1024,  // 1 << 10
+    HAS_VIEWPORT = 2048,  // 1 << 11
+    HAS_DOCK = 4096,  // 1 << 12
+    HAS_WINDOW_CLASS = 8192,  // 1 << 13
+}
+enum ImGuiOldColumnFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_BORDER = 1,  // 1 << 0
+    NO_RESIZE = 2,  // 1 << 1
+    NO_PRESERVE_WIDTHS = 4,  // 1 << 2
+    NO_FORCE_WITHIN_WINDOW = 8,  // 1 << 3
+    GROW_PARENT_CONTENTS_SIZE = 16,  // 1 << 4
+}
+enum ImGuiPlotType : const CInt
+{
+    LINES = 0,  // 0
+    HISTOGRAM = 1,  // 1
+}
+enum ImGuiPopupFlags : const CInt
+{
+    NONE = 0,  // 0
+    MOUSE_BUTTON_LEFT = 0,  // 0
+    MOUSE_BUTTON_RIGHT = 1,  // 1
+    MOUSE_BUTTON_MIDDLE = 2,  // 2
+    MOUSE_BUTTON_MASK_ = 31,  // 0x1F
+    MOUSE_BUTTON_DEFAULT_ = 1,  // 1
+    NO_REOPEN = 32,  // 1 << 5
+    NO_OPEN_OVER_EXISTING_POPUP = 128,  // 1 << 7
+    NO_OPEN_OVER_ITEMS = 256,  // 1 << 8
+    ANY_POPUP_ID = 1024,  // 1 << 10
+    ANY_POPUP_LEVEL = 2048,  // 1 << 11
+    ANY_POPUP = 3072,  // ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel
+}
+enum ImGuiPopupPositionPolicy : const CInt
+{
+    DEFAULT = 0,  // 0
+    COMBO_BOX = 1,  // 1
+    TOOLTIP = 2,  // 2
+}
+enum ImGuiScrollFlags : const CInt
+{
+    NONE = 0,  // 0
+    KEEP_VISIBLE_EDGE_X = 1,  // 1 << 0
+    KEEP_VISIBLE_EDGE_Y = 2,  // 1 << 1
+    KEEP_VISIBLE_CENTER_X = 4,  // 1 << 2
+    KEEP_VISIBLE_CENTER_Y = 8,  // 1 << 3
+    ALWAYS_CENTER_X = 16,  // 1 << 4
+    ALWAYS_CENTER_Y = 32,  // 1 << 5
+    NO_SCROLL_PARENT = 64,  // 1 << 6
+    MASK_X = 21,  // ImGuiScrollFlags_KeepVisibleEdgeX | ImGuiScrollFlags_KeepVisibleCenterX | ImGuiScrollFlags_AlwaysCenterX
+    MASK_Y = 42,  // ImGuiScrollFlags_KeepVisibleEdgeY | ImGuiScrollFlags_KeepVisibleCenterY | ImGuiScrollFlags_AlwaysCenterY
+}
+enum ImGuiSelectableFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_AUTO_CLOSE_POPUPS = 1,  // 1 << 0
+    SPAN_ALL_COLUMNS = 2,  // 1 << 1
+    ALLOW_DOUBLE_CLICK = 4,  // 1 << 2
+    DISABLED = 8,  // 1 << 3
+    ALLOW_OVERLAP = 16,  // 1 << 4
+    HIGHLIGHT = 32,  // 1 << 5
+}
+enum ImGuiSelectionRequestType : const CInt
+{
+    NONE = 0,  // 0
+    SET_ALL = 1,  // 1
+    SET_RANGE = 2,  // 2
+}
+enum ImGuiSeparatorFlags : const CInt
+{
+    NONE = 0,  // 0
+    HORIZONTAL = 1,  // 1 << 0
+    VERTICAL = 2,  // 1 << 1
+    SPAN_ALL_COLUMNS = 4,  // 1 << 2
+}
+enum ImGuiSliderFlags : const CInt
+{
+    NONE = 0,  // 0
+    LOGARITHMIC = 32,  // 1 << 5
+    NO_ROUND_TO_FORMAT = 64,  // 1 << 6
+    NO_INPUT = 128,  // 1 << 7
+    WRAP_AROUND = 256,  // 1 << 8
+    CLAMP_ON_INPUT = 512,  // 1 << 9
+    CLAMP_ZERO_RANGE = 1024,  // 1 << 10
+    NO_SPEED_TWEAKS = 2048,  // 1 << 11
+    ALWAYS_CLAMP = 1536,  // ImGuiSliderFlags_ClampOnInput | ImGuiSliderFlags_ClampZeroRange
+    INVALID_MASK_ = 1879048207,  // 0x7000000F
+}
+enum ImGuiSortDirection : const ImU8
+{
+    NONE = 0,  // 0
+    ASCENDING = 1,  // 1
+    DESCENDING = 2,  // 2
+}
+enum ImGuiStyleVar : const CInt
+{
+    ALPHA = 0,  // 0
+    DISABLED_ALPHA = 1,  // 1
+    WINDOW_PADDING = 2,  // 2
+    WINDOW_ROUNDING = 3,  // 3
+    WINDOW_BORDER_SIZE = 4,  // 4
+    WINDOW_MIN_SIZE = 5,  // 5
+    WINDOW_TITLE_ALIGN = 6,  // 6
+    CHILD_ROUNDING = 7,  // 7
+    CHILD_BORDER_SIZE = 8,  // 8
+    POPUP_ROUNDING = 9,  // 9
+    POPUP_BORDER_SIZE = 10,  // 10
+    FRAME_PADDING = 11,  // 11
+    FRAME_ROUNDING = 12,  // 12
+    FRAME_BORDER_SIZE = 13,  // 13
+    ITEM_SPACING = 14,  // 14
+    ITEM_INNER_SPACING = 15,  // 15
+    INDENT_SPACING = 16,  // 16
+    CELL_PADDING = 17,  // 17
+    SCROLLBAR_SIZE = 18,  // 18
+    SCROLLBAR_ROUNDING = 19,  // 19
+    GRAB_MIN_SIZE = 20,  // 20
+    GRAB_ROUNDING = 21,  // 21
+    IMAGE_BORDER_SIZE = 22,  // 22
+    TAB_ROUNDING = 23,  // 23
+    TAB_BORDER_SIZE = 24,  // 24
+    TAB_BAR_BORDER_SIZE = 25,  // 25
+    TAB_BAR_OVERLINE_SIZE = 26,  // 26
+    TABLE_ANGLED_HEADERS_ANGLE = 27,  // 27
+    TABLE_ANGLED_HEADERS_TEXT_ALIGN = 28,  // 28
+    BUTTON_TEXT_ALIGN = 29,  // 29
+    SELECTABLE_TEXT_ALIGN = 30,  // 30
+    SEPARATOR_TEXT_BORDER_SIZE = 31,  // 31
+    SEPARATOR_TEXT_ALIGN = 32,  // 32
+    SEPARATOR_TEXT_PADDING = 33,  // 33
+    DOCKING_SEPARATOR_SIZE = 34,  // 34
+    COUNT = 35,  // 35
+}
+enum ImGuiTabBarFlags : const CInt
+{
+    NONE = 0,  // 0
+    REORDERABLE = 1,  // 1 << 0
+    AUTO_SELECT_NEW_TABS = 2,  // 1 << 1
+    TAB_LIST_POPUP_BUTTON = 4,  // 1 << 2
+    NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = 8,  // 1 << 3
+    NO_TAB_LIST_SCROLLING_BUTTONS = 16,  // 1 << 4
+    NO_TOOLTIP = 32,  // 1 << 5
+    DRAW_SELECTED_OVERLINE = 64,  // 1 << 6
+    FITTING_POLICY_RESIZE_DOWN = 128,  // 1 << 7
+    FITTING_POLICY_SCROLL = 256,  // 1 << 8
+    FITTING_POLICY_MASK_ = 384,  // ImGuiTabBarFlags_FittingPolicyResizeDown | ImGuiTabBarFlags_FittingPolicyScroll
+    FITTING_POLICY_DEFAULT_ = 128,  // ImGuiTabBarFlags_FittingPolicyResizeDown
+}
+enum ImGuiTabItemFlags : const CInt
+{
+    NONE = 0,  // 0
+    UNSAVED_DOCUMENT = 1,  // 1 << 0
+    SET_SELECTED = 2,  // 1 << 1
+    NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON = 4,  // 1 << 2
+    NO_PUSH_ID = 8,  // 1 << 3
+    NO_TOOLTIP = 16,  // 1 << 4
+    NO_REORDER = 32,  // 1 << 5
+    LEADING = 64,  // 1 << 6
+    TRAILING = 128,  // 1 << 7
+    NO_ASSUMED_CLOSURE = 256,  // 1 << 8
+}
+enum ImGuiTableBgTarget : const CInt
+{
+    NONE = 0,  // 0
+    ROW_BG0 = 1,  // 1
+    ROW_BG1 = 2,  // 2
+    CELL_BG = 3,  // 3
+}
+enum ImGuiTableColumnFlags : const CInt
+{
+    NONE = 0,  // 0
+    DISABLED = 1,  // 1 << 0
+    DEFAULT_HIDE = 2,  // 1 << 1
+    DEFAULT_SORT = 4,  // 1 << 2
+    WIDTH_STRETCH = 8,  // 1 << 3
+    WIDTH_FIXED = 16,  // 1 << 4
+    NO_RESIZE = 32,  // 1 << 5
+    NO_REORDER = 64,  // 1 << 6
+    NO_HIDE = 128,  // 1 << 7
+    NO_CLIP = 256,  // 1 << 8
+    NO_SORT = 512,  // 1 << 9
+    NO_SORT_ASCENDING = 1024,  // 1 << 10
+    NO_SORT_DESCENDING = 2048,  // 1 << 11
+    NO_HEADER_LABEL = 4096,  // 1 << 12
+    NO_HEADER_WIDTH = 8192,  // 1 << 13
+    PREFER_SORT_ASCENDING = 16384,  // 1 << 14
+    PREFER_SORT_DESCENDING = 32768,  // 1 << 15
+    INDENT_ENABLE = 65536,  // 1 << 16
+    INDENT_DISABLE = 131072,  // 1 << 17
+    ANGLED_HEADER = 262144,  // 1 << 18
+    IS_ENABLED = 16777216,  // 1 << 24
+    IS_VISIBLE = 33554432,  // 1 << 25
+    IS_SORTED = 67108864,  // 1 << 26
+    IS_HOVERED = 134217728,  // 1 << 27
+    WIDTH_MASK_ = 24,  // ImGuiTableColumnFlags_WidthStretch | ImGuiTableColumnFlags_WidthFixed
+    INDENT_MASK_ = 196608,  // ImGuiTableColumnFlags_IndentEnable | ImGuiTableColumnFlags_IndentDisable
+    STATUS_MASK_ = 251658240,  // ImGuiTableColumnFlags_IsEnabled | ImGuiTableColumnFlags_IsVisible | ImGuiTableColumnFlags_IsSorted | ImGuiTableColumnFlags_IsHovered
+    NO_DIRECT_RESIZE_ = 1073741824,  // 1 << 30
+}
+enum ImGuiTableFlags : const CInt
+{
+    NONE = 0,  // 0
+    RESIZABLE = 1,  // 1 << 0
+    REORDERABLE = 2,  // 1 << 1
+    HIDEABLE = 4,  // 1 << 2
+    SORTABLE = 8,  // 1 << 3
+    NO_SAVED_SETTINGS = 16,  // 1 << 4
+    CONTEXT_MENU_IN_BODY = 32,  // 1 << 5
+    ROW_BG = 64,  // 1 << 6
+    BORDERS_INNER_H = 128,  // 1 << 7
+    BORDERS_OUTER_H = 256,  // 1 << 8
+    BORDERS_INNER_V = 512,  // 1 << 9
+    BORDERS_OUTER_V = 1024,  // 1 << 10
+    BORDERS_H = 384,  // ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_BordersOuterH
+    BORDERS_V = 1536,  // ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersOuterV
+    BORDERS_INNER = 640,  // ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH
+    BORDERS_OUTER = 1280,  // ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_BordersOuterH
+    BORDERS = 1920,  // ImGuiTableFlags_BordersInner | ImGuiTableFlags_BordersOuter
+    NO_BORDERS_IN_BODY = 2048,  // 1 << 11
+    NO_BORDERS_IN_BODY_UNTIL_RESIZE = 4096,  // 1 << 12
+    SIZING_FIXED_FIT = 8192,  // 1 << 13
+    SIZING_FIXED_SAME = 16384,  // 2 << 13
+    SIZING_STRETCH_PROP = 24576,  // 3 << 13
+    SIZING_STRETCH_SAME = 32768,  // 4 << 13
+    NO_HOST_EXTEND_X = 65536,  // 1 << 16
+    NO_HOST_EXTEND_Y = 131072,  // 1 << 17
+    NO_KEEP_COLUMNS_VISIBLE = 262144,  // 1 << 18
+    PRECISE_WIDTHS = 524288,  // 1 << 19
+    NO_CLIP = 1048576,  // 1 << 20
+    PAD_OUTER_X = 2097152,  // 1 << 21
+    NO_PAD_OUTER_X = 4194304,  // 1 << 22
+    NO_PAD_INNER_X = 8388608,  // 1 << 23
+    SCROLL_X = 16777216,  // 1 << 24
+    SCROLL_Y = 33554432,  // 1 << 25
+    SORT_MULTI = 67108864,  // 1 << 26
+    SORT_TRISTATE = 134217728,  // 1 << 27
+    HIGHLIGHT_HOVERED_COLUMN = 268435456,  // 1 << 28
+    SIZING_MASK_ = 57344,  // ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_SizingStretchSame
+}
+enum ImGuiTableRowFlags : const CInt
+{
+    NONE = 0,  // 0
+    HEADERS = 1,  // 1 << 0
+}
+enum ImGuiTextFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_WIDTH_FOR_LARGE_CLIPPED_TEXT = 1,  // 1 << 0
+}
+enum ImGuiTooltipFlags : const CInt
+{
+    NONE = 0,  // 0
+    OVERRIDE_PREVIOUS = 2,  // 1 << 1
+}
+enum ImGuiTreeNodeFlags : const CInt
+{
+    NONE = 0,  // 0
+    SELECTED = 1,  // 1 << 0
+    FRAMED = 2,  // 1 << 1
+    ALLOW_OVERLAP = 4,  // 1 << 2
+    NO_TREE_PUSH_ON_OPEN = 8,  // 1 << 3
+    NO_AUTO_OPEN_ON_LOG = 16,  // 1 << 4
+    DEFAULT_OPEN = 32,  // 1 << 5
+    OPEN_ON_DOUBLE_CLICK = 64,  // 1 << 6
+    OPEN_ON_ARROW = 128,  // 1 << 7
+    LEAF = 256,  // 1 << 8
+    BULLET = 512,  // 1 << 9
+    FRAME_PADDING = 1024,  // 1 << 10
+    SPAN_AVAIL_WIDTH = 2048,  // 1 << 11
+    SPAN_FULL_WIDTH = 4096,  // 1 << 12
+    SPAN_LABEL_WIDTH = 8192,  // 1 << 13
+    SPAN_ALL_COLUMNS = 16384,  // 1 << 14
+    LABEL_SPAN_ALL_COLUMNS = 32768,  // 1 << 15
+    NAV_LEFT_JUMPS_BACK_HERE = 131072,  // 1 << 17
+    COLLAPSING_HEADER = 26,  // ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
+}
+enum ImGuiTypingSelectFlags : const CInt
+{
+    NONE = 0,  // 0
+    ALLOW_BACKSPACE = 1,  // 1 << 0
+    ALLOW_SINGLE_CHAR_MODE = 2,  // 1 << 1
+}
+enum ImGuiViewportFlags : const CInt
+{
+    NONE = 0,  // 0
+    IS_PLATFORM_WINDOW = 1,  // 1 << 0
+    IS_PLATFORM_MONITOR = 2,  // 1 << 1
+    OWNED_BY_APP = 4,  // 1 << 2
+    NO_DECORATION = 8,  // 1 << 3
+    NO_TASK_BAR_ICON = 16,  // 1 << 4
+    NO_FOCUS_ON_APPEARING = 32,  // 1 << 5
+    NO_FOCUS_ON_CLICK = 64,  // 1 << 6
+    NO_INPUTS = 128,  // 1 << 7
+    NO_RENDERER_CLEAR = 256,  // 1 << 8
+    NO_AUTO_MERGE = 512,  // 1 << 9
+    TOP_MOST = 1024,  // 1 << 10
+    CAN_HOST_OTHER_WINDOWS = 2048,  // 1 << 11
+    IS_MINIMIZED = 4096,  // 1 << 12
+    IS_FOCUSED = 8192,  // 1 << 13
+}
+enum ImGuiWindowDockStyleCol : const CInt
+{
+    TEXT = 0,  // 0
+    TAB_HOVERED = 1,  // 1
+    TAB_FOCUSED = 2,  // 2
+    TAB_SELECTED = 3,  // 3
+    TAB_SELECTED_OVERLINE = 4,  // 4
+    TAB_DIMMED = 5,  // 5
+    TAB_DIMMED_SELECTED = 6,  // 6
+    TAB_DIMMED_SELECTED_OVERLINE = 7,  // 7
+    COUNT = 8,  // 8
+}
+enum ImGuiWindowFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_TITLE_BAR = 1,  // 1 << 0
+    NO_RESIZE = 2,  // 1 << 1
+    NO_MOVE = 4,  // 1 << 2
+    NO_SCROLLBAR = 8,  // 1 << 3
+    NO_SCROLL_WITH_MOUSE = 16,  // 1 << 4
+    NO_COLLAPSE = 32,  // 1 << 5
+    ALWAYS_AUTO_RESIZE = 64,  // 1 << 6
+    NO_BACKGROUND = 128,  // 1 << 7
+    NO_SAVED_SETTINGS = 256,  // 1 << 8
+    NO_MOUSE_INPUTS = 512,  // 1 << 9
+    MENU_BAR = 1024,  // 1 << 10
+    HORIZONTAL_SCROLLBAR = 2048,  // 1 << 11
+    NO_FOCUS_ON_APPEARING = 4096,  // 1 << 12
+    NO_BRING_TO_FRONT_ON_FOCUS = 8192,  // 1 << 13
+    ALWAYS_VERTICAL_SCROLLBAR = 16384,  // 1 << 14
+    ALWAYS_HORIZONTAL_SCROLLBAR = 32768,  // 1<< 15
+    NO_NAV_INPUTS = 65536,  // 1 << 16
+    NO_NAV_FOCUS = 131072,  // 1 << 17
+    UNSAVED_DOCUMENT = 262144,  // 1 << 18
+    NO_DOCKING = 524288,  // 1 << 19
+    NO_NAV = 196608,  // ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
+    NO_DECORATION = 43,  // ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse
+    NO_INPUTS = 197120,  // ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoNavFocus
+    DOCK_NODE_HOST = 8388608,  // 1 << 23
+    CHILD_WINDOW = 16777216,  // 1 << 24
+    TOOLTIP = 33554432,  // 1 << 25
+    POPUP = 67108864,  // 1 << 26
+    MODAL = 134217728,  // 1 << 27
+    CHILD_MENU = 268435456,  // 1 << 28
+}
+enum ImGuiWindowRefreshFlags : const CInt
+{
+    NONE = 0,  // 0
+    TRY_TO_AVOID_REFRESH = 1,  // 1 << 0
+    REFRESH_ON_HOVER = 2,  // 1 << 1
+    REFRESH_ON_FOCUS = 4,  // 1 << 2
+}
 struct ImBitVector
 {
     ImVector storage;
@@ -1513,7 +1495,7 @@ struct ImGuiContext
     double last_key_mods_change_from_none_time;
     double last_keyboard_key_press_time;
     ImBitArrayForNamedKeys keys_may_be_char_input;
-    ImGuiKeyOwnerData[(usz)key::NAMED_KEY_COUNT] keys_owner_data;
+    ImGuiKeyOwnerData[(usz)ImGuiKey.NAMED_KEY_COUNT] keys_owner_data;
     ImGuiKeyRoutingTable keys_routing_table;
     ImU32 active_id_using_nav_dir_mask;
     bool active_id_using_all_keyboard_keys;
@@ -1695,7 +1677,7 @@ struct ImGuiContext
     ImChunkStream settings_tables;
     ImVector hooks;
     ImGuiID hook_id_next;
-    ZString[(usz)loc_key::COUNT] localization_table;
+    ZString[(usz)ImGuiLocKey.COUNT] localization_table;
     bool log_enabled;
     ImGuiLogFlags log_flags;
     ImGuiWindow* log_window;
@@ -1968,7 +1950,7 @@ struct ImGuiIO
     bool key_alt;
     bool key_super;
     ImGuiKeyChord key_mods;
-    ImGuiKeyData[(usz)key::NAMED_KEY_COUNT] keys_data;
+    ImGuiKeyData[(usz)ImGuiKey.NAMED_KEY_COUNT] keys_data;
     bool want_capture_mouse_unless_popup_close;
     ImVec2 mouse_pos_prev;
     ImVec2[5] mouse_clicked_pos;
@@ -2104,7 +2086,7 @@ struct ImGuiKeyRoutingData
 }
 struct ImGuiKeyRoutingTable
 {
-    ImGuiKeyRoutingIndex[(usz)key::NAMED_KEY_COUNT] index;
+    ImGuiKeyRoutingIndex[(usz)ImGuiKey.NAMED_KEY_COUNT] index;
     ImVector entries;
     ImVector entries_next;
 }
@@ -2497,7 +2479,7 @@ struct ImGuiStyle
     bool anti_aliased_fill;
     float curve_tessellation_tol;
     float circle_tessellation_max_error;
-    ImVec4[(usz)col::COUNT] colors;
+    ImVec4[(usz)ImGuiCol.COUNT] colors;
     float hover_stationary_delay;
     float hover_delay_short;
     float hover_delay_normal;
@@ -3003,9 +2985,9 @@ struct ImGuiWindow
     ImGuiWindow* root_window_for_nav;
     ImGuiWindow* parent_window_for_focus_route;
     ImGuiWindow* nav_last_child_nav_window;
-    ImGuiID[(usz)nav_layer::COUNT] nav_last_ids;
-    ImRect[(usz)nav_layer::COUNT] nav_rect_rel;
-    ImVec2[(usz)nav_layer::COUNT] nav_preferred_scoring_pos_rel;
+    ImGuiID[(usz)ImGuiNavLayer.COUNT] nav_last_ids;
+    ImRect[(usz)ImGuiNavLayer.COUNT] nav_rect_rel;
+    ImVec2[(usz)ImGuiNavLayer.COUNT] nav_preferred_scoring_pos_rel;
     ImGuiID nav_root_focus_scope_id;
     CInt memory_draw_list_idx_capacity;
     CInt memory_draw_list_vtx_capacity;
@@ -3034,7 +3016,7 @@ struct ImGuiWindowClass
 }
 struct ImGuiWindowDockStyle
 {
-    ImU32[(usz)window_dock_style_col::COUNT] colors;
+    ImU32[(usz)ImGuiWindowDockStyleCol.COUNT] colors;
 }
 struct ImGuiWindowSettings
 {
@@ -3129,6 +3111,24 @@ struct ImVec4
     float z;
     float w;
 }
+typedef ImBitArrayPtr = ImU32*;
+alias ImDrawCallback = fn void(ImDrawList* parent_list, ImDrawCmd* cmd);
+typedef ImDrawIdx = CUShort;
+typedef ImFileHandle = libc::CFile;
+alias ImGuiContextHookCallback = fn void(ImGuiContext* ctx, ImGuiContextHook* hook);
+alias ImGuiErrorCallback = fn void(ImGuiContext* ctx, void* user_data, char* msg);
+typedef ImGuiID = CUInt;
+alias ImGuiInputTextCallback = fn int(ImGuiInputTextCallbackData* data);
+typedef ImGuiKeyChord = CInt;
+typedef ImGuiKeyRoutingIndex = ImS16;
+alias ImGuiMemAllocFunc = fn void*(usz sz, void* user_data);
+alias ImGuiMemFreeFunc = fn void(void* ptr, void* user_data);
+typedef ImGuiSelectionUserData = ImS64;
+alias ImGuiSizeCallback = fn void(ImGuiSizeCallbackData* data);
+typedef ImGuiTableColumnIdx = ImS16;
+typedef ImGuiTableDrawChannelIdx = ImU16;
+typedef ImPoolIdx = CInt;
+typedef ImTextureID = ImU64;
 // Skipping templated: ImBitArray_ClearAllBits
 // Skipping templated: ImBitArray_ClearBit
 // Skipping templated: ImBitArray_ImBitArray

@@ -36,9 +36,9 @@ fn void frame()
     });
 
     /*=== UI CODE STARTS HERE ===*/
-    ig::set_next_window_pos({10, 10}, ig::cond::ONCE);
-    ig::set_next_window_size({600, 500}, ig::cond::ONCE);
-    ig::begin("Hello Dear ImGui!", null, window_flags::NONE);
+    ig::set_next_window_pos({10, 10}, ImGuiCond.ONCE);
+    ig::set_next_window_size({600, 500}, ImGuiCond.ONCE);
+    ig::begin("Hello Dear ImGui!", null, ImGuiWindowFlags.NONE);
 
     if (ig::button("Open file dialog"))
     {

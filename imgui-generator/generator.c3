@@ -98,7 +98,7 @@ $else
 $endif
 }
 
-fn void? generate_typedefs(Object* node)
+fn void? generate_typedefs(Object* node, HashSet{String}* existing_enums)
 {
     if (!node.is_map()) return INVALID_DEFINITION?;
 
@@ -110,6 +110,7 @@ fn void? generate_typedefs(Object* node)
         bool generate_alias = true;
         generate_alias = generate_alias && !is_typedef_predefined(alias_name);
         generate_alias = generate_alias && !type.starts_with("struct ");  // Don't generate aliases for structs.
+        generate_alias = generate_alias && !existing_enums.contains(alias_name);  // Don't generate aliases for enums.
         if (generate_alias)
         {
             String c3_type = translate_type_in_typedef(type, alias_name)!;
@@ -350,18 +351,17 @@ fn String? translate_array_size(String size)
 {
 $if GENERATE_GUI:
     // Handle case when array size is specified by number of items in enum.
-    // For example array size `ImGuiKey_NamedKey_COUNT` shoule be translated to `key::NAMED_KEY_COUNT`.
+    // For example array size `ImGuiKey_NamedKey_COUNT` shoule be translated to `ImGuiKey.NAMED_KEY_COUNT`.
     if (size.starts_with("ImGui") && size.ends_with("_COUNT"))
     {
-        size = size.strip("ImGui");
         usz first_underscore_idx = size.index_of_char('_')!;
-        // Because count uses distinct type we have to convert it to `usz`.
-        return string::tformat("(usz)%s::%s", translate_field_name(size[:first_underscore_idx]), translate_constant_name(size[first_underscore_idx+1..]));
+        // Enum value must be converted to `usz` explicitly.
+        return string::tformat("(usz)%s.%s", size[:first_underscore_idx], translate_constant_name(size[first_underscore_idx+1..]));
     }
     return size;
 $else
-    if (size == "ImAxis_COUNT") return "(usz)ipl::axis::COUNT";
-    if (size == "ImPlotCol_COUNT") return "(usz)ipl::col::COUNT";
+    if (size == "ImAxis_COUNT") return "(usz)ImAxis.COUNT";
+    if (size == "ImPlotCol_COUNT") return "(usz)ImPlotCol.COUNT";
     return size;
 $endif
 }
@@ -379,7 +379,8 @@ fn String? translate_maybe_array_type(String type, String name)
     }
 }
 
-fn void? generate_structs_and_enums(Object* node)
+// `existing_enums` will be populated by enum names so we can skip those when generating typedefs.
+fn void? generate_structs_and_enums(Object* node, HashSet{String}* existing_enums)
 {
     if (!node.is_map()) return INVALID_DEFINITION?;
 
@@ -438,35 +439,19 @@ $endif
                     List{Object*} items = desc.array;
 
                     String c3_item_type = enum_name.strip_end("_");
-                    String c3_enum_submodule =
-                        enum_name.starts_with(ENUM_PREFIX_TO_DROP) ?
-                        enum_name.strip(ENUM_PREFIX_TO_DROP) :
-                        // Some enum names don't start with `ImGui` (nor with `ImPlot`) but only with `Im`.
-                        // But we don't want `im_` prefix in submodule name.
-                        // For example enums `ImDrawListFlags_` resp. `ImFontAtlasFlags_`
-                        // shoule be in module `ig::draw_flags` not `ig::im_draw_flags`
-                        // resp. `ig::font_atlas_flags` not `ig::im_font_atlas_flags`.
-                        enum_name.strip("Im");
-                    c3_enum_submodule = translate_field_name(c3_enum_submodule.strip_end("_"));
 
                     // Skip private enums.
                     if (!c3_item_type.ends_with("Private"))
                     {
-                        // If original enum name doesn't end with underscore then
-                        // we have to define distinct type.
-                        // Otherwise it was already defined when processing typedefs.
-                        if (!enum_name.ends_with("_"))
-                        {
-                            // If not specified otherwise underlying type for C enums is int.
-                            String underlying_type = "int";
-                            if (enum_types_obj.has_key(c3_item_type))
-                            {
-                                underlying_type = enum_types_obj.get_string(c3_item_type)!;
-                            }
-                            io::printfn("typedef %s = %s;", c3_item_type, translate_non_array_type(underlying_type, c3_item_type)!);
-                        }
+                        existing_enums.add(c3_item_type);
 
-                        io::printfn("module %s::%s;", current_module, c3_enum_submodule);
+                        String underlying_type = "int";
+                        if (enum_types_obj.has_key(c3_item_type))
+                        {
+                            underlying_type = enum_types_obj.get_string(c3_item_type)!;
+                        }
+                        io::printfn("enum %s : const %s", c3_item_type, translate_non_array_type(underlying_type, c3_item_type)!);
+                        io::printfn("{");
                         foreach (item : items)
                         {
                             // Usually enum item names start with enum name.
@@ -479,9 +464,9 @@ $endif
                             String c3_item_name = translate_constant_name(name);
                             long calc_value = item.get_long("calc_value")!;
                             String value = item.get_string("value")!;
-                            io::printfn("const %s %s = %d;  // %s", c3_item_type, c3_item_name, calc_value, value);
+                            io::printfn("    %s = %d,  // %s", c3_item_name, calc_value, value);
                         }
-                        io::printfn("module %s;", current_module);
+                        io::printfn("}");
                     }
                 };
                 break;
@@ -730,7 +715,7 @@ fn void? generate_imgui_code()
     io::printfn("// It should be kept in sync.");
     io::printfn("struct ImBitArrayForNamedKeys");
     io::printfn("{");
-    io::printfn("    ImU32[((usz)key::NAMED_KEY_COUNT + 31) >> 5] storage;");
+    io::printfn("    ImU32[((usz)ImGuiKey.NAMED_KEY_COUNT + 31) >> 5] storage;");
     io::printfn("}");
     // Unfortunately we can't use C3 vectors for ImVec1, ImVec2 and ImVec4.
     // It doesn't work even though their size is same.
@@ -804,13 +789,14 @@ fn void? generate_imgui_code()
     io::printfn("alias CompareFn = fn CInt(void*, void*);");
     io::printfn("alias GetFloatByIndexFn = fn float(void* data, CInt idx);");
 
-    char[] bytes = file::load_temp("imgui-generator/definitions/cimgui/typedefs_dict.json")!;
+    char[] bytes = file::load_temp("imgui-generator/definitions/cimgui/structs_and_enums.json")!;
     Object* obj = json::tparse_string((String)bytes)!;
-    generate_typedefs(obj)!;
+    HashSet{String} existing_enums;
+    generate_structs_and_enums(obj, &existing_enums)!;
 
-    bytes = file::load_temp("imgui-generator/definitions/cimgui/structs_and_enums.json")!;
+    bytes = file::load_temp("imgui-generator/definitions/cimgui/typedefs_dict.json")!;
     obj = json::tparse_string((String)bytes)!;
-    generate_structs_and_enums(obj)!;
+    generate_typedefs(obj, &existing_enums)!;
 
     bytes = file::load_temp("imgui-generator/definitions/cimgui/definitions.json")!;
     obj = json::tparse_string((String)bytes)!;
@@ -821,13 +807,14 @@ fn void? generate_implot_code()
 {
     io::printfn("module %s;", current_module);
 
-    char[] bytes = file::load_temp("imgui-generator/definitions/cimplot/typedefs_dict.json")!;
+    char[] bytes = file::load_temp("imgui-generator/definitions/cimplot/structs_and_enums.json")!;
     Object* obj = json::tparse_string((String)bytes)!;
-    generate_typedefs(obj)!;
+    HashSet{String} existing_enums;
+    generate_structs_and_enums(obj, &existing_enums)!;
 
-    bytes = file::load_temp("imgui-generator/definitions/cimplot/structs_and_enums.json")!;
+    bytes = file::load_temp("imgui-generator/definitions/cimplot/typedefs_dict.json")!;
     obj = json::tparse_string((String)bytes)!;
-    generate_structs_and_enums(obj)!;
+    generate_typedefs(obj, &existing_enums)!;
 
     bytes = file::load_temp("imgui-generator/definitions/cimplot/definitions.json")!;
     obj = json::tparse_string((String)bytes)!;

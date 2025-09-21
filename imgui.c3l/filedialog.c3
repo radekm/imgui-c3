@@ -160,7 +160,7 @@ extern fn bool FileDialog.display(
     FileDialog* self,
     // `key` dialog to display (if not the same key as defined by OpenDialog => no opening).
     ZString key,
-    ImGuiWindowFlags flags = window_flags::NO_COLLAPSE,
+    ImGuiWindowFlags flags = ImGuiWindowFlags.NO_COLLAPSE,
     // Minimal size constraint for the ImGuiWindow.
     ImVec2 min_size = {},
     // Maximal size constraint for the ImGuiWindow.
