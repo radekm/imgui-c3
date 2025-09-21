@@ -7,7 +7,7 @@ import igfd;
 
 struct State
 {
-    sg::PassAction pass_action;
+    SgPassAction pass_action;
     FileDialog* file_dialog;
 }
 
@@ -15,20 +15,20 @@ State state;
 
 fn void init()
 {
-    sg::setup(&&(sg::Desc) {
+    sg::setup(&&(SgDesc) {
         .environment = sglue::environment(),
         .logger.func = &slog::func,
     });
-    simgui::setup(&&(simgui::Desc) {});
+    simgui::setup(&&(SimguiDesc) {});
     state.file_dialog = igfd::new_file_dialog();
 
     // initial clear color
-    state.pass_action.colors[0] = { .load_action = load_action::CLEAR, .clear_value = { 0.0f, 0.5f, 1.0f, 1.0 } };
+    state.pass_action.colors[0] = { .load_action = CLEAR, .clear_value = { 0.0f, 0.5f, 1.0f, 1.0 } };
 }
 
 fn void frame()
 {
-    simgui::new_frame(&&(simgui::FrameDesc) {
+    simgui::new_frame(&&(SimguiFrameDesc) {
         .width = sapp::width(),
         .height = sapp::height(),
         .delta_time = sapp::frame_duration(),
@@ -70,13 +70,13 @@ fn void frame()
     }
     /*=== UI CODE ENDS HERE ===*/
 
-    sg::begin_pass(&&(sg::Pass) { .action = state.pass_action, .swapchain = sglue::swapchain() });
+    sg::begin_pass(&&(SgPass) { .action = state.pass_action, .swapchain = sglue::swapchain() });
     simgui::render();
     sg::end_pass();
     sg::commit();
 }
 
-fn void event(sapp::Event* ev)
+fn void event(SappEvent* ev)
 {
     simgui::handle_event(ev);
 }
@@ -90,7 +90,7 @@ fn void cleanup()
 
 fn void main()
 {
-    sapp::run(&&(sapp::Desc) {
+    sapp::run(&&(SappDesc) {
         .init_cb = &init,
         .frame_cb = &frame,
         .cleanup_cb = &cleanup,

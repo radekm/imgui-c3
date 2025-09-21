@@ -15,4 +15,6 @@
 
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include "cimgui.h"
+// `ImTextureID_Invalid` is needed by `sokol_imgui.h`.
+#define ImTextureID_Invalid ((ImTextureID)0)
 #include "sokol_imgui.h"

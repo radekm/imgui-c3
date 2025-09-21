@@ -2,7 +2,7 @@
     "provides": "sokol",
     "targets": {
         "macos-aarch64": {
-            "cflags": "-mmacos-version-min=13.0",
+            "cflags-override": "-DIMPL -mmacos-version-min=11.0 -x objective-c -DSOKOL_METAL",
             "linked-libraries": [
                 "sokol",
                 "Foundation.framework",
@@ -16,6 +16,7 @@
             ]
         },
         "linux-x64": {
+            "cflags-override": "-DIMPL -DSOKOL_GLCORE",
             "linked-libraries": [
                 "sokol",
                 "X11",
@@ -24,10 +25,12 @@
                 "GL",
                 "asound",
                 "dl",
-                "pthread"
+                "pthread",
+                "m"
             ]
         },
         "windows-x64": {
+            "cflags-override": "-DIMPL -DSOKOL_D3D11",
             "linked-libraries": [
                 "sokol"
             ]

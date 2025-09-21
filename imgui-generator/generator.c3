@@ -53,6 +53,7 @@ fn bool is_typedef_predefined(String alias_name)
         case "ImU16":
         case "ImU32":
         case "ImU64":
+        case "stbrp_node_im":
             return true;
         default:
             return false;
@@ -210,6 +211,35 @@ $if GENERATE_GUI:
             return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "bool(*)(ImFontAtlas* atlas)":
             if (name == "FontBuilder_Build") return "FontBuilder_Build";
+            if (name == "LoaderInit") return "LoaderInitFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "void(*)(ImFontAtlas* atlas)":
+            if (name == "LoaderShutdown") return "LoaderShutdownFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "bool(*)(ImFontAtlas* atlas,ImFontConfig* src)":
+            if (name == "FontSrcInit") return "FontSrcInitFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "void(*)(ImFontAtlas* atlas,ImFontConfig* src)":
+            if (name == "FontSrcDestroy") return "FontSrcDestroyFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "bool(*)(ImFontAtlas* atlas,ImFontConfig* src,ImWchar codepoint)":
+            if (name == "FontSrcContainsGlyph") return "FontSrcContainsGlyphFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "bool(*)(ImFontAtlas* atlas,ImFontConfig* src,ImFontBaked* baked,void* loader_data_for_baked_src)":
+            if (name == "FontBakedInit") return "FontBakedInitFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "void(*)(ImFontAtlas* atlas,ImFontConfig* src,ImFontBaked* baked,void* loader_data_for_baked_src)":
+            if (name == "FontBakedDestroy") return "FontBakedDestroyFn";
+            io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
+            return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
+        case "bool(*)(ImFontAtlas* atlas,ImFontConfig* src,ImFontBaked* baked,void* loader_data_for_baked_src,ImWchar codepoint,ImFontGlyph* out_glyph,float* out_advance_x)":
+            if (name == "FontBakedLoadGlyph") return "FontBakedLoadGlyphFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "char*(*)(ImGuiContext* ctx)":
@@ -241,7 +271,7 @@ $if GENERATE_GUI:
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "ImVec2(*)(ImGuiViewport* vp)":
-            if (name == "Platform_GetWindowPos" || name == "Platform_GetWindowSize") return "Platform_GetWindowPosOrSizeFn";
+            if (name == "Platform_GetWindowPos" || name == "Platform_GetWindowSize" || name == "Platform_GetWindowFramebufferScale") return "Platform_GetWindowPosOrSizeOrScaleFn";
             io::printfn("Unknown field '%s' with function pointer '%s'", name, type);
             return UNKNOWN_FIELD_WITH_FUNCTION_POINTER?;
         case "ImVec4(*)(ImGuiViewport* vp)":
@@ -320,6 +350,7 @@ $endif
         case "unsigned char": return "char";
         case "unsigned char*": return "char*";
         case "unsigned char**": return "char**";
+        // CONSIDER: Should we use CChar? Or it doesn't matter?
         case "char": return "char";  // NOTE: This is also applied for char arrays.
         // Maybe we shouldn't return `ZString` for `ImFont_CalcTextSizeA`.
         case "char*": return "ZString";
@@ -330,6 +361,9 @@ $endif
         case "tm": return "libc::Tm";
         case "tm*": return "libc::Tm*";
         case "time_t": return "libc::Time_t";
+
+        case "stbrp_context_opaque": return "StbrpContextOpaque";
+        case "stbrp_node": return "StbrpNode";
 
         default:
 
@@ -410,6 +444,7 @@ $endif
                 @each_asc(val.map; String struct_name, Object* desc)
                 {
                     if (!desc.is_array()) return INVALID_DEFINITION?;
+                    if (struct_name == "stbrp_context_opaque") struct_name = "StbrpContextOpaque";
                     List{Object*} fields = desc.array;
 
                     io::printfn("struct %s", struct_name);
@@ -500,6 +535,7 @@ fn bool is_unsupported_function(String name)
         case "igTreeNodeExV_Ptr":
         case "igTreeNodeV_Str":
         case "igTreeNodeV_Ptr":
+        case "igTextAlignedV":
             return true;
 
         // From ImPlot.
@@ -746,6 +782,13 @@ fn void? generate_imgui_code()
     io::printfn("{");
     io::printfn("    ImVector buf;");
     io::printfn("}");
+    io::printfn("struct ImStableVector_ImFontBaked__32");
+    io::printfn("{");
+    io::printfn("    CInt size;");
+    io::printfn("    CInt capacity;");
+    io::printfn("    ImVector blocks;");
+    io::printfn("}");
+    io::printfn("alias StbrpNode = void;");
     io::printfn("alias ImWchar16 = ushort;");
     io::printfn("alias ImWchar32 = ulong;");
     io::printfn("// We don't compile ImGui with IMGUI_USE_WCHAR32 option.");
@@ -769,13 +812,21 @@ fn void? generate_imgui_code()
     io::printfn("alias Settings_WriteAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf);");
     io::printfn("alias Context_DockNodeWindowMenuHandler = fn void(ImGuiContext* ctx, ImGuiDockNode* node, ImGuiTabBar* tab_bar);");
     io::printfn("alias FontBuilder_Build = fn bool(ImFontAtlas* atlas);");
+    io::printfn("alias LoaderInitFn = fn bool(ImFontAtlas* atlas);");
+    io::printfn("alias LoaderShutdownFn = fn void(ImFontAtlas* atlas);");
+    io::printfn("alias FontSrcInitFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src);");
+    io::printfn("alias FontSrcDestroyFn = fn void(ImFontAtlas* atlas, ImFontConfig* src);");
+    io::printfn("alias FontSrcContainsGlyphFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImWchar codepoint);");
+    io::printfn("alias FontBakedInitFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src);");
+    io::printfn("alias FontBakedDestroyFn = fn void(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src);");
+    io::printfn("alias FontBakedLoadGlyphFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, ImWchar codepoint, ImFontGlyph* out_glyph, float* out_advance_x);");
     io::printfn("alias Platform_GetClipboardTextFn = fn ZString(ImGuiContext* ctx);");
     io::printfn("alias Platform_SetClipboardTextFn = fn void(ImGuiContext* ctx, ZString text);");
     io::printfn("alias Platform_OpenInShellFn = fn bool(ImGuiContext* ctx, ZString path);");
     io::printfn("alias Platform_SetImeDataFn = fn void(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);");
     io::printfn("alias Platform_WindowActionFn = fn void(ImGuiViewport* vp);");
     io::printfn("alias Platform_SetWindowPosOrSizeFn = fn void(ImGuiViewport* vp, ImVec2 pos_or_size);");
-    io::printfn("alias Platform_GetWindowPosOrSizeFn = fn ImVec2(ImGuiViewport* vp);");
+    io::printfn("alias Platform_GetWindowPosOrSizeOrScaleFn = fn ImVec2(ImGuiViewport* vp);");
     io::printfn("alias Platform_GetWindowWorkAreaInsetsFn = fn ImVec4(ImGuiViewport* vp);");
     io::printfn("alias Platform_GetWindowBoolPropFn = fn bool(ImGuiViewport* vp);");
     io::printfn("alias Platform_SetWindowTitleFn = fn void(ImGuiViewport* vp, ZString str);");

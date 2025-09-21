@@ -31,6 +31,13 @@ struct ImChunkStream
 {
     ImVector buf;
 }
+struct ImStableVector_ImFontBaked__32
+{
+    CInt size;
+    CInt capacity;
+    ImVector blocks;
+}
+alias StbrpNode = void;
 alias ImWchar16 = ushort;
 alias ImWchar32 = ulong;
 // We don't compile ImGui with IMGUI_USE_WCHAR32 option.
@@ -53,13 +60,21 @@ alias Settings_ApplyAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* han
 alias Settings_WriteAllFn = fn void(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* out_buf);
 alias Context_DockNodeWindowMenuHandler = fn void(ImGuiContext* ctx, ImGuiDockNode* node, ImGuiTabBar* tab_bar);
 alias FontBuilder_Build = fn bool(ImFontAtlas* atlas);
+alias LoaderInitFn = fn bool(ImFontAtlas* atlas);
+alias LoaderShutdownFn = fn void(ImFontAtlas* atlas);
+alias FontSrcInitFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src);
+alias FontSrcDestroyFn = fn void(ImFontAtlas* atlas, ImFontConfig* src);
+alias FontSrcContainsGlyphFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImWchar codepoint);
+alias FontBakedInitFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src);
+alias FontBakedDestroyFn = fn void(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src);
+alias FontBakedLoadGlyphFn = fn bool(ImFontAtlas* atlas, ImFontConfig* src, ImFontBaked* baked, void* loader_data_for_baked_src, ImWchar codepoint, ImFontGlyph* out_glyph, float* out_advance_x);
 alias Platform_GetClipboardTextFn = fn ZString(ImGuiContext* ctx);
 alias Platform_SetClipboardTextFn = fn void(ImGuiContext* ctx, ZString text);
 alias Platform_OpenInShellFn = fn bool(ImGuiContext* ctx, ZString path);
 alias Platform_SetImeDataFn = fn void(ImGuiContext* ctx, ImGuiViewport* viewport, ImGuiPlatformImeData* data);
 alias Platform_WindowActionFn = fn void(ImGuiViewport* vp);
 alias Platform_SetWindowPosOrSizeFn = fn void(ImGuiViewport* vp, ImVec2 pos_or_size);
-alias Platform_GetWindowPosOrSizeFn = fn ImVec2(ImGuiViewport* vp);
+alias Platform_GetWindowPosOrSizeOrScaleFn = fn ImVec2(ImGuiViewport* vp);
 alias Platform_GetWindowWorkAreaInsetsFn = fn ImVec4(ImGuiViewport* vp);
 alias Platform_GetWindowBoolPropFn = fn bool(ImGuiViewport* vp);
 alias Platform_SetWindowTitleFn = fn void(ImGuiViewport* vp, ZString str);
@@ -104,6 +119,13 @@ enum ImFontAtlasFlags : const CInt
     NO_MOUSE_CURSORS = 2,  // 1 << 1
     NO_BAKED_LINES = 4,  // 1 << 2
 }
+enum ImFontFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_LOAD_ERROR = 2,  // 1 << 1
+    NO_LOAD_GLYPHS = 4,  // 1 << 2
+    LOCK_BAKED_SIZES = 8,  // 1 << 3
+}
 enum ImGuiActivateFlags : const CInt
 {
     NONE = 0,  // 0
@@ -126,6 +148,7 @@ enum ImGuiBackendFlags : const CInt
     HAS_MOUSE_CURSORS = 2,  // 1 << 1
     HAS_SET_MOUSE_POS = 4,  // 1 << 2
     RENDERER_HAS_VTX_OFFSET = 8,  // 1 << 3
+    RENDERER_HAS_TEXTURES = 16,  // 1 << 4
     PLATFORM_HAS_VIEWPORTS = 1024,  // 1 << 10
     HAS_MOUSE_HOVERED_VIEWPORT = 2048,  // 1 << 11
     RENDERER_HAS_VIEWPORTS = 4096,  // 1 << 12
@@ -187,32 +210,34 @@ enum ImGuiCol : const CInt
     RESIZE_GRIP = 30,  // 30
     RESIZE_GRIP_HOVERED = 31,  // 31
     RESIZE_GRIP_ACTIVE = 32,  // 32
-    TAB_HOVERED = 33,  // 33
-    TAB = 34,  // 34
-    TAB_SELECTED = 35,  // 35
-    TAB_SELECTED_OVERLINE = 36,  // 36
-    TAB_DIMMED = 37,  // 37
-    TAB_DIMMED_SELECTED = 38,  // 38
-    TAB_DIMMED_SELECTED_OVERLINE = 39,  // 39
-    DOCKING_PREVIEW = 40,  // 40
-    DOCKING_EMPTY_BG = 41,  // 41
-    PLOT_LINES = 42,  // 42
-    PLOT_LINES_HOVERED = 43,  // 43
-    PLOT_HISTOGRAM = 44,  // 44
-    PLOT_HISTOGRAM_HOVERED = 45,  // 45
-    TABLE_HEADER_BG = 46,  // 46
-    TABLE_BORDER_STRONG = 47,  // 47
-    TABLE_BORDER_LIGHT = 48,  // 48
-    TABLE_ROW_BG = 49,  // 49
-    TABLE_ROW_BG_ALT = 50,  // 50
-    TEXT_LINK = 51,  // 51
-    TEXT_SELECTED_BG = 52,  // 52
-    DRAG_DROP_TARGET = 53,  // 53
-    NAV_CURSOR = 54,  // 54
-    NAV_WINDOWING_HIGHLIGHT = 55,  // 55
-    NAV_WINDOWING_DIM_BG = 56,  // 56
-    MODAL_WINDOW_DIM_BG = 57,  // 57
-    COUNT = 58,  // 58
+    INPUT_TEXT_CURSOR = 33,  // 33
+    TAB_HOVERED = 34,  // 34
+    TAB = 35,  // 35
+    TAB_SELECTED = 36,  // 36
+    TAB_SELECTED_OVERLINE = 37,  // 37
+    TAB_DIMMED = 38,  // 38
+    TAB_DIMMED_SELECTED = 39,  // 39
+    TAB_DIMMED_SELECTED_OVERLINE = 40,  // 40
+    DOCKING_PREVIEW = 41,  // 41
+    DOCKING_EMPTY_BG = 42,  // 42
+    PLOT_LINES = 43,  // 43
+    PLOT_LINES_HOVERED = 44,  // 44
+    PLOT_HISTOGRAM = 45,  // 45
+    PLOT_HISTOGRAM_HOVERED = 46,  // 46
+    TABLE_HEADER_BG = 47,  // 47
+    TABLE_BORDER_STRONG = 48,  // 48
+    TABLE_BORDER_LIGHT = 49,  // 49
+    TABLE_ROW_BG = 50,  // 50
+    TABLE_ROW_BG_ALT = 51,  // 51
+    TEXT_LINK = 52,  // 52
+    TEXT_SELECTED_BG = 53,  // 53
+    TREE_LINES = 54,  // 54
+    DRAG_DROP_TARGET = 55,  // 55
+    NAV_CURSOR = 56,  // 56
+    NAV_WINDOWING_HIGHLIGHT = 57,  // 57
+    NAV_WINDOWING_DIM_BG = 58,  // 58
+    MODAL_WINDOW_DIM_BG = 59,  // 59
+    COUNT = 60,  // 60
 }
 enum ImGuiColorEditFlags : const CInt
 {
@@ -279,8 +304,6 @@ enum ImGuiConfigFlags : const CInt
     NO_KEYBOARD = 64,  // 1 << 6
     DOCKING_ENABLE = 128,  // 1 << 7
     VIEWPORTS_ENABLE = 1024,  // 1 << 10
-    DPI_ENABLE_SCALE_VIEWPORTS = 16384,  // 1 << 14
-    DPI_ENABLE_SCALE_FONTS = 32768,  // 1 << 15
     IS_SRGB = 1048576,  // 1 << 20
     IS_TOUCH_SCREEN = 2097152,  // 1 << 21
 }
@@ -395,7 +418,7 @@ enum ImGuiFocusedFlags : const CInt
     DOCK_HIERARCHY = 16,  // 1 << 4
     ROOT_AND_CHILD_WINDOWS = 3,  // ImGuiFocusedFlags_RootWindow | ImGuiFocusedFlags_ChildWindows
 }
-enum ImGuiFreeTypeBuilderFlags : const CInt
+enum ImGuiFreeTypeLoaderFlags : const CInt
 {
     NO_HINTING = 1,  // 1 << 0
     NO_AUTO_HINT = 2,  // 1 << 1
@@ -679,13 +702,13 @@ enum ImGuiKey : const CInt
     RESERVED_FOR_MOD_ALT = 665,  // 665
     RESERVED_FOR_MOD_SUPER = 666,  // 666
     NAMED_KEY_END = 667,  // 667
+    NAMED_KEY_COUNT = 155,  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
     MOD_NONE = 0,  // 0
     MOD_CTRL = 4096,  // 1 << 12
     MOD_SHIFT = 8192,  // 1 << 13
     MOD_ALT = 16384,  // 1 << 14
     MOD_SUPER = 32768,  // 1 << 15
     MOD_MASK_ = 61440,  // 0xF000
-    NAMED_KEY_COUNT = 155,  // ImGuiKey_NamedKey_END - ImGuiKey_NamedKey_BEGIN
 }
 enum ImGuiLayoutType : const CInt
 {
@@ -950,13 +973,15 @@ enum ImGuiStyleVar : const CInt
     TAB_BAR_OVERLINE_SIZE = 26,  // 26
     TABLE_ANGLED_HEADERS_ANGLE = 27,  // 27
     TABLE_ANGLED_HEADERS_TEXT_ALIGN = 28,  // 28
-    BUTTON_TEXT_ALIGN = 29,  // 29
-    SELECTABLE_TEXT_ALIGN = 30,  // 30
-    SEPARATOR_TEXT_BORDER_SIZE = 31,  // 31
-    SEPARATOR_TEXT_ALIGN = 32,  // 32
-    SEPARATOR_TEXT_PADDING = 33,  // 33
-    DOCKING_SEPARATOR_SIZE = 34,  // 34
-    COUNT = 35,  // 35
+    TREE_LINES_SIZE = 29,  // 29
+    TREE_LINES_ROUNDING = 30,  // 30
+    BUTTON_TEXT_ALIGN = 31,  // 31
+    SELECTABLE_TEXT_ALIGN = 32,  // 32
+    SEPARATOR_TEXT_BORDER_SIZE = 33,  // 33
+    SEPARATOR_TEXT_ALIGN = 34,  // 34
+    SEPARATOR_TEXT_PADDING = 35,  // 35
+    DOCKING_SEPARATOR_SIZE = 36,  // 36
+    COUNT = 37,  // 37
 }
 enum ImGuiTabBarFlags : const CInt
 {
@@ -1098,8 +1123,11 @@ enum ImGuiTreeNodeFlags : const CInt
     SPAN_LABEL_WIDTH = 8192,  // 1 << 13
     SPAN_ALL_COLUMNS = 16384,  // 1 << 14
     LABEL_SPAN_ALL_COLUMNS = 32768,  // 1 << 15
-    NAV_LEFT_JUMPS_BACK_HERE = 131072,  // 1 << 17
+    NAV_LEFT_JUMPS_TO_PARENT = 131072,  // 1 << 17
     COLLAPSING_HEADER = 26,  // ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_NoAutoOpenOnLog
+    DRAW_LINES_NONE = 262144,  // 1 << 18
+    DRAW_LINES_FULL = 524288,  // 1 << 19
+    DRAW_LINES_TO_NODES = 1048576,  // 1 << 20
 }
 enum ImGuiTypingSelectFlags : const CInt
 {
@@ -1177,6 +1205,19 @@ enum ImGuiWindowRefreshFlags : const CInt
     REFRESH_ON_HOVER = 2,  // 1 << 1
     REFRESH_ON_FOCUS = 4,  // 1 << 2
 }
+enum ImTextureFormat : const CInt
+{
+    RGBA32 = 0,  // 0
+    ALPHA8 = 1,  // 1
+}
+enum ImTextureStatus : const CInt
+{
+    OK = 0,  // 0
+    DESTROYED = 1,  // 1
+    WANT_CREATE = 2,  // 2
+    WANT_UPDATES = 3,  // 3
+    WANT_DESTROY = 4,  // 4
+}
 struct ImBitVector
 {
     ImVector storage;
@@ -1193,7 +1234,7 @@ struct ImDrawChannel
 struct ImDrawCmd
 {
     ImVec4 clip_rect;
-    ImTextureID texture_id;
+    ImTextureRef tex_ref;
     CUInt vtx_offset;
     CUInt idx_offset;
     CUInt elem_count;
@@ -1205,7 +1246,7 @@ struct ImDrawCmd
 struct ImDrawCmdHeader
 {
     ImVec4 clip_rect;
-    ImTextureID texture_id;
+    ImTextureRef tex_ref;
     CUInt vtx_offset;
 }
 struct ImDrawData
@@ -1219,6 +1260,7 @@ struct ImDrawData
     ImVec2 display_size;
     ImVec2 framebuffer_scale;
     ImGuiViewport* owner_viewport;
+    ImVector textures;
 }
 struct ImDrawDataBuilder
 {
@@ -1239,7 +1281,7 @@ struct ImDrawList
     ImDrawCmdHeader cmd_header;
     ImDrawListSplitter splitter;
     ImVector clip_rect_stack;
-    ImVector texture_id_stack;
+    ImVector texture_stack;
     ImVector callbacks_data_buf;
     float fringe_scale;
     ZString owner_name;
@@ -1248,6 +1290,7 @@ struct ImDrawListSharedData
 {
     ImVec2 tex_uv_white_pixel;
     ImVec4* tex_uv_lines;
+    ImFontAtlas* font_atlas;
     ImFont* font;
     float font_size;
     float font_scale;
@@ -1257,6 +1300,8 @@ struct ImDrawListSharedData
     ImDrawListFlags initial_flags;
     ImVec4 clip_rect_fullscreen;
     ImVector temp_buffer;
+    ImVector draw_lists;
+    ImGuiContext* context;
     ImVec2[48] arc_fast_vtx;
     float arc_fast_radius_cutoff;
     ImU8[64] circle_segment_counts;
@@ -1275,95 +1320,155 @@ struct ImDrawVert
 }
 struct ImFont
 {
-    ImVector index_advance_x;
-    float fallback_advance_x;
-    float font_size;
-    ImVector index_lookup;
-    ImVector glyphs;
-    ImFontGlyph* fallback_glyph;
+    ImFontBaked* last_baked;
     ImFontAtlas* container_atlas;
-    ImFontConfig* sources;
-    CShort sources_count;
-    CShort ellipsis_char_count;
+    ImFontFlags flags;
+    float current_rasterizer_density;
+    ImGuiID font_id;
+    float legacy_size;
+    ImVector sources;
     ImWchar ellipsis_char;
     ImWchar fallback_char;
-    float ellipsis_width;
-    float ellipsis_char_step;
-    float scale;
-    float ascent;
-    float descent;
-    CInt metrics_total_surface;
-    bool dirty_lookup_tables;
     ImU8[(0xFFFF+1)/8192/8] used8k_pages_map;
+    bool ellipsis_auto_bake;
+    ImGuiStorage remap_pairs;
 }
 struct ImFontAtlas
 {
     ImFontAtlasFlags flags;
-    ImTextureID tex_id;
-    CInt tex_desired_width;
+    ImTextureFormat tex_desired_format;
     CInt tex_glyph_padding;
+    CInt tex_min_width;
+    CInt tex_min_height;
+    CInt tex_max_width;
+    CInt tex_max_height;
     void* user_data;
+    ImTextureRef tex_ref;
+    ImTextureData* tex_data;
+    ImVector tex_list;
     bool locked;
-    bool tex_ready;
+    bool renderer_has_textures;
+    bool tex_is_built;
     bool tex_pixels_use_colors;
-    char* tex_pixels_alpha8;
-    CUInt* tex_pixels_rgba32;
-    CInt tex_width;
-    CInt tex_height;
     ImVec2 tex_uv_scale;
     ImVec2 tex_uv_white_pixel;
     ImVector fonts;
-    ImVector custom_rects;
     ImVector sources;
     ImVec4[(32)+1] tex_uv_lines;
-    ImFontBuilderIO* font_builder_io;
-    CUInt font_builder_flags;
-    CInt pack_id_mouse_cursors;
-    CInt pack_id_lines;
+    CInt tex_next_unique_id;
+    CInt font_next_unique_id;
+    ImVector draw_list_shared_datas;
+    ImFontAtlasBuilder* builder;
+    ImFontLoader* font_loader;
+    ZString font_loader_name;
+    void* font_loader_data;
+    CUInt font_loader_flags;
+    CInt ref_count;
+    ImGuiContext* owner_context;
 }
-struct ImFontAtlasCustomRect
+struct ImFontAtlasBuilder
+{
+    StbrpContextOpaque pack_context;
+    ImVector pack_nodes;
+    ImVector rects;
+    ImVector rects_index;
+    ImVector temp_buffer;
+    CInt rects_index_free_list_start;
+    CInt rects_packed_count;
+    CInt rects_packed_surface;
+    CInt rects_discarded_count;
+    CInt rects_discarded_surface;
+    CInt frame_count;
+    ImVec2i max_rect_size;
+    ImVec2i max_rect_bounds;
+    bool lock_disable_resize;
+    bool preloaded_all_glyphs_ranges;
+    ImStableVector_ImFontBaked__32 baked_pool;
+    ImGuiStorage baked_map;
+    CInt baked_discarded_count;
+    ImFontAtlasRectId pack_id_mouse_cursors;
+    ImFontAtlasRectId pack_id_lines_tex_data;
+}
+struct ImFontAtlasPostProcessData
+{
+    ImFontAtlas* font_atlas;
+    ImFont* font;
+    ImFontConfig* font_src;
+    ImFontBaked* font_baked;
+    ImFontGlyph* glyph;
+    void* pixels;
+    ImTextureFormat format;
+    CInt pitch;
+    CInt width;
+    CInt height;
+}
+struct ImFontAtlasRect
 {
     CUShort x;
     CUShort y;
-    CUShort width;
-    CUShort height;
-    CUInt glyph_id;
-    CUInt glyph_colored;
-    float glyph_advance_x;
-    ImVec2 glyph_offset;
-    ImFont* font;
+    CUShort w;
+    CUShort h;
+    ImVec2 uv0;
+    ImVec2 uv1;
 }
-struct ImFontBuilderIO
+struct ImFontAtlasRectEntry
 {
-    FontBuilder_Build font_builder_build;
+    CInt target_index;
+    CInt generation;
+    CUInt is_used;
+}
+struct ImFontBaked
+{
+    ImVector index_advance_x;
+    float fallback_advance_x;
+    float size;
+    float rasterizer_density;
+    ImVector index_lookup;
+    ImVector glyphs;
+    CInt fallback_glyph_index;
+    float ascent;
+    float descent;
+    CUInt metrics_total_surface;
+    CUInt want_destroy;
+    CUInt lock_loading_fallback;
+    CInt last_used_frame;
+    ImGuiID baked_id;
+    ImFont* container_font;
+    void* font_loader_datas;
 }
 struct ImFontConfig
 {
+    char[40] name;
     void* font_data;
     CInt font_data_size;
     bool font_data_owned_by_atlas;
     bool merge_mode;
     bool pixel_snap_h;
-    CInt font_no;
-    CInt oversample_h;
-    CInt oversample_v;
+    bool pixel_snap_v;
+    ImS8 oversample_h;
+    ImS8 oversample_v;
+    ImWchar ellipsis_char;
     float size_pixels;
-    ImVec2 glyph_offset;
     ImWchar* glyph_ranges;
+    ImWchar* glyph_exclude_ranges;
+    ImVec2 glyph_offset;
     float glyph_min_advance_x;
     float glyph_max_advance_x;
     float glyph_extra_advance_x;
-    CUInt font_builder_flags;
+    ImU32 font_no;
+    CUInt font_loader_flags;
     float rasterizer_multiply;
     float rasterizer_density;
-    ImWchar ellipsis_char;
-    char[40] name;
+    ImFontFlags flags;
     ImFont* dst_font;
+    ImFontLoader* font_loader;
+    void* font_loader_data;
 }
 struct ImFontGlyph
 {
     CUInt colored;
     CUInt visible;
+    CUInt source_idx;
     CUInt codepoint;
     float advance_x;
     float x0;
@@ -1374,10 +1479,30 @@ struct ImFontGlyph
     float v0;
     float u1;
     float v1;
+    CInt pack_id;
 }
 struct ImFontGlyphRangesBuilder
 {
     ImVector used_chars;
+}
+struct ImFontLoader
+{
+    ZString name;
+    LoaderInitFn loader_init;
+    LoaderShutdownFn loader_shutdown;
+    FontSrcInitFn font_src_init;
+    FontSrcDestroyFn font_src_destroy;
+    FontSrcContainsGlyphFn font_src_contains_glyph;
+    FontBakedInitFn font_baked_init;
+    FontBakedDestroyFn font_baked_destroy;
+    FontBakedLoadGlyphFn font_baked_load_glyph;
+    usz font_baked_src_loader_data_size;
+}
+struct ImFontStackData
+{
+    ImFont* font;
+    float font_size_before_scaling;
+    float font_size_after_scaling;
 }
 struct ImGuiBoxSelectState
 {
@@ -1414,16 +1539,18 @@ struct ImGuiComboPreviewData
 struct ImGuiContext
 {
     bool initialized;
-    bool font_atlas_owned_by_context;
     ImGuiIO io;
     ImGuiPlatformIO platform_io;
     ImGuiStyle style;
     ImGuiConfigFlags config_flags_curr_frame;
     ImGuiConfigFlags config_flags_last_frame;
+    ImVector font_atlases;
     ImFont* font;
+    ImFontBaked* font_baked;
     float font_size;
-    float font_base_size;
-    float font_scale;
+    float font_size_base;
+    float font_baked_scale;
+    float font_rasterizer_density;
     float current_dpi_scale;
     ImDrawListSharedData draw_list_shared_data;
     double time;
@@ -1462,7 +1589,7 @@ struct ImGuiContext
     float wheeling_window_release_timer;
     ImVec2 wheeling_window_wheel_remainder;
     ImVec2 wheeling_axis_avg;
-    ImGuiID debug_draw_id_conflicts;
+    ImGuiID debug_draw_id_conflicts_id;
     ImGuiID debug_hook_id_info;
     ImGuiID hovered_id;
     ImGuiID hovered_id_previous_frame;
@@ -1575,6 +1702,7 @@ struct ImGuiContext
     ImGuiKeyChord nav_just_moved_to_key_mods;
     bool nav_just_moved_to_is_tabbing;
     bool nav_just_moved_to_has_selection_data;
+    bool config_nav_windowing_with_gamepad;
     ImGuiKeyChord config_nav_windowing_key_next;
     ImGuiKeyChord config_nav_windowing_key_prev;
     ImGuiWindow* nav_windowing_target;
@@ -1582,6 +1710,7 @@ struct ImGuiContext
     ImGuiWindow* nav_windowing_list_window;
     float nav_windowing_timer;
     float nav_windowing_highlight_alpha;
+    ImGuiInputSource nav_windowing_input_source;
     bool nav_windowing_toggle_layer;
     ImGuiKey nav_windowing_toggle_key;
     ImVec2 nav_windowing_accum_delta_pos;
@@ -1634,7 +1763,8 @@ struct ImGuiContext
     ImVec2 mouse_last_valid_pos;
     ImGuiInputTextState input_text_state;
     ImGuiInputTextDeactivatedState input_text_deactivated_state;
-    ImFont input_text_password_font;
+    ImFontBaked input_text_password_font_backup_baked;
+    ImFontFlags input_text_password_font_backup_flags;
     ImGuiID temp_input_id;
     ImGuiDataTypeStorage data_type_zero_value;
     CInt begin_menu_depth;
@@ -1666,7 +1796,7 @@ struct ImGuiContext
     ImGuiTypingSelectState typing_select_state;
     ImGuiPlatformImeData platform_ime_data;
     ImGuiPlatformImeData platform_ime_data_prev;
-    ImGuiID platform_ime_viewport;
+    ImVector user_textures;
     ImGuiDockContext dock_context;
     Context_DockNodeWindowMenuHandler dock_node_window_menu_handler;
     bool settings_loaded;
@@ -1868,16 +1998,15 @@ struct ImGuiIO
     ImGuiConfigFlags config_flags;
     ImGuiBackendFlags backend_flags;
     ImVec2 display_size;
+    ImVec2 display_framebuffer_scale;
     float delta_time;
     float ini_saving_rate;
     ZString ini_filename;
     ZString log_filename;
     void* user_data;
     ImFontAtlas* fonts;
-    float font_global_scale;
-    bool font_allow_user_scaling;
     ImFont* font_default;
-    ImVec2 display_framebuffer_scale;
+    bool font_allow_user_scaling;
     bool config_nav_swap_gamepad_buttons;
     bool config_nav_move_set_mouse_pos;
     bool config_nav_capture_keyboard;
@@ -1893,6 +2022,8 @@ struct ImGuiIO
     bool config_viewports_no_task_bar_icon;
     bool config_viewports_no_decoration;
     bool config_viewports_no_default_parent;
+    bool config_dpi_scale_fonts;
+    bool config_dpi_scale_viewports;
     bool mouse_draw_cursor;
     bool config_mac_osxbehaviors;
     bool config_input_trickle_event_queue;
@@ -2108,7 +2239,7 @@ struct ImGuiListClipper
     CInt display_end;
     CInt items_count;
     float items_height;
-    float start_pos_y;
+    double start_pos_y;
     double start_seek_offset_y;
     void* temp_data;
 }
@@ -2154,11 +2285,13 @@ struct ImGuiMetricsConfig
     bool show_draw_cmd_mesh;
     bool show_draw_cmd_bounding_boxes;
     bool show_text_encoding_viewer;
+    bool show_texture_used_rect;
     bool show_docking_nodes;
     CInt show_windows_rects_type;
     CInt show_tables_rects_type;
     CInt highlight_monitor_idx;
     ImGuiID highlight_viewport_id;
+    bool show_font_preview;
 }
 struct ImGuiMultiSelectIO
 {
@@ -2303,14 +2436,17 @@ struct ImGuiPlatformIO
     Platform_SetImeDataFn platform_set_ime_data_fn;
     void* platform_ime_user_data;
     ImWchar platform_locale_decimal_point;
+    CInt renderer_texture_max_width;
+    CInt renderer_texture_max_height;
     void* renderer_render_state;
     Platform_WindowActionFn platform_create_window;
     Platform_WindowActionFn platform_destroy_window;
     Platform_WindowActionFn platform_show_window;
     Platform_SetWindowPosOrSizeFn platform_set_window_pos;
-    Platform_GetWindowPosOrSizeFn platform_get_window_pos;
+    Platform_GetWindowPosOrSizeOrScaleFn platform_get_window_pos;
     Platform_SetWindowPosOrSizeFn platform_set_window_size;
-    Platform_GetWindowPosOrSizeFn platform_get_window_size;
+    Platform_GetWindowPosOrSizeOrScaleFn platform_get_window_size;
+    Platform_GetWindowPosOrSizeOrScaleFn platform_get_window_framebuffer_scale;
     Platform_WindowActionFn platform_set_window_focus;
     Platform_GetWindowBoolPropFn platform_get_window_focus;
     Platform_GetWindowBoolPropFn platform_get_window_minimized;
@@ -2329,13 +2465,16 @@ struct ImGuiPlatformIO
     Platform_RenderActionFn renderer_render_window;
     Platform_RenderActionFn renderer_swap_buffers;
     ImVector monitors;
+    ImVector textures;
     ImVector viewports;
 }
 struct ImGuiPlatformImeData
 {
     bool want_visible;
+    bool want_text_input;
     ImVec2 input_pos;
     float input_line_height;
+    ImGuiID viewport_id;
 }
 struct ImGuiPlatformMonitor
 {
@@ -2428,6 +2567,9 @@ struct ImGuiStoragePair
 }
 struct ImGuiStyle
 {
+    float font_size_base;
+    float font_scale_main;
+    float font_scale_dpi;
     float alpha;
     float disabled_alpha;
     ImVec2 window_padding;
@@ -2464,6 +2606,9 @@ struct ImGuiStyle
     float tab_bar_overline_size;
     float table_angled_headers_angle;
     ImVec2 table_angled_headers_text_align;
+    ImGuiTreeNodeFlags tree_lines_flags;
+    float tree_lines_size;
+    float tree_lines_rounding;
     ImGuiDir color_button_position;
     ImVec2 button_text_align;
     ImVec2 selectable_text_align;
@@ -2485,6 +2630,8 @@ struct ImGuiStyle
     float hover_delay_normal;
     ImGuiHoveredFlags hover_flags_for_tooltip_mouse;
     ImGuiHoveredFlags hover_flags_for_tooltip_nav;
+    float main_scale;
+    float next_frame_font_size_base;
 }
 struct ImGuiStyleMod
 {
@@ -2808,6 +2955,9 @@ struct ImGuiTreeNodeStackData
     ImGuiTreeNodeFlags tree_flags;
     ImGuiItemFlags item_flags;
     ImRect nav_rect;
+    float draw_lines_x1;
+    float draw_lines_to_nodes_y2;
+    ImGuiTableColumnIdx draw_lines_table_column;
 }
 struct ImGuiTypingSelectRequest
 {
@@ -2833,6 +2983,7 @@ struct ImGuiViewport
     ImGuiViewportFlags flags;
     ImVec2 pos;
     ImVec2 size;
+    ImVec2 framebuffer_scale;
     ImVec2 work_pos;
     ImVec2 work_size;
     float dpi_scale;
@@ -2971,7 +3122,6 @@ struct ImGuiWindow
     ImVector columns_storage;
     float font_window_scale;
     float font_window_scale_parents;
-    float font_dpi_scale;
     float font_ref_size;
     CInt settings_offset;
     ImDrawList* draw_list;
@@ -3069,6 +3219,7 @@ struct ImGuiWindowTempData
     ImGuiMenuColumns menu_columns;
     CInt tree_depth;
     ImU32 tree_has_stack_data_depth_mask;
+    ImU32 tree_records_clipped_nodes_y2_mask;
     ImVector child_windows;
     ImGuiStorage* state_storage;
     ImGuiOldColumns* current_columns;
@@ -3090,6 +3241,37 @@ struct ImRect
     ImVec2 min;
     ImVec2 max;
 }
+struct ImTextureData
+{
+    CInt unique_id;
+    ImTextureStatus status;
+    void* backend_user_data;
+    ImTextureID tex_id;
+    ImTextureFormat format;
+    CInt width;
+    CInt height;
+    CInt bytes_per_pixel;
+    char* pixels;
+    ImTextureRect used_rect;
+    ImTextureRect update_rect;
+    ImVector updates;
+    CInt unused_frames;
+    CUShort ref_count;
+    bool use_colors;
+    bool want_destroy_next_frame;
+}
+struct ImTextureRect
+{
+    CUShort x;
+    CUShort y;
+    CUShort w;
+    CUShort h;
+}
+struct ImTextureRef
+{
+    ImTextureData* tex_data;
+    ImTextureID tex_id;
+}
 struct ImVec1
 {
     float x;
@@ -3098,6 +3280,11 @@ struct ImVec2
 {
     float x;
     float y;
+}
+struct ImVec2i
+{
+    CInt x;
+    CInt y;
 }
 struct ImVec2ih
 {
@@ -3111,10 +3298,15 @@ struct ImVec4
     float z;
     float w;
 }
+struct StbrpContextOpaque
+{
+    char[80] data;
+}
 typedef ImBitArrayPtr = ImU32*;
 alias ImDrawCallback = fn void(ImDrawList* parent_list, ImDrawCmd* cmd);
 typedef ImDrawIdx = CUShort;
 typedef ImFileHandle = libc::CFile;
+typedef ImFontAtlasRectId = CInt;
 alias ImGuiContextHookCallback = fn void(ImGuiContext* ctx, ImGuiContextHook* hook);
 alias ImGuiErrorCallback = fn void(ImGuiContext* ctx, void* user_data, char* msg);
 typedef ImGuiID = CUInt;
@@ -3192,9 +3384,9 @@ extern fn void ImDrawList.add_convex_poly_filled(ImDrawList* self, ImVec2* point
 extern fn void ImDrawList.add_draw_cmd(ImDrawList* self) @extern("ImDrawList_AddDrawCmd");
 extern fn void ImDrawList.add_ellipse(ImDrawList* self, ImVec2 center, ImVec2 radius, ImU32 col, float rot = 0.0f, CInt num_segments = 0, float thickness = 1.0f) @extern("ImDrawList_AddEllipse");
 extern fn void ImDrawList.add_ellipse_filled(ImDrawList* self, ImVec2 center, ImVec2 radius, ImU32 col, float rot = 0.0f, CInt num_segments = 0) @extern("ImDrawList_AddEllipseFilled");
-extern fn void ImDrawList.add_image(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min = {}, ImVec2 uv_max = {1, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImage");
-extern fn void ImDrawList.add_image_quad(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, ImVec2 uv1 = {}, ImVec2 uv2 = {1, 0}, ImVec2 uv3 = {1, 1}, ImVec2 uv4 = {1, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImageQuad");
-extern fn void ImDrawList.add_image_rounded(ImDrawList* self, ImTextureID user_texture_id, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min, ImVec2 uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0) @extern("ImDrawList_AddImageRounded");
+extern fn void ImDrawList.add_image(ImDrawList* self, ImTextureRef tex_ref, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min = {}, ImVec2 uv_max = {1, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImage");
+extern fn void ImDrawList.add_image_quad(ImDrawList* self, ImTextureRef tex_ref, ImVec2 p1, ImVec2 p2, ImVec2 p3, ImVec2 p4, ImVec2 uv1 = {}, ImVec2 uv2 = {1, 0}, ImVec2 uv3 = {1, 1}, ImVec2 uv4 = {1, 1}, ImU32 col = 4294967295) @extern("ImDrawList_AddImageQuad");
+extern fn void ImDrawList.add_image_rounded(ImDrawList* self, ImTextureRef tex_ref, ImVec2 p_min, ImVec2 p_max, ImVec2 uv_min, ImVec2 uv_max, ImU32 col, float rounding, ImDrawFlags flags = 0) @extern("ImDrawList_AddImageRounded");
 extern fn void ImDrawList.add_line(ImDrawList* self, ImVec2 p1, ImVec2 p2, ImU32 col, float thickness = 1.0f) @extern("ImDrawList_AddLine");
 extern fn void ImDrawList.add_ngon(ImDrawList* self, ImVec2 center, float radius, ImU32 col, CInt num_segments, float thickness = 1.0f) @extern("ImDrawList_AddNgon");
 extern fn void ImDrawList.add_ngon_filled(ImDrawList* self, ImVec2 center, float radius, ImU32 col, CInt num_segments) @extern("ImDrawList_AddNgonFilled");
@@ -3228,7 +3420,7 @@ extern fn void ImDrawList.path_line_to_merge_duplicate(ImDrawList* self, ImVec2 
 extern fn void ImDrawList.path_rect(ImDrawList* self, ImVec2 rect_min, ImVec2 rect_max, float rounding = 0.0f, ImDrawFlags flags = 0) @extern("ImDrawList_PathRect");
 extern fn void ImDrawList.path_stroke(ImDrawList* self, ImU32 col, ImDrawFlags flags = 0, float thickness = 1.0f) @extern("ImDrawList_PathStroke");
 extern fn void ImDrawList.pop_clip_rect(ImDrawList* self) @extern("ImDrawList_PopClipRect");
-extern fn void ImDrawList.pop_texture_id(ImDrawList* self) @extern("ImDrawList_PopTextureID");
+extern fn void ImDrawList.pop_texture(ImDrawList* self) @extern("ImDrawList_PopTexture");
 extern fn void ImDrawList.prim_quad_uv(ImDrawList* self, ImVec2 a, ImVec2 b, ImVec2 c, ImVec2 d, ImVec2 uv_a, ImVec2 uv_b, ImVec2 uv_c, ImVec2 uv_d, ImU32 col) @extern("ImDrawList_PrimQuadUV");
 extern fn void ImDrawList.prim_rect(ImDrawList* self, ImVec2 a, ImVec2 b, ImU32 col) @extern("ImDrawList_PrimRect");
 extern fn void ImDrawList.prim_rect_uv(ImDrawList* self, ImVec2 a, ImVec2 b, ImVec2 uv_a, ImVec2 uv_b, ImU32 col) @extern("ImDrawList_PrimRectUV");
@@ -3239,52 +3431,50 @@ extern fn void ImDrawList.prim_write_idx(ImDrawList* self, ImDrawIdx idx) @exter
 extern fn void ImDrawList.prim_write_vtx(ImDrawList* self, ImVec2 pos, ImVec2 uv, ImU32 col) @extern("ImDrawList_PrimWriteVtx");
 extern fn void ImDrawList.push_clip_rect(ImDrawList* self, ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool intersect_with_current_clip_rect = false) @extern("ImDrawList_PushClipRect");
 extern fn void ImDrawList.push_clip_rect_full_screen(ImDrawList* self) @extern("ImDrawList_PushClipRectFullScreen");
-extern fn void ImDrawList.push_texture_id(ImDrawList* self, ImTextureID texture_id) @extern("ImDrawList_PushTextureID");
+extern fn void ImDrawList.push_texture(ImDrawList* self, ImTextureRef tex_ref) @extern("ImDrawList_PushTexture");
 extern fn CInt ImDrawList.calc_circle_auto_segment_count(ImDrawList* self, float radius) @extern("ImDrawList__CalcCircleAutoSegmentCount");
 extern fn void ImDrawList.clear_free_memory(ImDrawList* self) @extern("ImDrawList__ClearFreeMemory");
 extern fn void ImDrawList.on_changed_clip_rect(ImDrawList* self) @extern("ImDrawList__OnChangedClipRect");
-extern fn void ImDrawList.on_changed_texture_id(ImDrawList* self) @extern("ImDrawList__OnChangedTextureID");
+extern fn void ImDrawList.on_changed_texture(ImDrawList* self) @extern("ImDrawList__OnChangedTexture");
 extern fn void ImDrawList.on_changed_vtx_offset(ImDrawList* self) @extern("ImDrawList__OnChangedVtxOffset");
 extern fn void ImDrawList.path_arc_to_fast_ex(ImDrawList* self, ImVec2 center, float radius, CInt a_min_sample, CInt a_max_sample, CInt a_step) @extern("ImDrawList__PathArcToFastEx");
 extern fn void ImDrawList.path_arc_to_n(ImDrawList* self, ImVec2 center, float radius, float a_min, float a_max, CInt num_segments) @extern("ImDrawList__PathArcToN");
 extern fn void ImDrawList.pop_unused_draw_cmd(ImDrawList* self) @extern("ImDrawList__PopUnusedDrawCmd");
 extern fn void ImDrawList.reset_for_new_frame(ImDrawList* self) @extern("ImDrawList__ResetForNewFrame");
-extern fn void ImDrawList.set_texture_id(ImDrawList* self, ImTextureID texture_id) @extern("ImDrawList__SetTextureID");
+extern fn void ImDrawList.set_draw_list_shared_data(ImDrawList* self, ImDrawListSharedData* data) @extern("ImDrawList__SetDrawListSharedData");
+extern fn void ImDrawList.set_texture(ImDrawList* self, ImTextureRef tex_ref) @extern("ImDrawList__SetTexture");
 extern fn void ImDrawList.try_merge_draw_cmds(ImDrawList* self) @extern("ImDrawList__TryMergeDrawCmds");
 extern fn void ImDrawList.destroy(ImDrawList* self) @extern("ImDrawList_destroy");
-extern fn ImFontAtlasCustomRect* new_im_font_atlas_custom_rect() @extern("ImFontAtlasCustomRect_ImFontAtlasCustomRect");
-extern fn bool ImFontAtlasCustomRect.is_packed(ImFontAtlasCustomRect* self) @extern("ImFontAtlasCustomRect_IsPacked");
-extern fn void ImFontAtlasCustomRect.destroy(ImFontAtlasCustomRect* self) @extern("ImFontAtlasCustomRect_destroy");
-extern fn CInt ImFontAtlas.add_custom_rect_font_glyph(ImFontAtlas* self, ImFont* font, ImWchar id, CInt width, CInt height, float advance_x, ImVec2 offset = {}) @extern("ImFontAtlas_AddCustomRectFontGlyph");
-extern fn CInt ImFontAtlas.add_custom_rect_regular(ImFontAtlas* self, CInt width, CInt height) @extern("ImFontAtlas_AddCustomRectRegular");
+extern fn ImFontAtlasBuilder* new_im_font_atlas_builder() @extern("ImFontAtlasBuilder_ImFontAtlasBuilder");
+extern fn void ImFontAtlasBuilder.destroy(ImFontAtlasBuilder* self) @extern("ImFontAtlasBuilder_destroy");
+extern fn ImFontAtlasRect* new_im_font_atlas_rect() @extern("ImFontAtlasRect_ImFontAtlasRect");
+extern fn void ImFontAtlasRect.destroy(ImFontAtlasRect* self) @extern("ImFontAtlasRect_destroy");
+extern fn ImFontAtlasRectId ImFontAtlas.add_custom_rect(ImFontAtlas* self, CInt width, CInt height, ImFontAtlasRect* out_r = null) @extern("ImFontAtlas_AddCustomRect");
 extern fn ImFont* ImFontAtlas.add_font(ImFontAtlas* self, ImFontConfig* font_cfg) @extern("ImFontAtlas_AddFont");
 extern fn ImFont* ImFontAtlas.add_font_default(ImFontAtlas* self, ImFontConfig* font_cfg = null) @extern("ImFontAtlas_AddFontDefault");
-extern fn ImFont* ImFontAtlas.add_font_from_file_ttf(ImFontAtlas* self, ZString filename, float size_pixels, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromFileTTF");
-extern fn ImFont* ImFontAtlas.add_font_from_memory_compressed_base85_ttf(ImFontAtlas* self, ZString compressed_font_data_base85, float size_pixels, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
-extern fn ImFont* ImFontAtlas.add_font_from_memory_compressed_ttf(ImFontAtlas* self, void* compressed_font_data, CInt compressed_font_data_size, float size_pixels, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedTTF");
-extern fn ImFont* ImFontAtlas.add_font_from_memory_ttf(ImFontAtlas* self, void* font_data, CInt font_data_size, float size_pixels, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryTTF");
-extern fn bool ImFontAtlas.build(ImFontAtlas* self) @extern("ImFontAtlas_Build");
-extern fn void ImFontAtlas.calc_custom_rect_uv(ImFontAtlas* self, ImFontAtlasCustomRect* rect, ImVec2* out_uv_min, ImVec2* out_uv_max) @extern("ImFontAtlas_CalcCustomRectUV");
+extern fn ImFont* ImFontAtlas.add_font_from_file_ttf(ImFontAtlas* self, ZString filename, float size_pixels = 0.0f, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromFileTTF");
+extern fn ImFont* ImFontAtlas.add_font_from_memory_compressed_base85_ttf(ImFontAtlas* self, ZString compressed_font_data_base85, float size_pixels = 0.0f, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
+extern fn ImFont* ImFontAtlas.add_font_from_memory_compressed_ttf(ImFontAtlas* self, void* compressed_font_data, CInt compressed_font_data_size, float size_pixels = 0.0f, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryCompressedTTF");
+extern fn ImFont* ImFontAtlas.add_font_from_memory_ttf(ImFontAtlas* self, void* font_data, CInt font_data_size, float size_pixels = 0.0f, ImFontConfig* font_cfg = null, ImWchar* glyph_ranges = null) @extern("ImFontAtlas_AddFontFromMemoryTTF");
 extern fn void ImFontAtlas.clear(ImFontAtlas* self) @extern("ImFontAtlas_Clear");
 extern fn void ImFontAtlas.clear_fonts(ImFontAtlas* self) @extern("ImFontAtlas_ClearFonts");
 extern fn void ImFontAtlas.clear_input_data(ImFontAtlas* self) @extern("ImFontAtlas_ClearInputData");
 extern fn void ImFontAtlas.clear_tex_data(ImFontAtlas* self) @extern("ImFontAtlas_ClearTexData");
-extern fn ImFontAtlasCustomRect* ImFontAtlas.get_custom_rect_by_index(ImFontAtlas* self, CInt index) @extern("ImFontAtlas_GetCustomRectByIndex");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_chinese_full(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesChineseFull");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_chinese_simplified_common(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_cyrillic(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesCyrillic");
+extern fn void ImFontAtlas.compact_cache(ImFontAtlas* self) @extern("ImFontAtlas_CompactCache");
+extern fn bool ImFontAtlas.get_custom_rect(ImFontAtlas* self, ImFontAtlasRectId id, ImFontAtlasRect* out_r) @extern("ImFontAtlas_GetCustomRect");
 extern fn ImWchar* ImFontAtlas.get_glyph_ranges_default(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesDefault");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_greek(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesGreek");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_japanese(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesJapanese");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_korean(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesKorean");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_thai(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesThai");
-extern fn ImWchar* ImFontAtlas.get_glyph_ranges_vietnamese(ImFontAtlas* self) @extern("ImFontAtlas_GetGlyphRangesVietnamese");
-extern fn void ImFontAtlas.get_tex_data_as_alpha8(ImFontAtlas* self, char** out_pixels, CInt* out_width, CInt* out_height, CInt* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsAlpha8");
-extern fn void ImFontAtlas.get_tex_data_as_rgba32(ImFontAtlas* self, char** out_pixels, CInt* out_width, CInt* out_height, CInt* out_bytes_per_pixel = null) @extern("ImFontAtlas_GetTexDataAsRGBA32");
 extern fn ImFontAtlas* new_im_font_atlas() @extern("ImFontAtlas_ImFontAtlas");
-extern fn bool ImFontAtlas.is_built(ImFontAtlas* self) @extern("ImFontAtlas_IsBuilt");
-extern fn void ImFontAtlas.set_tex_id(ImFontAtlas* self, ImTextureID id) @extern("ImFontAtlas_SetTexID");
+extern fn void ImFontAtlas.remove_custom_rect(ImFontAtlas* self, ImFontAtlasRectId id) @extern("ImFontAtlas_RemoveCustomRect");
+extern fn void ImFontAtlas.remove_font(ImFontAtlas* self, ImFont* font) @extern("ImFontAtlas_RemoveFont");
+extern fn void ImFontAtlas.set_font_loader(ImFontAtlas* self, ImFontLoader* font_loader) @extern("ImFontAtlas_SetFontLoader");
 extern fn void ImFontAtlas.destroy(ImFontAtlas* self) @extern("ImFontAtlas_destroy");
+extern fn void ImFontBaked.clear_output_data(ImFontBaked* self) @extern("ImFontBaked_ClearOutputData");
+extern fn ImFontGlyph* ImFontBaked.find_glyph(ImFontBaked* self, ImWchar c) @extern("ImFontBaked_FindGlyph");
+extern fn ImFontGlyph* ImFontBaked.find_glyph_no_fallback(ImFontBaked* self, ImWchar c) @extern("ImFontBaked_FindGlyphNoFallback");
+extern fn float ImFontBaked.get_char_advance(ImFontBaked* self, ImWchar c) @extern("ImFontBaked_GetCharAdvance");
+extern fn ImFontBaked* new_im_font_baked() @extern("ImFontBaked_ImFontBaked");
+extern fn bool ImFontBaked.is_glyph_loaded(ImFontBaked* self, ImWchar c) @extern("ImFontBaked_IsGlyphLoaded");
+extern fn void ImFontBaked.destroy(ImFontBaked* self) @extern("ImFontBaked_destroy");
 extern fn ImFontConfig* new_im_font_config() @extern("ImFontConfig_ImFontConfig");
 extern fn void ImFontConfig.destroy(ImFontConfig* self) @extern("ImFontConfig_destroy");
 extern fn void ImFontGlyphRangesBuilder.add_char(ImFontGlyphRangesBuilder* self, ImWchar c) @extern("ImFontGlyphRangesBuilder_AddChar");
@@ -3296,21 +3486,21 @@ extern fn bool ImFontGlyphRangesBuilder.get_bit(ImFontGlyphRangesBuilder* self, 
 extern fn ImFontGlyphRangesBuilder* new_im_font_glyph_ranges_builder() @extern("ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder");
 extern fn void ImFontGlyphRangesBuilder.set_bit(ImFontGlyphRangesBuilder* self, usz n) @extern("ImFontGlyphRangesBuilder_SetBit");
 extern fn void ImFontGlyphRangesBuilder.destroy(ImFontGlyphRangesBuilder* self) @extern("ImFontGlyphRangesBuilder_destroy");
-extern fn void ImFont.add_glyph(ImFont* self, ImFontConfig* src_cfg, ImWchar c, float x0, float y0, float x1, float y1, float u0, float v0, float u1, float v1, float advance_x) @extern("ImFont_AddGlyph");
-extern fn void ImFont.add_remap_char(ImFont* self, ImWchar dst, ImWchar src, bool overwrite_dst = true) @extern("ImFont_AddRemapChar");
-extern fn void ImFont.build_lookup_table(ImFont* self) @extern("ImFont_BuildLookupTable");
+extern fn ImFontGlyph* new_im_font_glyph() @extern("ImFontGlyph_ImFontGlyph");
+extern fn void ImFontGlyph.destroy(ImFontGlyph* self) @extern("ImFontGlyph_destroy");
+extern fn ImFontLoader* new_im_font_loader() @extern("ImFontLoader_ImFontLoader");
+extern fn void ImFontLoader.destroy(ImFontLoader* self) @extern("ImFontLoader_destroy");
+extern fn void ImFont.add_remap_char(ImFont* self, ImWchar from_codepoint, ImWchar to_codepoint) @extern("ImFont_AddRemapChar");
 extern fn void im_font_calc_text_size_a(ImVec2* p_out, ImFont* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, char** remaining = null) @extern("ImFont_CalcTextSizeA");
-extern fn ZString ImFont.calc_word_wrap_position_a(ImFont* self, float scale, ZString text, ZString text_end, float wrap_width) @extern("ImFont_CalcWordWrapPositionA");
+extern fn ZString ImFont.calc_word_wrap_position(ImFont* self, float size, ZString text, ZString text_end, float wrap_width) @extern("ImFont_CalcWordWrapPosition");
 extern fn void ImFont.clear_output_data(ImFont* self) @extern("ImFont_ClearOutputData");
-extern fn ImFontGlyph* ImFont.find_glyph(ImFont* self, ImWchar c) @extern("ImFont_FindGlyph");
-extern fn ImFontGlyph* ImFont.find_glyph_no_fallback(ImFont* self, ImWchar c) @extern("ImFont_FindGlyphNoFallback");
-extern fn float ImFont.get_char_advance(ImFont* self, ImWchar c) @extern("ImFont_GetCharAdvance");
 extern fn ZString ImFont.get_debug_name(ImFont* self) @extern("ImFont_GetDebugName");
-extern fn void ImFont.grow_index(ImFont* self, CInt new_size) @extern("ImFont_GrowIndex");
+extern fn ImFontBaked* ImFont.get_font_baked(ImFont* self, float font_size, float density = -1.0f) @extern("ImFont_GetFontBaked");
 extern fn ImFont* new_im_font() @extern("ImFont_ImFont");
+extern fn bool ImFont.is_glyph_in_font(ImFont* self, ImWchar c) @extern("ImFont_IsGlyphInFont");
 extern fn bool ImFont.is_glyph_range_unused(ImFont* self, CUInt c_begin, CUInt c_last) @extern("ImFont_IsGlyphRangeUnused");
 extern fn bool ImFont.is_loaded(ImFont* self) @extern("ImFont_IsLoaded");
-extern fn void ImFont.render_char(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImWchar c) @extern("ImFont_RenderChar");
+extern fn void ImFont.render_char(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImWchar c, ImVec4* cpu_fine_clip = null) @extern("ImFont_RenderChar");
 extern fn void ImFont.render_text(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImVec4 clip_rect, ZString text_begin, ZString text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) @extern("ImFont_RenderText");
 extern fn void ImFont.destroy(ImFont* self) @extern("ImFont_destroy");
 extern fn ImGuiBoxSelectState* new_im_gui_box_select_state() @extern("ImGuiBoxSelectState_ImGuiBoxSelectState");
@@ -3341,7 +3531,8 @@ extern fn void ImGuiDockNode.update_merged_flags(ImGuiDockNode* self) @extern("I
 extern fn void ImGuiDockNode.destroy(ImGuiDockNode* self) @extern("ImGuiDockNode_destroy");
 extern fn ImGuiErrorRecoveryState* new_im_gui_error_recovery_state() @extern("ImGuiErrorRecoveryState_ImGuiErrorRecoveryState");
 extern fn void ImGuiErrorRecoveryState.destroy(ImGuiErrorRecoveryState* self) @extern("ImGuiErrorRecoveryState_destroy");
-extern fn ImFontBuilderIO* im_gui_free_type_get_builder_for_free_type() @extern("ImGuiFreeType_GetBuilderForFreeType");
+extern fn bool im_gui_free_type_debug_edit_font_loader_flags(ImGuiFreeTypeLoaderFlags* p_font_loader_flags) @extern("ImGuiFreeType_DebugEditFontLoaderFlags");
+extern fn ImFontLoader* im_gui_free_type_get_font_loader() @extern("ImGuiFreeType_GetFontLoader");
 extern fn void im_gui_free_type_set_allocator_functions(ImGuiMemAllocFunc alloc_func, ImGuiMemFreeFunc free_func, void* user_data = null) @extern("ImGuiFreeType_SetAllocatorFunctions");
 extern fn ImGuiIDStackTool* new_im_gui_idstack_tool() @extern("ImGuiIDStackTool_ImGuiIDStackTool");
 extern fn void ImGuiIDStackTool.destroy(ImGuiIDStackTool* self) @extern("ImGuiIDStackTool_destroy");
@@ -3571,7 +3762,6 @@ extern fn void ImGuiWindowClass.destroy(ImGuiWindowClass* self) @extern("ImGuiWi
 extern fn ZString ImGuiWindowSettings.get_name(ImGuiWindowSettings* self) @extern("ImGuiWindowSettings_GetName");
 extern fn ImGuiWindowSettings* new_im_gui_window_settings() @extern("ImGuiWindowSettings_ImGuiWindowSettings");
 extern fn void ImGuiWindowSettings.destroy(ImGuiWindowSettings* self) @extern("ImGuiWindowSettings_destroy");
-extern fn float ImGuiWindow.calc_font_size(ImGuiWindow* self) @extern("ImGuiWindow_CalcFontSize");
 extern fn ImGuiID ImGuiWindow.get_idstr(ImGuiWindow* self, ZString str, ZString str_end = null) @extern("ImGuiWindow_GetID_Str");
 extern fn ImGuiID ImGuiWindow.get_idptr(ImGuiWindow* self, void* ptr) @extern("ImGuiWindow_GetID_Ptr");
 extern fn ImGuiID ImGuiWindow.get_idint(ImGuiWindow* self, CInt n) @extern("ImGuiWindow_GetID_Int");
@@ -3648,12 +3838,35 @@ extern fn void ImRect.destroy(ImRect* self) @extern("ImRect_destroy");
 // Skipping templated: ImSpan_set_TPtr
 // Skipping templated: ImSpan_size
 // Skipping templated: ImSpan_size_in_bytes
+// Skipping templated: ImStableVector_clear
+// Skipping templated: ImStableVector_push_back
+// Skipping templated: ImStableVector_reserve
+// Skipping templated: ImStableVector_resize
+extern fn void ImTextureData.create(ImTextureData* self, ImTextureFormat format, CInt w, CInt h) @extern("ImTextureData_Create");
+extern fn void ImTextureData.destroy_pixels(ImTextureData* self) @extern("ImTextureData_DestroyPixels");
+extern fn CInt ImTextureData.get_pitch(ImTextureData* self) @extern("ImTextureData_GetPitch");
+extern fn void* ImTextureData.get_pixels(ImTextureData* self) @extern("ImTextureData_GetPixels");
+extern fn void* ImTextureData.get_pixels_at(ImTextureData* self, CInt x, CInt y) @extern("ImTextureData_GetPixelsAt");
+extern fn CInt ImTextureData.get_size_in_bytes(ImTextureData* self) @extern("ImTextureData_GetSizeInBytes");
+extern fn ImTextureID ImTextureData.get_tex_id(ImTextureData* self) @extern("ImTextureData_GetTexID");
+extern fn void im_texture_data_get_tex_ref(ImTextureRef* p_out, ImTextureData* self) @extern("ImTextureData_GetTexRef");
+extern fn ImTextureData* new_im_texture_data() @extern("ImTextureData_ImTextureData");
+extern fn void ImTextureData.set_status(ImTextureData* self, ImTextureStatus status) @extern("ImTextureData_SetStatus");
+extern fn void ImTextureData.set_tex_id(ImTextureData* self, ImTextureID tex_id) @extern("ImTextureData_SetTexID");
+extern fn void ImTextureData.destroy(ImTextureData* self) @extern("ImTextureData_destroy");
+extern fn ImTextureID ImTextureRef.get_tex_id(ImTextureRef* self) @extern("ImTextureRef_GetTexID");
+extern fn ImTextureRef* new_im_texture_ref_nil() @extern("ImTextureRef_ImTextureRef_Nil");
+extern fn ImTextureRef* new_im_texture_ref_texture_id(ImTextureID tex_id) @extern("ImTextureRef_ImTextureRef_TextureID");
+extern fn void ImTextureRef.destroy(ImTextureRef* self) @extern("ImTextureRef_destroy");
 extern fn ImVec1* new_im_vec1_nil() @extern("ImVec1_ImVec1_Nil");
 extern fn ImVec1* new_im_vec1_float(float x) @extern("ImVec1_ImVec1_Float");
 extern fn void ImVec1.destroy(ImVec1* self) @extern("ImVec1_destroy");
 extern fn ImVec2* new_im_vec2_nil() @extern("ImVec2_ImVec2_Nil");
 extern fn ImVec2* new_im_vec2_float(float x, float y) @extern("ImVec2_ImVec2_Float");
 extern fn void ImVec2.destroy(ImVec2* self) @extern("ImVec2_destroy");
+extern fn ImVec2i* new_im_vec2i_nil() @extern("ImVec2i_ImVec2i_Nil");
+extern fn ImVec2i* new_im_vec2i_int(CInt x, CInt y) @extern("ImVec2i_ImVec2i_Int");
+extern fn void ImVec2i.destroy(ImVec2i* self) @extern("ImVec2i_destroy");
 extern fn ImVec2ih* new_im_vec2ih_nil() @extern("ImVec2ih_ImVec2ih_Nil");
 extern fn ImVec2ih* new_im_vec2ih_short(CShort x, CShort y) @extern("ImVec2ih_ImVec2ih_short");
 extern fn ImVec2ih* new_im_vec2ih_vec2(ImVec2 rhs) @extern("ImVec2ih_ImVec2ih_Vec2");
@@ -3831,6 +4044,7 @@ extern fn void debug_node_draw_cmd_show_mesh_and_bounding_box(ImDrawList* out_dr
 extern fn void debug_node_draw_list(ImGuiWindow* window, ImGuiViewportP* viewport, ImDrawList* draw_list, ZString label) @extern("igDebugNodeDrawList");
 extern fn void debug_node_font(ImFont* font) @extern("igDebugNodeFont");
 extern fn void debug_node_font_glyph(ImFont* font, ImFontGlyph* glyph) @extern("igDebugNodeFontGlyph");
+extern fn void debug_node_font_glyphes_for_src_mask(ImFont* font, ImFontBaked* baked, CInt src_mask) @extern("igDebugNodeFontGlyphesForSrcMask");
 extern fn void debug_node_input_text_state(ImGuiInputTextState* state) @extern("igDebugNodeInputTextState");
 extern fn void debug_node_multi_select_state(ImGuiMultiSelectState* state) @extern("igDebugNodeMultiSelectState");
 extern fn void debug_node_platform_monitor(ImGuiPlatformMonitor* monitor, ZString label, CInt idx) @extern("igDebugNodePlatformMonitor");
@@ -3838,6 +4052,7 @@ extern fn void debug_node_storage(ImGuiStorage* storage, ZString label) @extern(
 extern fn void debug_node_tab_bar(ImGuiTabBar* tab_bar, ZString label) @extern("igDebugNodeTabBar");
 extern fn void debug_node_table(ImGuiTable* table) @extern("igDebugNodeTable");
 extern fn void debug_node_table_settings(ImGuiTableSettings* settings) @extern("igDebugNodeTableSettings");
+extern fn void debug_node_texture(ImTextureData* tex, CInt int_id, ImFontAtlasRect* highlight_rect = null) @extern("igDebugNodeTexture");
 extern fn void debug_node_typing_select_state(ImGuiTypingSelectState* state) @extern("igDebugNodeTypingSelectState");
 extern fn void debug_node_viewport(ImGuiViewportP* viewport) @extern("igDebugNodeViewport");
 extern fn void debug_node_window(ImGuiWindow* window, ZString label) @extern("igDebugNodeWindow");
@@ -3989,6 +4204,8 @@ extern fn ImDrawData* get_draw_data() @extern("igGetDrawData");
 extern fn ImDrawListSharedData* get_draw_list_shared_data() @extern("igGetDrawListSharedData");
 extern fn ImGuiID get_focus_id() @extern("igGetFocusID");
 extern fn ImFont* get_font() @extern("igGetFont");
+extern fn ImFontBaked* get_font_baked() @extern("igGetFontBaked");
+extern fn float get_font_rasterizer_density() @extern("igGetFontRasterizerDensity");
 extern fn float get_font_size() @extern("igGetFontSize");
 extern fn void get_font_tex_uv_white_pixel(ImVec2* p_out) @extern("igGetFontTexUvWhitePixel");
 extern fn ImDrawList* get_foreground_draw_list_viewport_ptr(ImGuiViewport* viewport = null) @extern("igGetForegroundDrawList_ViewportPtr");
@@ -4031,6 +4248,7 @@ extern fn float get_nav_tweak_pressed_amount(ImGuiAxis axis) @extern("igGetNavTw
 extern fn ImGuiPlatformIO* get_platform_ionil() @extern("igGetPlatformIO_Nil");
 extern fn ImGuiPlatformIO* get_platform_iocontext_ptr(ImGuiContext* ctx) @extern("igGetPlatformIO_ContextPtr");
 extern fn void get_popup_allowed_extent_rect(ImRect* p_out, ImGuiWindow* window) @extern("igGetPopupAllowedExtentRect");
+extern fn float get_rounded_font_size(float size) @extern("igGetRoundedFontSize");
 extern fn float get_scroll_max_x() @extern("igGetScrollMaxX");
 extern fn float get_scroll_max_y() @extern("igGetScrollMaxY");
 extern fn float get_scroll_x() @extern("igGetScrollX");
@@ -4094,18 +4312,60 @@ extern fn ImU64 im_file_read(void* data, ImU64 size, ImU64 count, ImFileHandle f
 extern fn ImU64 im_file_write(void* data, ImU64 size, ImU64 count, ImFileHandle file) @extern("igImFileWrite");
 extern fn float im_floor_float(float f) @extern("igImFloor_Float");
 extern fn void im_floor_vec2(ImVec2* p_out, ImVec2 v) @extern("igImFloor_Vec2");
-extern fn void im_font_atlas_build_finish(ImFontAtlas* atlas) @extern("igImFontAtlasBuildFinish");
-extern fn void im_font_atlas_build_get_oversample_factors(ImFontConfig* src, CInt* out_oversample_h, CInt* out_oversample_v) @extern("igImFontAtlasBuildGetOversampleFactors");
+extern fn void im_font_atlas_add_draw_list_shared_data(ImFontAtlas* atlas, ImDrawListSharedData* data) @extern("igImFontAtlasAddDrawListSharedData");
+extern fn ImFontBaked* im_font_atlas_baked_add(ImFontAtlas* atlas, ImFont* font, float font_size, float font_rasterizer_density, ImGuiID baked_id) @extern("igImFontAtlasBakedAdd");
+extern fn ImFontGlyph* im_font_atlas_baked_add_font_glyph(ImFontAtlas* atlas, ImFontBaked* baked, ImFontConfig* src, ImFontGlyph* in_glyph) @extern("igImFontAtlasBakedAddFontGlyph");
+extern fn void im_font_atlas_baked_add_font_glyph_advanced_x(ImFontAtlas* atlas, ImFontBaked* baked, ImFontConfig* src, ImWchar codepoint, float advance_x) @extern("igImFontAtlasBakedAddFontGlyphAdvancedX");
+extern fn void im_font_atlas_baked_discard(ImFontAtlas* atlas, ImFont* font, ImFontBaked* baked) @extern("igImFontAtlasBakedDiscard");
+extern fn void im_font_atlas_baked_discard_font_glyph(ImFontAtlas* atlas, ImFont* font, ImFontBaked* baked, ImFontGlyph* glyph) @extern("igImFontAtlasBakedDiscardFontGlyph");
+extern fn ImFontBaked* im_font_atlas_baked_get_closest_match(ImFontAtlas* atlas, ImFont* font, float font_size, float font_rasterizer_density) @extern("igImFontAtlasBakedGetClosestMatch");
+extern fn ImGuiID im_font_atlas_baked_get_id(ImGuiID font_id, float baked_size, float rasterizer_density) @extern("igImFontAtlasBakedGetId");
+extern fn ImFontBaked* im_font_atlas_baked_get_or_add(ImFontAtlas* atlas, ImFont* font, float font_size, float font_rasterizer_density) @extern("igImFontAtlasBakedGetOrAdd");
+extern fn void im_font_atlas_baked_set_font_glyph_bitmap(ImFontAtlas* atlas, ImFontBaked* baked, ImFontConfig* src, ImFontGlyph* glyph, ImTextureRect* r, char* src_pixels, ImTextureFormat src_fmt, CInt src_pitch) @extern("igImFontAtlasBakedSetFontGlyphBitmap");
+extern fn void im_font_atlas_build_clear(ImFontAtlas* atlas) @extern("igImFontAtlasBuildClear");
+extern fn void im_font_atlas_build_destroy(ImFontAtlas* atlas) @extern("igImFontAtlasBuildDestroy");
+extern fn void im_font_atlas_build_discard_bakes(ImFontAtlas* atlas, CInt unused_frames) @extern("igImFontAtlasBuildDiscardBakes");
+extern fn void im_font_atlas_build_get_oversample_factors(ImFontConfig* src, ImFontBaked* baked, CInt* out_oversample_h, CInt* out_oversample_v) @extern("igImFontAtlasBuildGetOversampleFactors");
 extern fn void im_font_atlas_build_init(ImFontAtlas* atlas) @extern("igImFontAtlasBuildInit");
-extern fn void im_font_atlas_build_multiply_calc_lookup_table(char[256]* out_table, float in_multiply_factor) @extern("igImFontAtlasBuildMultiplyCalcLookupTable");
-extern fn void im_font_atlas_build_multiply_rect_alpha8(char[256]* table, char* pixels, CInt x, CInt y, CInt w, CInt h, CInt stride) @extern("igImFontAtlasBuildMultiplyRectAlpha8");
-extern fn void im_font_atlas_build_pack_custom_rects(ImFontAtlas* atlas, void* stbrp_context_opaque) @extern("igImFontAtlasBuildPackCustomRects");
-extern fn void im_font_atlas_build_render32bpp_rect_from_string(ImFontAtlas* atlas, CInt x, CInt y, CInt w, CInt h, ZString in_str, char in_marker_char, CUInt in_marker_pixel_value) @extern("igImFontAtlasBuildRender32bppRectFromString");
-extern fn void im_font_atlas_build_render8bpp_rect_from_string(ImFontAtlas* atlas, CInt x, CInt y, CInt w, CInt h, ZString in_str, char in_marker_char, char in_marker_pixel_value) @extern("igImFontAtlasBuildRender8bppRectFromString");
-extern fn void im_font_atlas_build_setup_font(ImFontAtlas* atlas, ImFont* font, ImFontConfig* src, float ascent, float descent) @extern("igImFontAtlasBuildSetupFont");
-extern fn ImFontBuilderIO* im_font_atlas_get_builder_for_stb_truetype() @extern("igImFontAtlasGetBuilderForStbTruetype");
+extern fn void im_font_atlas_build_legacy_preload_all_glyph_ranges(ImFontAtlas* atlas) @extern("igImFontAtlasBuildLegacyPreloadAllGlyphRanges");
+extern fn void im_font_atlas_build_main(ImFontAtlas* atlas) @extern("igImFontAtlasBuildMain");
+extern fn void im_font_atlas_build_render_bitmap_from_string(ImFontAtlas* atlas, CInt x, CInt y, CInt w, CInt h, ZString in_str, char in_marker_char) @extern("igImFontAtlasBuildRenderBitmapFromString");
+extern fn void im_font_atlas_build_setup_font_loader(ImFontAtlas* atlas, ImFontLoader* font_loader) @extern("igImFontAtlasBuildSetupFontLoader");
+extern fn void im_font_atlas_build_setup_font_special_glyphs(ImFontAtlas* atlas, ImFont* font, ImFontConfig* src) @extern("igImFontAtlasBuildSetupFontSpecialGlyphs");
+extern fn void im_font_atlas_build_update_pointers(ImFontAtlas* atlas) @extern("igImFontAtlasBuildUpdatePointers");
+extern fn void im_font_atlas_debug_log_texture_requests(ImFontAtlas* atlas) @extern("igImFontAtlasDebugLogTextureRequests");
+extern fn void im_font_atlas_font_destroy_output(ImFontAtlas* atlas, ImFont* font) @extern("igImFontAtlasFontDestroyOutput");
+extern fn void im_font_atlas_font_destroy_source_data(ImFontAtlas* atlas, ImFontConfig* src) @extern("igImFontAtlasFontDestroySourceData");
+extern fn void im_font_atlas_font_discard_bakes(ImFontAtlas* atlas, ImFont* font, CInt unused_frames) @extern("igImFontAtlasFontDiscardBakes");
+extern fn bool im_font_atlas_font_init_output(ImFontAtlas* atlas, ImFont* font) @extern("igImFontAtlasFontInitOutput");
+extern fn void im_font_atlas_font_source_add_to_font(ImFontAtlas* atlas, ImFont* font, ImFontConfig* src) @extern("igImFontAtlasFontSourceAddToFont");
+extern fn bool im_font_atlas_font_source_init(ImFontAtlas* atlas, ImFontConfig* src) @extern("igImFontAtlasFontSourceInit");
+extern fn ImFontLoader* im_font_atlas_get_font_loader_for_stb_truetype() @extern("igImFontAtlasGetFontLoaderForStbTruetype");
 extern fn bool im_font_atlas_get_mouse_cursor_tex_data(ImFontAtlas* atlas, ImGuiMouseCursor cursor_type, ImVec2* out_offset, ImVec2* out_size, ImVec2[2] out_uv_border, ImVec2[2] out_uv_fill) @extern("igImFontAtlasGetMouseCursorTexData");
-extern fn void im_font_atlas_update_sources_pointers(ImFontAtlas* atlas) @extern("igImFontAtlasUpdateSourcesPointers");
+extern fn ImFontAtlasRectId im_font_atlas_pack_add_rect(ImFontAtlas* atlas, CInt w, CInt h, ImFontAtlasRectEntry* overwrite_entry = null) @extern("igImFontAtlasPackAddRect");
+extern fn void im_font_atlas_pack_discard_rect(ImFontAtlas* atlas, ImFontAtlasRectId id) @extern("igImFontAtlasPackDiscardRect");
+extern fn ImTextureRect* im_font_atlas_pack_get_rect(ImFontAtlas* atlas, ImFontAtlasRectId id) @extern("igImFontAtlasPackGetRect");
+extern fn ImTextureRect* im_font_atlas_pack_get_rect_safe(ImFontAtlas* atlas, ImFontAtlasRectId id) @extern("igImFontAtlasPackGetRectSafe");
+extern fn void im_font_atlas_pack_init(ImFontAtlas* atlas) @extern("igImFontAtlasPackInit");
+extern fn CInt im_font_atlas_rect_id_get_generation(ImFontAtlasRectId id) @extern("igImFontAtlasRectId_GetGeneration");
+extern fn CInt im_font_atlas_rect_id_get_index(ImFontAtlasRectId id) @extern("igImFontAtlasRectId_GetIndex");
+extern fn ImFontAtlasRectId im_font_atlas_rect_id_make(CInt index_idx, CInt gen_idx) @extern("igImFontAtlasRectId_Make");
+extern fn void im_font_atlas_remove_draw_list_shared_data(ImFontAtlas* atlas, ImDrawListSharedData* data) @extern("igImFontAtlasRemoveDrawListSharedData");
+extern fn ImTextureData* im_font_atlas_texture_add(ImFontAtlas* atlas, CInt w, CInt h) @extern("igImFontAtlasTextureAdd");
+extern fn void im_font_atlas_texture_block_convert(char* src_pixels, ImTextureFormat src_fmt, CInt src_pitch, char* dst_pixels, ImTextureFormat dst_fmt, CInt dst_pitch, CInt w, CInt h) @extern("igImFontAtlasTextureBlockConvert");
+extern fn void im_font_atlas_texture_block_copy(ImTextureData* src_tex, CInt src_x, CInt src_y, ImTextureData* dst_tex, CInt dst_x, CInt dst_y, CInt w, CInt h) @extern("igImFontAtlasTextureBlockCopy");
+extern fn void im_font_atlas_texture_block_fill(ImTextureData* dst_tex, CInt dst_x, CInt dst_y, CInt w, CInt h, ImU32 col) @extern("igImFontAtlasTextureBlockFill");
+extern fn void im_font_atlas_texture_block_post_process(ImFontAtlasPostProcessData* data) @extern("igImFontAtlasTextureBlockPostProcess");
+extern fn void im_font_atlas_texture_block_post_process_multiply(ImFontAtlasPostProcessData* data, float multiply_factor) @extern("igImFontAtlasTextureBlockPostProcessMultiply");
+extern fn void im_font_atlas_texture_block_queue_upload(ImFontAtlas* atlas, ImTextureData* tex, CInt x, CInt y, CInt w, CInt h) @extern("igImFontAtlasTextureBlockQueueUpload");
+extern fn void im_font_atlas_texture_compact(ImFontAtlas* atlas) @extern("igImFontAtlasTextureCompact");
+extern fn void im_font_atlas_texture_get_size_estimate(ImVec2i* p_out, ImFontAtlas* atlas) @extern("igImFontAtlasTextureGetSizeEstimate");
+extern fn void im_font_atlas_texture_grow(ImFontAtlas* atlas, CInt old_w = -1, CInt old_h = -1) @extern("igImFontAtlasTextureGrow");
+extern fn void im_font_atlas_texture_make_space(ImFontAtlas* atlas) @extern("igImFontAtlasTextureMakeSpace");
+extern fn void im_font_atlas_texture_repack(ImFontAtlas* atlas, CInt w, CInt h) @extern("igImFontAtlasTextureRepack");
+extern fn void im_font_atlas_update_draw_lists_shared_data(ImFontAtlas* atlas) @extern("igImFontAtlasUpdateDrawListsSharedData");
+extern fn void im_font_atlas_update_draw_lists_textures(ImFontAtlas* atlas, ImTextureRef old_tex, ImTextureRef new_tex) @extern("igImFontAtlasUpdateDrawListsTextures");
+extern fn void im_font_atlas_update_new_frame(ImFontAtlas* atlas, CInt frame_count, bool renderer_has_textures) @extern("igImFontAtlasUpdateNewFrame");
 extern fn CInt im_format_string(ZString buf, usz buf_size, ZString fmt, ...) @extern("igImFormatString");
 extern fn void im_format_string_to_temp_buffer(char** out_buf, char** out_buf_end, ZString fmt, ...) @extern("igImFormatStringToTempBuffer");
 extern fn ImGuiID im_hash_data(void* data, usz data_size, ImGuiID seed = 0) @extern("igImHashData");
@@ -4126,6 +4386,7 @@ extern fn float im_log_float(float x) @extern("igImLog_Float");
 extern fn double im_log_double(double x) @extern("igImLog_double");
 extern fn ImGuiStoragePair* im_lower_bound(ImGuiStoragePair* in_begin, ImGuiStoragePair* in_end, ImGuiID key) @extern("igImLowerBound");
 extern fn void im_max(ImVec2* p_out, ImVec2 lhs, ImVec2 rhs) @extern("igImMax");
+extern fn void* im_memdup(void* src, usz size) @extern("igImMemdup");
 extern fn void im_min(ImVec2* p_out, ImVec2 lhs, ImVec2 rhs) @extern("igImMin");
 extern fn CInt im_mod_positive(CInt a, CInt b) @extern("igImModPositive");
 extern fn void im_mul(ImVec2* p_out, ImVec2 lhs, ImVec2 rhs) @extern("igImMul");
@@ -4139,6 +4400,7 @@ extern fn float im_pow_float(float x, float y) @extern("igImPow_Float");
 extern fn double im_pow_double(double x, double y) @extern("igImPow_double");
 extern fn void im_qsort(void* base, usz count, usz size_of_element, CompareFn compare_func) @extern("igImQsort");
 extern fn void im_rotate(ImVec2* p_out, ImVec2 v, float cos_a, float sin_a) @extern("igImRotate");
+extern fn float im_round64(float f) @extern("igImRound64");
 extern fn float im_rsqrt_float(float x) @extern("igImRsqrt_Float");
 extern fn double im_rsqrt_double(double x) @extern("igImRsqrt_double");
 extern fn float im_saturate(float f) @extern("igImSaturate");
@@ -4165,6 +4427,9 @@ extern fn CInt im_text_count_utf8_bytes_from_str(ImWchar* in_text, ImWchar* in_t
 extern fn ZString im_text_find_previous_utf8_codepoint(ZString in_text_start, ZString in_text_curr) @extern("igImTextFindPreviousUtf8Codepoint");
 extern fn CInt im_text_str_from_utf8(ImWchar* out_buf, CInt out_buf_size, ZString in_text, ZString in_text_end, char** in_remaining = null) @extern("igImTextStrFromUtf8");
 extern fn CInt im_text_str_to_utf8(ZString out_buf, CInt out_buf_size, ImWchar* in_text, ImWchar* in_text_end) @extern("igImTextStrToUtf8");
+extern fn CInt im_texture_data_get_format_bytes_per_pixel(ImTextureFormat format) @extern("igImTextureDataGetFormatBytesPerPixel");
+extern fn ZString im_texture_data_get_format_name(ImTextureFormat format) @extern("igImTextureDataGetFormatName");
+extern fn ZString im_texture_data_get_status_name(ImTextureStatus status) @extern("igImTextureDataGetStatusName");
 extern fn char im_to_upper(char c) @extern("igImToUpper");
 extern fn float im_triangle_area(ImVec2 a, ImVec2 b, ImVec2 c) @extern("igImTriangleArea");
 extern fn void im_triangle_barycentric_coords(ImVec2 a, ImVec2 b, ImVec2 c, ImVec2 p, float* out_u, float* out_v, float* out_w) @extern("igImTriangleBarycentricCoords");
@@ -4173,11 +4438,12 @@ extern fn bool im_triangle_contains_point(ImVec2 a, ImVec2 b, ImVec2 c, ImVec2 p
 extern fn bool im_triangle_is_clockwise(ImVec2 a, ImVec2 b, ImVec2 c) @extern("igImTriangleIsClockwise");
 extern fn float im_trunc_float(float f) @extern("igImTrunc_Float");
 extern fn void im_trunc_vec2(ImVec2* p_out, ImVec2 v) @extern("igImTrunc_Vec2");
+extern fn float im_trunc64(float f) @extern("igImTrunc64");
 extern fn CInt im_upper_power_of_two(CInt v) @extern("igImUpperPowerOfTwo");
-extern fn void image(ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}) @extern("igImage");
-extern fn bool image_button(ZString str_id, ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageButton");
-extern fn bool image_button_ex(ImGuiID id, ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col, ImGuiButtonFlags flags = 0) @extern("igImageButtonEx");
-extern fn void image_with_bg(ImTextureID user_texture_id, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageWithBg");
+extern fn void image(ImTextureRef tex_ref, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}) @extern("igImage");
+extern fn bool image_button(ZString str_id, ImTextureRef tex_ref, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageButton");
+extern fn bool image_button_ex(ImGuiID id, ImTextureRef tex_ref, ImVec2 image_size, ImVec2 uv0, ImVec2 uv1, ImVec4 bg_col, ImVec4 tint_col, ImGuiButtonFlags flags = 0) @extern("igImageButtonEx");
+extern fn void image_with_bg(ImTextureRef tex_ref, ImVec2 image_size, ImVec2 uv0 = {}, ImVec2 uv1 = {1, 1}, ImVec4 bg_col = {}, ImVec4 tint_col = {1, 1, 1, 1}) @extern("igImageWithBg");
 extern fn void indent(float indent_w = 0.0f) @extern("igIndent");
 extern fn void initialize() @extern("igInitialize");
 extern fn bool input_double(ZString label, double* v, double step = 0.0, double step_fast = 0.0, ZString format = "%.6f", ImGuiInputTextFlags flags = 0) @extern("igInputDouble");
@@ -4327,6 +4593,7 @@ extern fn void pop_font() @extern("igPopFont");
 extern fn void pop_id() @extern("igPopID");
 extern fn void pop_item_flag() @extern("igPopItemFlag");
 extern fn void pop_item_width() @extern("igPopItemWidth");
+extern fn void pop_password_font() @extern("igPopPasswordFont");
 extern fn void pop_style_color(CInt count = 1) @extern("igPopStyleColor");
 extern fn void pop_style_var(CInt count = 1) @extern("igPopStyleVar");
 extern fn void pop_text_wrap_pos() @extern("igPopTextWrapPos");
@@ -4335,7 +4602,7 @@ extern fn void push_clip_rect(ImVec2 clip_rect_min, ImVec2 clip_rect_max, bool i
 extern fn void push_column_clip_rect(CInt column_index) @extern("igPushColumnClipRect");
 extern fn void push_columns_background() @extern("igPushColumnsBackground");
 extern fn void push_focus_scope(ImGuiID id) @extern("igPushFocusScope");
-extern fn void push_font(ImFont* font) @extern("igPushFont");
+extern fn void push_font(ImFont* font, float font_size_base_unscaled) @extern("igPushFont");
 extern fn void push_idstr(ZString str_id) @extern("igPushID_Str");
 extern fn void push_idstr_str(ZString str_id_begin, ZString str_id_end) @extern("igPushID_StrStr");
 extern fn void push_idptr(void* ptr_id) @extern("igPushID_Ptr");
@@ -4354,6 +4621,8 @@ extern fn void push_style_var_y(ImGuiStyleVar idx, float val_y) @extern("igPushS
 extern fn void push_text_wrap_pos(float wrap_local_pos_x = 0.0f) @extern("igPushTextWrapPos");
 extern fn bool radio_button_bool(ZString label, bool active) @extern("igRadioButton_Bool");
 extern fn bool radio_button_int_ptr(ZString label, CInt* v, CInt v_button) @extern("igRadioButton_IntPtr");
+extern fn void register_font_atlas(ImFontAtlas* atlas) @extern("igRegisterFontAtlas");
+extern fn void register_user_texture(ImTextureData* tex) @extern("igRegisterUserTexture");
 extern fn void remove_context_hook(ImGuiContext* context, ImGuiID hook_to_remove) @extern("igRemoveContextHook");
 extern fn void remove_settings_handler(ZString type_name) @extern("igRemoveSettingsHandler");
 extern fn void render() @extern("igRender");
@@ -4374,7 +4643,7 @@ extern fn void render_rect_filled_with_hole(ImDrawList* draw_list, ImRect outer,
 extern fn void render_text(ImVec2 pos, ZString text, ZString text_end = null, bool hide_text_after_hash = true) @extern("igRenderText");
 extern fn void render_text_clipped(ImVec2 pos_min, ImVec2 pos_max, ZString text, ZString text_end, ImVec2* text_size_if_known, ImVec2 align = {}, ImRect* clip_rect = null) @extern("igRenderTextClipped");
 extern fn void render_text_clipped_ex(ImDrawList* draw_list, ImVec2 pos_min, ImVec2 pos_max, ZString text, ZString text_end, ImVec2* text_size_if_known, ImVec2 align = {}, ImRect* clip_rect = null) @extern("igRenderTextClippedEx");
-extern fn void render_text_ellipsis(ImDrawList* draw_list, ImVec2 pos_min, ImVec2 pos_max, float clip_max_x, float ellipsis_max_x, ZString text, ZString text_end, ImVec2* text_size_if_known) @extern("igRenderTextEllipsis");
+extern fn void render_text_ellipsis(ImDrawList* draw_list, ImVec2 pos_min, ImVec2 pos_max, float ellipsis_max_x, ZString text, ZString text_end, ImVec2* text_size_if_known) @extern("igRenderTextEllipsis");
 extern fn void render_text_wrapped(ImVec2 pos, ZString text, ZString text_end, float wrap_width) @extern("igRenderTextWrapped");
 extern fn void reset_mouse_drag_delta(ImGuiMouseButton button = 0) @extern("igResetMouseDragDelta");
 extern fn void same_line(float offset_from_start_x = 0.0f, float spacing = -1.0f) @extern("igSameLine");
@@ -4401,7 +4670,7 @@ extern fn void set_color_edit_options(ImGuiColorEditFlags flags) @extern("igSetC
 extern fn void set_column_offset(CInt column_index, float offset_x) @extern("igSetColumnOffset");
 extern fn void set_column_width(CInt column_index, float width) @extern("igSetColumnWidth");
 extern fn void set_current_context(ImGuiContext* ctx) @extern("igSetCurrentContext");
-extern fn void set_current_font(ImFont* font) @extern("igSetCurrentFont");
+extern fn void set_current_font(ImFont* font, float font_size_before_scaling, float font_size_after_scaling) @extern("igSetCurrentFont");
 extern fn void set_current_viewport(ImGuiWindow* window, ImGuiViewportP* viewport) @extern("igSetCurrentViewport");
 extern fn void set_cursor_pos(ImVec2 local_pos) @extern("igSetCursorPos");
 extern fn void set_cursor_pos_x(float local_x) @extern("igSetCursorPosX");
@@ -4409,6 +4678,7 @@ extern fn void set_cursor_pos_y(float local_y) @extern("igSetCursorPosY");
 extern fn void set_cursor_screen_pos(ImVec2 pos) @extern("igSetCursorScreenPos");
 extern fn bool set_drag_drop_payload(ZString type, void* data, usz sz, ImGuiCond cond = 0) @extern("igSetDragDropPayload");
 extern fn void set_focus_id(ImGuiID id, ImGuiWindow* window) @extern("igSetFocusID");
+extern fn void set_font_rasterizer_density(float rasterizer_density) @extern("igSetFontRasterizerDensity");
 extern fn void set_hovered_id(ImGuiID id) @extern("igSetHoveredID");
 extern fn void set_item_default_focus() @extern("igSetItemDefaultFocus");
 extern fn void set_item_key_owner_nil(ImGuiKey key) @extern("igSetItemKeyOwner_Nil");
@@ -4466,7 +4736,6 @@ extern fn void set_window_collapsed_window_ptr(ImGuiWindow* window, bool collaps
 extern fn void set_window_dock(ImGuiWindow* window, ImGuiID dock_id, ImGuiCond cond) @extern("igSetWindowDock");
 extern fn void set_window_focus_nil() @extern("igSetWindowFocus_Nil");
 extern fn void set_window_focus_str(ZString name) @extern("igSetWindowFocus_Str");
-extern fn void set_window_font_scale(float scale) @extern("igSetWindowFontScale");
 extern fn void set_window_hidden_and_skip_items_for_current_frame(ImGuiWindow* window) @extern("igSetWindowHiddenAndSkipItemsForCurrentFrame");
 extern fn void set_window_hit_test_hole(ImGuiWindow* window, ImVec2 pos, ImVec2 size) @extern("igSetWindowHitTestHole");
 extern fn void set_window_parent_window_for_focus_route(ImGuiWindow* window, ImGuiWindow* parent_window) @extern("igSetWindowParentWindowForFocusRoute");
@@ -4578,7 +4847,9 @@ extern fn bool table_next_column() @extern("igTableNextColumn");
 extern fn void table_next_row(ImGuiTableRowFlags row_flags = 0, float min_row_height = 0.0f) @extern("igTableNextRow");
 extern fn void table_open_context_menu(CInt column_n = -1) @extern("igTableOpenContextMenu");
 extern fn void table_pop_background_channel() @extern("igTablePopBackgroundChannel");
+extern fn void table_pop_column_channel() @extern("igTablePopColumnChannel");
 extern fn void table_push_background_channel() @extern("igTablePushBackgroundChannel");
+extern fn void table_push_column_channel(CInt column_n) @extern("igTablePushColumnChannel");
 extern fn void table_remove(ImGuiTable* table) @extern("igTableRemove");
 extern fn void table_reset_settings(ImGuiTable* table) @extern("igTableResetSettings");
 extern fn void table_save_settings(ImGuiTable* table) @extern("igTableSaveSettings");
@@ -4607,11 +4878,12 @@ extern fn bool temp_input_text(ImRect bb, ImGuiID id, ZString label, ZString buf
 extern fn bool test_key_owner(ImGuiKey key, ImGuiID owner_id) @extern("igTestKeyOwner");
 extern fn bool test_shortcut_routing(ImGuiKeyChord key_chord, ImGuiID owner_id) @extern("igTestShortcutRouting");
 extern fn void text(ZString fmt, ...) @extern("igText");
+extern fn void text_aligned(float align_x, float size_x, ZString fmt, ...) @extern("igTextAligned");
 extern fn void text_colored(ImVec4 col, ZString fmt, ...) @extern("igTextColored");
 extern fn void text_disabled(ZString fmt, ...) @extern("igTextDisabled");
 extern fn void text_ex(ZString text, ZString text_end = null, ImGuiTextFlags flags = 0) @extern("igTextEx");
 extern fn bool text_link(ZString label) @extern("igTextLink");
-extern fn void text_link_open_url(ZString label, ZString url = null) @extern("igTextLinkOpenURL");
+extern fn bool text_link_open_url(ZString label, ZString url = null) @extern("igTextLinkOpenURL");
 extern fn void text_unformatted(ZString text, ZString text_end = null) @extern("igTextUnformatted");
 extern fn void text_wrapped(ZString fmt, ...) @extern("igTextWrapped");
 extern fn void translate_windows_in_viewport(ImGuiViewportP* viewport, ImVec2 old_pos, ImVec2 new_pos, ImVec2 old_size, ImVec2 new_size) @extern("igTranslateWindowsInViewport");
@@ -4619,6 +4891,8 @@ extern fn bool tree_node_str(ZString label) @extern("igTreeNode_Str");
 extern fn bool tree_node_str_str(ZString str_id, ZString fmt, ...) @extern("igTreeNode_StrStr");
 extern fn bool tree_node_ptr(void* ptr_id, ZString fmt, ...) @extern("igTreeNode_Ptr");
 extern fn bool tree_node_behavior(ImGuiID id, ImGuiTreeNodeFlags flags, ZString label, ZString label_end = null) @extern("igTreeNodeBehavior");
+extern fn void tree_node_draw_line_to_child_node(ImVec2 target_pos) @extern("igTreeNodeDrawLineToChildNode");
+extern fn void tree_node_draw_line_to_tree_pop(ImGuiTreeNodeStackData* data) @extern("igTreeNodeDrawLineToTreePop");
 extern fn bool tree_node_ex_str(ZString label, ImGuiTreeNodeFlags flags = 0) @extern("igTreeNodeEx_Str");
 extern fn bool tree_node_ex_str_str(ZString str_id, ImGuiTreeNodeFlags flags, ZString fmt, ...) @extern("igTreeNodeEx_StrStr");
 extern fn bool tree_node_ex_ptr(void* ptr_id, ImGuiTreeNodeFlags flags, ZString fmt, ...) @extern("igTreeNodeEx_Ptr");
@@ -4633,7 +4907,10 @@ extern fn CInt typing_select_find_best_leading_match(ImGuiTypingSelectRequest* r
 extern fn CInt typing_select_find_match(ImGuiTypingSelectRequest* req, CInt items_count, GetZStringByIndexFn get_item_name_func, void* user_data, CInt nav_item_idx) @extern("igTypingSelectFindMatch");
 extern fn CInt typing_select_find_next_single_char_match(ImGuiTypingSelectRequest* req, CInt items_count, GetZStringByIndexFn get_item_name_func, void* user_data, CInt nav_item_idx) @extern("igTypingSelectFindNextSingleCharMatch");
 extern fn void unindent(float indent_w = 0.0f) @extern("igUnindent");
-extern fn void update_hovered_window_and_capture_flags() @extern("igUpdateHoveredWindowAndCaptureFlags");
+extern fn void unregister_font_atlas(ImFontAtlas* atlas) @extern("igUnregisterFontAtlas");
+extern fn void unregister_user_texture(ImTextureData* tex) @extern("igUnregisterUserTexture");
+extern fn void update_current_font_size(float restore_font_size_after_scaling) @extern("igUpdateCurrentFontSize");
+extern fn void update_hovered_window_and_capture_flags(ImVec2 mouse_pos) @extern("igUpdateHoveredWindowAndCaptureFlags");
 extern fn void update_input_events(bool trickle_fast_inputs) @extern("igUpdateInputEvents");
 extern fn void update_mouse_moving_window_end_frame() @extern("igUpdateMouseMovingWindowEndFrame");
 extern fn void update_mouse_moving_window_new_frame() @extern("igUpdateMouseMovingWindowNewFrame");

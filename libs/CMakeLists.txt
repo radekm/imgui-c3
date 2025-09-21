@@ -52,7 +52,7 @@ target_compile_definitions(filedialog PRIVATE IMGUI_IMPL_API=extern\t\"C\"\t)
 
 target_include_directories(filedialog PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/cimgui/imgui)
 
-add_library(sokol STATIC 
+add_library(sokol STATIC
     sokol/sokol.c
 )
 
