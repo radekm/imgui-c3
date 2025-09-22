@@ -4266,7 +4266,7 @@ extern fn ImGuiWindow* get_top_most_and_visible_popup_modal() @extern("igGetTopM
 extern fn ImGuiWindow* get_top_most_popup_modal() @extern("igGetTopMostPopupModal");
 extern fn float get_tree_node_to_label_spacing() @extern("igGetTreeNodeToLabelSpacing");
 extern fn void get_typematic_repeat_rate(ImGuiInputFlags flags, float* repeat_delay, float* repeat_rate) @extern("igGetTypematicRepeatRate");
-extern fn ImGuiTypingSelectRequest* get_typing_select_request(ImGuiTypingSelectFlags flags = typing_select_flags::NONE) @extern("igGetTypingSelectRequest");
+extern fn ImGuiTypingSelectRequest* get_typing_select_request(ImGuiTypingSelectFlags flags = ImGuiTypingSelectFlags.NONE) @extern("igGetTypingSelectRequest");
 extern fn ZString get_version() @extern("igGetVersion");
 extern fn ImGuiPlatformMonitor* get_viewport_platform_monitor(ImGuiViewport* viewport) @extern("igGetViewportPlatformMonitor");
 extern fn bool get_window_always_want_own_tab_bar(ImGuiWindow* window) @extern("igGetWindowAlwaysWantOwnTabBar");
@@ -4579,7 +4579,7 @@ extern fn void new_line() @extern("igNewLine");
 extern fn void next_column() @extern("igNextColumn");
 extern fn void open_popup_str(ZString str_id, ImGuiPopupFlags popup_flags = 0) @extern("igOpenPopup_Str");
 extern fn void open_popup_id(ImGuiID id, ImGuiPopupFlags popup_flags = 0) @extern("igOpenPopup_ID");
-extern fn void open_popup_ex(ImGuiID id, ImGuiPopupFlags popup_flags = popup_flags::NONE) @extern("igOpenPopupEx");
+extern fn void open_popup_ex(ImGuiID id, ImGuiPopupFlags popup_flags = ImGuiPopupFlags.NONE) @extern("igOpenPopupEx");
 extern fn void open_popup_on_item_click(ZString str_id = null, ImGuiPopupFlags popup_flags = 1) @extern("igOpenPopupOnItemClick");
 extern fn CInt plot_ex(ImGuiPlotType plot_type, ZString label, GetFloatByIndexFn values_getter, void* data, CInt values_count, CInt values_offset, ZString overlay_text, float scale_min, float scale_max, ImVec2 size_arg) @extern("igPlotEx");
 extern fn void plot_histogram_float_ptr(ZString label, float* values, CInt values_count, CInt values_offset = 0, ZString overlay_text = null, float scale_min = math::FLOAT_MAX, float scale_max = math::FLOAT_MAX, ImVec2 graph_size = {}, CInt stride = float.sizeof) @extern("igPlotHistogram_FloatPtr");
@@ -4636,7 +4636,7 @@ extern fn void render_drag_drop_target_rect(ImRect bb, ImRect item_clip_rect) @e
 extern fn void render_frame(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool borders = true, float rounding = 0.0f) @extern("igRenderFrame");
 extern fn void render_frame_border(ImVec2 p_min, ImVec2 p_max, float rounding = 0.0f) @extern("igRenderFrameBorder");
 extern fn void render_mouse_cursor(ImVec2 pos, float scale, ImGuiMouseCursor mouse_cursor, ImU32 col_fill, ImU32 col_border, ImU32 col_shadow) @extern("igRenderMouseCursor");
-extern fn void render_nav_cursor(ImRect bb, ImGuiID id, ImGuiNavRenderCursorFlags flags = nav_render_cursor_flags::NONE) @extern("igRenderNavCursor");
+extern fn void render_nav_cursor(ImRect bb, ImGuiID id, ImGuiNavRenderCursorFlags flags = ImGuiNavRenderCursorFlags.NONE) @extern("igRenderNavCursor");
 extern fn void render_platform_windows_default(void* platform_render_arg = null, void* renderer_render_arg = null) @extern("igRenderPlatformWindowsDefault");
 extern fn void render_rect_filled_range_h(ImDrawList* draw_list, ImRect rect, ImU32 col, float x_start_norm, float x_end_norm, float rounding) @extern("igRenderRectFilledRangeH");
 extern fn void render_rect_filled_with_hole(ImDrawList* draw_list, ImRect outer, ImRect inner, ImU32 col, float rounding) @extern("igRenderRectFilledWithHole");
