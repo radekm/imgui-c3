@@ -76,6 +76,7 @@ fn void main()
         .event_cb = &event,
         .width = 800,
         .height = 600,
+        .high_dpi = true,
         .window_title = "Hello Sokol + Dear ImGui + ImPlot",
         .icon = { .sokol_default = true },
         .logger = { .func = &slog::func },
