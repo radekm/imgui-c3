@@ -112,6 +112,13 @@ enum ImDrawListFlags : const CInt
     ANTI_ALIASED_FILL = 4,  // 1 << 2
     ALLOW_VTX_OFFSET = 8,  // 1 << 3
 }
+enum ImDrawTextFlags : const CInt
+{
+    NONE = 0,  // 0
+    CPU_FINE_CLIP = 1,  // 1 << 0
+    WRAP_KEEP_BLANKS = 2,  // 1 << 1
+    STOP_ON_NEW_LINE = 4,  // 1 << 2
+}
 enum ImFontAtlasFlags : const CInt
 {
     NONE = 0,  // 0
@@ -134,6 +141,7 @@ enum ImGuiActivateFlags : const CInt
     TRY_TO_PRESERVE_STATE = 4,  // 1 << 2
     FROM_TABBING = 8,  // 1 << 3
     FROM_SHORTCUT = 16,  // 1 << 4
+    FROM_FOCUS_API = 32,  // 1 << 5
 }
 enum ImGuiAxis : const CInt
 {
@@ -516,6 +524,7 @@ enum ImGuiInputTextFlags : const CInt
     CALLBACK_CHAR_FILTER = 2097152,  // 1 << 21
     CALLBACK_RESIZE = 4194304,  // 1 << 22
     CALLBACK_EDIT = 8388608,  // 1 << 23
+    WORD_WRAP = 16777216,  // 1 << 24
 }
 enum ImGuiItemFlags : const CInt
 {
@@ -715,6 +724,11 @@ enum ImGuiLayoutType : const CInt
     HORIZONTAL = 0,  // 0
     VERTICAL = 1,  // 1
 }
+enum ImGuiListClipperFlags : const CInt
+{
+    NONE = 0,  // 0
+    NO_SET_TABLE_ROW_COUNTERS = 1,  // 1 << 0
+}
 enum ImGuiLocKey : const CInt
 {
     VERSION_STR = 0,  // 0
@@ -909,6 +923,7 @@ enum ImGuiSelectableFlags : const CInt
     DISABLED = 8,  // 1 << 3
     ALLOW_OVERLAP = 16,  // 1 << 4
     HIGHLIGHT = 32,  // 1 << 5
+    SELECT_ON_NAV = 64,  // 1 << 6
 }
 enum ImGuiSelectionRequestType : const CInt
 {
@@ -964,24 +979,27 @@ enum ImGuiStyleVar : const CInt
     CELL_PADDING = 17,  // 17
     SCROLLBAR_SIZE = 18,  // 18
     SCROLLBAR_ROUNDING = 19,  // 19
-    GRAB_MIN_SIZE = 20,  // 20
-    GRAB_ROUNDING = 21,  // 21
-    IMAGE_BORDER_SIZE = 22,  // 22
-    TAB_ROUNDING = 23,  // 23
-    TAB_BORDER_SIZE = 24,  // 24
-    TAB_BAR_BORDER_SIZE = 25,  // 25
-    TAB_BAR_OVERLINE_SIZE = 26,  // 26
-    TABLE_ANGLED_HEADERS_ANGLE = 27,  // 27
-    TABLE_ANGLED_HEADERS_TEXT_ALIGN = 28,  // 28
-    TREE_LINES_SIZE = 29,  // 29
-    TREE_LINES_ROUNDING = 30,  // 30
-    BUTTON_TEXT_ALIGN = 31,  // 31
-    SELECTABLE_TEXT_ALIGN = 32,  // 32
-    SEPARATOR_TEXT_BORDER_SIZE = 33,  // 33
-    SEPARATOR_TEXT_ALIGN = 34,  // 34
-    SEPARATOR_TEXT_PADDING = 35,  // 35
-    DOCKING_SEPARATOR_SIZE = 36,  // 36
-    COUNT = 37,  // 37
+    SCROLLBAR_PADDING = 20,  // 20
+    GRAB_MIN_SIZE = 21,  // 21
+    GRAB_ROUNDING = 22,  // 22
+    IMAGE_BORDER_SIZE = 23,  // 23
+    TAB_ROUNDING = 24,  // 24
+    TAB_BORDER_SIZE = 25,  // 25
+    TAB_MIN_WIDTH_BASE = 26,  // 26
+    TAB_MIN_WIDTH_SHRINK = 27,  // 27
+    TAB_BAR_BORDER_SIZE = 28,  // 28
+    TAB_BAR_OVERLINE_SIZE = 29,  // 29
+    TABLE_ANGLED_HEADERS_ANGLE = 30,  // 30
+    TABLE_ANGLED_HEADERS_TEXT_ALIGN = 31,  // 31
+    TREE_LINES_SIZE = 32,  // 32
+    TREE_LINES_ROUNDING = 33,  // 33
+    BUTTON_TEXT_ALIGN = 34,  // 34
+    SELECTABLE_TEXT_ALIGN = 35,  // 35
+    SEPARATOR_TEXT_BORDER_SIZE = 36,  // 36
+    SEPARATOR_TEXT_ALIGN = 37,  // 37
+    SEPARATOR_TEXT_PADDING = 38,  // 38
+    DOCKING_SEPARATOR_SIZE = 39,  // 39
+    COUNT = 40,  // 40
 }
 enum ImGuiTabBarFlags : const CInt
 {
@@ -993,10 +1011,11 @@ enum ImGuiTabBarFlags : const CInt
     NO_TAB_LIST_SCROLLING_BUTTONS = 16,  // 1 << 4
     NO_TOOLTIP = 32,  // 1 << 5
     DRAW_SELECTED_OVERLINE = 64,  // 1 << 6
-    FITTING_POLICY_RESIZE_DOWN = 128,  // 1 << 7
-    FITTING_POLICY_SCROLL = 256,  // 1 << 8
-    FITTING_POLICY_MASK_ = 384,  // ImGuiTabBarFlags_FittingPolicyResizeDown | ImGuiTabBarFlags_FittingPolicyScroll
-    FITTING_POLICY_DEFAULT_ = 128,  // ImGuiTabBarFlags_FittingPolicyResizeDown
+    FITTING_POLICY_MIXED = 128,  // 1 << 7
+    FITTING_POLICY_SHRINK = 256,  // 1 << 8
+    FITTING_POLICY_SCROLL = 512,  // 1 << 9
+    FITTING_POLICY_MASK_ = 896,  // ImGuiTabBarFlags_FittingPolicyMixed | ImGuiTabBarFlags_FittingPolicyShrink | ImGuiTabBarFlags_FittingPolicyScroll
+    FITTING_POLICY_DEFAULT_ = 128,  // ImGuiTabBarFlags_FittingPolicyMixed
 }
 enum ImGuiTabItemFlags : const CInt
 {
@@ -1414,7 +1433,7 @@ struct ImFontAtlasRect
 struct ImFontAtlasRectEntry
 {
     CInt target_index;
-    CInt generation;
+    CUInt generation;
     CUInt is_used;
 }
 struct ImFontBaked
@@ -1430,7 +1449,8 @@ struct ImFontBaked
     float descent;
     CUInt metrics_total_surface;
     CUInt want_destroy;
-    CUInt lock_loading_fallback;
+    CUInt load_no_fallback;
+    CUInt load_no_render_on_layout;
     CInt last_used_frame;
     ImGuiID baked_id;
     ImFont* container_font;
@@ -1590,7 +1610,7 @@ struct ImGuiContext
     ImVec2 wheeling_window_wheel_remainder;
     ImVec2 wheeling_axis_avg;
     ImGuiID debug_draw_id_conflicts_id;
-    ImGuiID debug_hook_id_info;
+    ImGuiID debug_hook_id_info_id;
     ImGuiID hovered_id;
     ImGuiID hovered_id_previous_frame;
     CInt hovered_id_previous_frame_item_count;
@@ -1609,6 +1629,7 @@ struct ImGuiContext
     bool active_id_has_been_edited_before;
     bool active_id_has_been_edited_this_frame;
     bool active_id_from_shortcut;
+    ImGuiID active_id_disabled_id;
     CInt active_id_mouse_button;
     ImVec2 active_id_click_offset;
     ImGuiWindow* active_id_window;
@@ -1762,6 +1783,7 @@ struct ImGuiContext
     float mouse_stationary_timer;
     ImVec2 mouse_last_valid_pos;
     ImGuiInputTextState input_text_state;
+    ImGuiTextIndex input_text_line_index;
     ImGuiInputTextDeactivatedState input_text_deactivated_state;
     ImFontBaked input_text_password_font_backup_baked;
     ImFontFlags input_text_password_font_backup_flags;
@@ -1987,11 +2009,14 @@ struct ImGuiIDStackTool
 {
     CInt last_active_frame;
     CInt stack_level;
-    ImGuiID query_id;
+    ImGuiID query_main_id;
     ImVector results;
-    bool copy_to_clipboard_on_ctrl_c;
+    bool query_hook_active;
+    bool opt_hex_encode_non_ascii_chars;
+    bool opt_copy_to_clipboard_on_ctrl_c;
     float copy_to_clipboard_last_time;
-    ImGuiTextBuffer result_path_buf;
+    ImGuiTextBuffer result_paths_buf;
+    ImGuiTextBuffer result_temp_buf;
 }
 struct ImGuiIO
 {
@@ -2022,6 +2047,7 @@ struct ImGuiIO
     bool config_viewports_no_task_bar_icon;
     bool config_viewports_no_decoration;
     bool config_viewports_no_default_parent;
+    bool config_viewport_platform_focus_sets_im_gui_focus;
     bool config_dpi_scale_fonts;
     bool config_dpi_scale_viewports;
     bool mouse_draw_cursor;
@@ -2184,11 +2210,15 @@ struct ImGuiInputTextState
     ImVector callback_text_backup;
     CInt buf_capacity;
     ImVec2 scroll;
+    CInt line_count;
+    float wrap_width;
     float cursor_anim;
     bool cursor_follow;
+    bool cursor_center_y;
     bool selected_all_mouse_lock;
     bool edited;
     bool want_reload_user_buf;
+    ImS8 last_move_direction_lr;
     CInt reload_selection_start;
     CInt reload_selection_end;
 }
@@ -2242,6 +2272,7 @@ struct ImGuiListClipper
     double start_pos_y;
     double start_seek_offset_y;
     void* temp_data;
+    ImGuiListClipperFlags flags;
 }
 struct ImGuiListClipperData
 {
@@ -2553,8 +2584,8 @@ struct ImGuiStackLevelInfo
     ImGuiID id;
     ImS8 query_frame_count;
     bool query_success;
-    ImGuiDataType data_type;
-    char[57] desc;
+    ImS8 data_type;
+    CInt desc_offset;
 }
 struct ImGuiStorage
 {
@@ -2594,12 +2625,15 @@ struct ImGuiStyle
     float columns_min_spacing;
     float scrollbar_size;
     float scrollbar_rounding;
+    float scrollbar_padding;
     float grab_min_size;
     float grab_rounding;
     float log_slider_deadzone;
     float image_border_size;
     float tab_rounding;
     float tab_border_size;
+    float tab_min_width_base;
+    float tab_min_width_shrink;
     float tab_close_button_min_width_selected;
     float tab_close_button_min_width_unselected;
     float tab_bar_border_size;
@@ -2617,6 +2651,7 @@ struct ImGuiStyle
     ImVec2 separator_text_padding;
     ImVec2 display_window_padding;
     ImVec2 display_safe_area_padding;
+    bool docking_node_has_close_button;
     float docking_separator_size;
     float mouse_cursor_scale;
     bool anti_aliased_lines;
@@ -2656,6 +2691,7 @@ struct ImGuiTabBar
     CInt curr_frame_visible;
     CInt prev_frame_visible;
     ImRect bar_rect;
+    float bar_rect_prev_width;
     float curr_tabs_contents_height;
     float prev_tabs_contents_height;
     float width_all_tabs;
@@ -2674,6 +2710,7 @@ struct ImGuiTabBar
     bool want_layout;
     bool visible_tab_was_submitted;
     bool tabs_added_new;
+    bool scroll_button_enabled;
     ImS16 tabs_active_count;
     ImS16 last_tab_item_idx;
     float item_spacing_y;
@@ -2941,7 +2978,7 @@ struct ImGuiTextFilter
 }
 struct ImGuiTextIndex
 {
-    ImVector line_offsets;
+    ImVector offsets;
     CInt end_offset;
 }
 struct ImGuiTextRange
@@ -3491,7 +3528,7 @@ extern fn void ImFontGlyph.destroy(ImFontGlyph* self) @extern("ImFontGlyph_destr
 extern fn ImFontLoader* new_im_font_loader() @extern("ImFontLoader_ImFontLoader");
 extern fn void ImFontLoader.destroy(ImFontLoader* self) @extern("ImFontLoader_destroy");
 extern fn void ImFont.add_remap_char(ImFont* self, ImWchar from_codepoint, ImWchar to_codepoint) @extern("ImFont_AddRemapChar");
-extern fn void im_font_calc_text_size_a(ImVec2* p_out, ImFont* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, char** remaining = null) @extern("ImFont_CalcTextSizeA");
+extern fn void im_font_calc_text_size_a(ImVec2* p_out, ImFont* self, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end = null, char** out_remaining = null) @extern("ImFont_CalcTextSizeA");
 extern fn ZString ImFont.calc_word_wrap_position(ImFont* self, float size, ZString text, ZString text_end, float wrap_width) @extern("ImFont_CalcWordWrapPosition");
 extern fn void ImFont.clear_output_data(ImFont* self) @extern("ImFont_ClearOutputData");
 extern fn ZString ImFont.get_debug_name(ImFont* self) @extern("ImFont_GetDebugName");
@@ -3501,7 +3538,7 @@ extern fn bool ImFont.is_glyph_in_font(ImFont* self, ImWchar c) @extern("ImFont_
 extern fn bool ImFont.is_glyph_range_unused(ImFont* self, CUInt c_begin, CUInt c_last) @extern("ImFont_IsGlyphRangeUnused");
 extern fn bool ImFont.is_loaded(ImFont* self) @extern("ImFont_IsLoaded");
 extern fn void ImFont.render_char(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImWchar c, ImVec4* cpu_fine_clip = null) @extern("ImFont_RenderChar");
-extern fn void ImFont.render_text(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImVec4 clip_rect, ZString text_begin, ZString text_end, float wrap_width = 0.0f, bool cpu_fine_clip = false) @extern("ImFont_RenderText");
+extern fn void ImFont.render_text(ImFont* self, ImDrawList* draw_list, float size, ImVec2 pos, ImU32 col, ImVec4 clip_rect, ZString text_begin, ZString text_end, float wrap_width = 0.0f, ImDrawTextFlags flags = 0) @extern("ImFont_RenderText");
 extern fn void ImFont.destroy(ImFont* self) @extern("ImFont_destroy");
 extern fn ImGuiBoxSelectState* new_im_gui_box_select_state() @extern("ImGuiBoxSelectState_ImGuiBoxSelectState");
 extern fn void ImGuiBoxSelectState.destroy(ImGuiBoxSelectState* self) @extern("ImGuiBoxSelectState_destroy");
@@ -3572,6 +3609,7 @@ extern fn void ImGuiInputTextState.clear_text(ImGuiInputTextState* self) @extern
 extern fn void ImGuiInputTextState.cursor_anim_reset(ImGuiInputTextState* self) @extern("ImGuiInputTextState_CursorAnimReset");
 extern fn void ImGuiInputTextState.cursor_clamp(ImGuiInputTextState* self) @extern("ImGuiInputTextState_CursorClamp");
 extern fn CInt ImGuiInputTextState.get_cursor_pos(ImGuiInputTextState* self) @extern("ImGuiInputTextState_GetCursorPos");
+extern fn float ImGuiInputTextState.get_preferred_offset_x(ImGuiInputTextState* self) @extern("ImGuiInputTextState_GetPreferredOffsetX");
 extern fn CInt ImGuiInputTextState.get_selection_end(ImGuiInputTextState* self) @extern("ImGuiInputTextState_GetSelectionEnd");
 extern fn CInt ImGuiInputTextState.get_selection_start(ImGuiInputTextState* self) @extern("ImGuiInputTextState_GetSelectionStart");
 extern fn bool ImGuiInputTextState.has_selection(ImGuiInputTextState* self) @extern("ImGuiInputTextState_HasSelection");
@@ -3790,6 +3828,7 @@ extern fn void ImGuiWindow.destroy(ImGuiWindow* self) @extern("ImGuiWindow_destr
 // Skipping templated: ImPool_destroy
 extern fn void ImRect.add_vec2(ImRect* self, ImVec2 p) @extern("ImRect_Add_Vec2");
 extern fn void ImRect.add_rect(ImRect* self, ImRect r) @extern("ImRect_Add_Rect");
+extern fn ImVec4* ImRect.as_vec4(ImRect* self) @extern("ImRect_AsVec4");
 extern fn void ImRect.clip_with(ImRect* self, ImRect r) @extern("ImRect_ClipWith");
 extern fn void ImRect.clip_with_full(ImRect* self, ImRect r) @extern("ImRect_ClipWithFull");
 extern fn bool ImRect.contains_vec2(ImRect* self, ImVec2 p) @extern("ImRect_Contains_Vec2");
@@ -3973,6 +4012,7 @@ extern fn void bullet_text(ZString fmt, ...) @extern("igBulletText");
 extern fn bool button(ZString label, ImVec2 size = {}) @extern("igButton");
 extern fn bool button_behavior(ImRect bb, ImGuiID id, bool* out_hovered, bool* out_held, ImGuiButtonFlags flags = 0) @extern("igButtonBehavior");
 extern fn bool button_ex(ZString label, ImVec2 size_arg = {}, ImGuiButtonFlags flags = 0) @extern("igButtonEx");
+extern fn void calc_clip_rect_visible_items_y(ImRect clip_rect, ImVec2 pos, float items_height, CInt* out_visible_start, CInt* out_visible_end) @extern("igCalcClipRectVisibleItemsY");
 extern fn void calc_item_size(ImVec2* p_out, ImVec2 size, float default_w, float default_h) @extern("igCalcItemSize");
 extern fn float calc_item_width() @extern("igCalcItemWidth");
 extern fn ImDrawFlags calc_rounding_flags_for_rect_in_rect(ImRect r_in, ImRect r_outer, float threshold) @extern("igCalcRoundingFlagsForRectInRect");
@@ -4347,7 +4387,7 @@ extern fn void im_font_atlas_pack_discard_rect(ImFontAtlas* atlas, ImFontAtlasRe
 extern fn ImTextureRect* im_font_atlas_pack_get_rect(ImFontAtlas* atlas, ImFontAtlasRectId id) @extern("igImFontAtlasPackGetRect");
 extern fn ImTextureRect* im_font_atlas_pack_get_rect_safe(ImFontAtlas* atlas, ImFontAtlasRectId id) @extern("igImFontAtlasPackGetRectSafe");
 extern fn void im_font_atlas_pack_init(ImFontAtlas* atlas) @extern("igImFontAtlasPackInit");
-extern fn CInt im_font_atlas_rect_id_get_generation(ImFontAtlasRectId id) @extern("igImFontAtlasRectId_GetGeneration");
+extern fn CUInt im_font_atlas_rect_id_get_generation(ImFontAtlasRectId id) @extern("igImFontAtlasRectId_GetGeneration");
 extern fn CInt im_font_atlas_rect_id_get_index(ImFontAtlasRectId id) @extern("igImFontAtlasRectId_GetIndex");
 extern fn ImFontAtlasRectId im_font_atlas_rect_id_make(CInt index_idx, CInt gen_idx) @extern("igImFontAtlasRectId_Make");
 extern fn void im_font_atlas_remove_draw_list_shared_data(ImFontAtlas* atlas, ImDrawListSharedData* data) @extern("igImFontAtlasRemoveDrawListSharedData");
@@ -4366,9 +4406,12 @@ extern fn void im_font_atlas_texture_repack(ImFontAtlas* atlas, CInt w, CInt h) 
 extern fn void im_font_atlas_update_draw_lists_shared_data(ImFontAtlas* atlas) @extern("igImFontAtlasUpdateDrawListsSharedData");
 extern fn void im_font_atlas_update_draw_lists_textures(ImFontAtlas* atlas, ImTextureRef old_tex, ImTextureRef new_tex) @extern("igImFontAtlasUpdateDrawListsTextures");
 extern fn void im_font_atlas_update_new_frame(ImFontAtlas* atlas, CInt frame_count, bool renderer_has_textures) @extern("igImFontAtlasUpdateNewFrame");
+extern fn void im_font_calc_text_size_ex(ImVec2* p_out, ImFont* font, float size, float max_width, float wrap_width, ZString text_begin, ZString text_end_display, ZString text_end, char** out_remaining, ImVec2* out_offset, ImDrawTextFlags flags) @extern("igImFontCalcTextSizeEx");
+extern fn ZString im_font_calc_word_wrap_position_ex(ImFont* font, float size, ZString text, ZString text_end, float wrap_width, ImDrawTextFlags flags = 0) @extern("igImFontCalcWordWrapPositionEx");
 extern fn CInt im_format_string(ZString buf, usz buf_size, ZString fmt, ...) @extern("igImFormatString");
 extern fn void im_format_string_to_temp_buffer(char** out_buf, char** out_buf_end, ZString fmt, ...) @extern("igImFormatStringToTempBuffer");
 extern fn ImGuiID im_hash_data(void* data, usz data_size, ImGuiID seed = 0) @extern("igImHashData");
+extern fn ZString im_hash_skip_uncontributing_prefix(ZString label) @extern("igImHashSkipUncontributingPrefix");
 extern fn ImGuiID im_hash_str(ZString data, usz data_size = 0, ImGuiID seed = 0) @extern("igImHashStr");
 extern fn float im_inv_length(ImVec2 lhs, float fail_value) @extern("igImInvLength");
 extern fn bool im_is_float_above_guaranteed_integer_precision(float f) @extern("igImIsFloatAboveGuaranteedIntegerPrecision");
@@ -4418,8 +4461,9 @@ extern fn ZString im_stristr(ZString haystack, ZString haystack_end, ZString nee
 extern fn CInt im_strlen_w(ImWchar* str) @extern("igImStrlenW");
 extern fn void im_strncpy(ZString dst, ZString src, usz count) @extern("igImStrncpy");
 extern fn CInt im_strnicmp(ZString str1, ZString str2, usz count) @extern("igImStrnicmp");
+extern fn ZString im_text_calc_word_wrap_next_line_start(ZString text, ZString text_end, ImDrawTextFlags flags = 0) @extern("igImTextCalcWordWrapNextLineStart");
 extern fn CInt im_text_char_from_utf8(CUInt* out_char, ZString in_text, ZString in_text_end) @extern("igImTextCharFromUtf8");
-extern fn ZString im_text_char_to_utf8(char[5]* out_buf, CUInt c) @extern("igImTextCharToUtf8");
+extern fn CInt im_text_char_to_utf8(char[5]* out_buf, CUInt c) @extern("igImTextCharToUtf8");
 extern fn CInt im_text_count_chars_from_utf8(ZString in_text, ZString in_text_end) @extern("igImTextCountCharsFromUtf8");
 extern fn CInt im_text_count_lines(ZString in_text, ZString in_text_end) @extern("igImTextCountLines");
 extern fn CInt im_text_count_utf8_bytes_from_char(ZString in_text, ZString in_text_end) @extern("igImTextCountUtf8BytesFromChar");
@@ -4761,7 +4805,7 @@ extern fn void show_metrics_window(bool* p_open = null) @extern("igShowMetricsWi
 extern fn void show_style_editor(ImGuiStyle* ref = null) @extern("igShowStyleEditor");
 extern fn bool show_style_selector(ZString label) @extern("igShowStyleSelector");
 extern fn void show_user_guide() @extern("igShowUserGuide");
-extern fn void shrink_widths(ImGuiShrinkWidthItem* items, CInt count, float width_excess) @extern("igShrinkWidths");
+extern fn void shrink_widths(ImGuiShrinkWidthItem* items, CInt count, float width_excess, float width_min) @extern("igShrinkWidths");
 extern fn void shutdown() @extern("igShutdown");
 extern fn bool slider_angle(ZString label, float* v_rad, float v_degrees_min = -360.0f, float v_degrees_max = +360.0f, ZString format = "%.0f deg", ImGuiSliderFlags flags = 0) @extern("igSliderAngle");
 extern fn bool slider_behavior(ImRect bb, ImGuiID id, ImGuiDataType data_type, void* p_v, void* p_min, void* p_max, ZString format, ImGuiSliderFlags flags, ImRect* out_grab_bb) @extern("igSliderBehavior");
@@ -4780,11 +4824,13 @@ extern fn void spacing() @extern("igSpacing");
 extern fn bool splitter_behavior(ImRect bb, ImGuiID id, ImGuiAxis axis, float* size1, float* size2, float min_size1, float min_size2, float hover_extend = 0.0f, float hover_visibility_delay = 0.0f, ImU32 bg_col = 0) @extern("igSplitterBehavior");
 extern fn void start_mouse_moving_window(ImGuiWindow* window) @extern("igStartMouseMovingWindow");
 extern fn void start_mouse_moving_window_or_node(ImGuiWindow* window, ImGuiDockNode* node, bool undock) @extern("igStartMouseMovingWindowOrNode");
+extern fn void stop_mouse_moving_window() @extern("igStopMouseMovingWindow");
 extern fn void style_colors_classic(ImGuiStyle* dst = null) @extern("igStyleColorsClassic");
 extern fn void style_colors_dark(ImGuiStyle* dst = null) @extern("igStyleColorsDark");
 extern fn void style_colors_light(ImGuiStyle* dst = null) @extern("igStyleColorsLight");
 extern fn void tab_bar_add_tab(ImGuiTabBar* tab_bar, ImGuiTabItemFlags tab_flags, ImGuiWindow* window) @extern("igTabBarAddTab");
 extern fn void tab_bar_close_tab(ImGuiTabBar* tab_bar, ImGuiTabItem* tab) @extern("igTabBarCloseTab");
+extern fn ImGuiTabBar* tab_bar_find_by_id(ImGuiID id) @extern("igTabBarFindByID");
 extern fn ImGuiTabItem* tab_bar_find_most_recently_selected_tab_for_active_window(ImGuiTabBar* tab_bar) @extern("igTabBarFindMostRecentlySelectedTabForActiveWindow");
 extern fn ImGuiTabItem* tab_bar_find_tab_by_id(ImGuiTabBar* tab_bar, ImGuiID tab_id) @extern("igTabBarFindTabByID");
 extern fn ImGuiTabItem* tab_bar_find_tab_by_order(ImGuiTabBar* tab_bar, CInt order) @extern("igTabBarFindTabByOrder");
@@ -4796,6 +4842,7 @@ extern fn void tab_bar_queue_focus_tab_item_ptr(ImGuiTabBar* tab_bar, ImGuiTabIt
 extern fn void tab_bar_queue_focus_str(ImGuiTabBar* tab_bar, ZString tab_name) @extern("igTabBarQueueFocus_Str");
 extern fn void tab_bar_queue_reorder(ImGuiTabBar* tab_bar, ImGuiTabItem* tab, CInt offset) @extern("igTabBarQueueReorder");
 extern fn void tab_bar_queue_reorder_from_mouse_pos(ImGuiTabBar* tab_bar, ImGuiTabItem* tab, ImVec2 mouse_pos) @extern("igTabBarQueueReorderFromMousePos");
+extern fn void tab_bar_remove(ImGuiTabBar* tab_bar) @extern("igTabBarRemove");
 extern fn void tab_bar_remove_tab(ImGuiTabBar* tab_bar, ImGuiID tab_id) @extern("igTabBarRemoveTab");
 extern fn void tab_item_background(ImDrawList* draw_list, ImRect bb, ImGuiTabItemFlags flags, ImU32 col) @extern("igTabItemBackground");
 extern fn bool tab_item_button(ZString label, ImGuiTabItemFlags flags = 0) @extern("igTabItemButton");

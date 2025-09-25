@@ -4203,6 +4203,15 @@ typedef struct sg_frame_stats_wgpu {
     sg_frame_stats_wgpu_bindings bindings;
 } sg_frame_stats_wgpu;
 
+typedef struct sg_resource_stats {
+    uint32_t total_alive;   // number of live objects in pool
+    uint32_t total_free;    // number of free objects in pool
+    uint32_t allocated;     // number of allocated objects in current frame
+    uint32_t deallocated;   // number of deallocated object in current frame
+    uint32_t inited;        // number of initialized objects in current frame
+    uint32_t uninited;      // number of deinitialized objects in current frame
+} sg_resource_stats;
+
 typedef struct sg_frame_stats {
     uint32_t frame_index;   // current frame counter, starts at 0
 
@@ -4222,6 +4231,13 @@ typedef struct sg_frame_stats {
     uint32_t size_update_buffer;
     uint32_t size_append_buffer;
     uint32_t size_update_image;
+
+    sg_resource_stats buffers;
+    sg_resource_stats images;
+    sg_resource_stats samplers;
+    sg_resource_stats views;
+    sg_resource_stats shaders;
+    sg_resource_stats pipelines;
 
     sg_frame_stats_gl gl;
     sg_frame_stats_d3d11 d3d11;
@@ -6312,6 +6328,18 @@ typedef struct {
     HINSTANCE d3dcompiler_dll;
     bool d3dcompiler_dll_load_failed;
     pD3DCompile D3DCompile_func;
+    // static bindings arrays
+    struct {
+        ID3D11Buffer* vbs[SG_MAX_VERTEXBUFFER_BINDSLOTS];
+        UINT vb_offsets[SG_MAX_VERTEXBUFFER_BINDSLOTS];
+        ID3D11ShaderResourceView* vs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS];
+        ID3D11ShaderResourceView* fs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS];
+        ID3D11ShaderResourceView* cs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS];
+        ID3D11UnorderedAccessView* cs_uavs[_SG_D3D11_MAX_STAGE_UAV_BINDINGS];
+        ID3D11SamplerState* vs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS];
+        ID3D11SamplerState* fs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS];
+        ID3D11SamplerState* cs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS];
+    } bnd;
     // global subresourcedata array for texture updates
     D3D11_SUBRESOURCE_DATA subres_data[_SG_D3D11_MAX_TEXTURE_SUBRESOURCES];
 } _sg_d3d11_backend_t;
@@ -7319,6 +7347,24 @@ _SG_IMPL_RES_PTR_OR_NULL(_sg_view_ref_ptr_or_null, _sg_view_ref_t, _sg_view_t)
 #define _sg_fequal(val,cmp,delta) ((((val)-(cmp))> -(delta))&&(((val)-(cmp))<(delta)))
 #define _sg_ispow2(val) ((val&(val-1))==0)
 #define _sg_stats_add(key,val) {if(_sg.stats_enabled){ _sg.stats.key+=val;}}
+
+_SOKOL_PRIVATE void _sg_update_resource_stats(sg_resource_stats* stats, const _sg_pool_t* pool) {
+    SOKOL_ASSERT(stats && pool);
+    stats->total_alive = (uint32_t) ((pool->size - 1) - pool->queue_top);
+    stats->total_free = (uint32_t) pool->queue_top;
+}
+
+_SOKOL_PRIVATE void _sg_update_frame_stats(void) {
+    _sg.stats.frame_index = _sg.frame_index;
+    _sg_update_resource_stats(&_sg.stats.buffers, &_sg.pools.buffer_pool);
+    _sg_update_resource_stats(&_sg.stats.images, &_sg.pools.image_pool);
+    _sg_update_resource_stats(&_sg.stats.views, &_sg.pools.view_pool);
+    _sg_update_resource_stats(&_sg.stats.samplers, &_sg.pools.sampler_pool);
+    _sg_update_resource_stats(&_sg.stats.shaders, &_sg.pools.shader_pool);
+    _sg_update_resource_stats(&_sg.stats.pipelines, &_sg.pools.pipeline_pool);
+    _sg.prev_stats = _sg.stats;
+    _sg_clear(&_sg.stats, sizeof(_sg.stats));
+}
 
 _SOKOL_PRIVATE uint32_t _sg_align_u32(uint32_t val, uint32_t align) {
     SOKOL_ASSERT((align > 0) && ((align & (align - 1)) == 0));
@@ -13477,27 +13523,36 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
     const _sg_shader_t* shd = _sg_shader_ref_ptr(&bnd->pip->cmn.shader);
     const bool is_compute = bnd->pip->cmn.is_compute;
 
+    if (is_compute) {
+        _sg_clear(&_sg.d3d11.bnd.cs_srvs, sizeof(_sg.d3d11.bnd.cs_srvs));
+        _sg_clear(&_sg.d3d11.bnd.cs_uavs, sizeof(_sg.d3d11.bnd.cs_uavs));
+        _sg_clear(&_sg.d3d11.bnd.cs_smps, sizeof(_sg.d3d11.bnd.cs_smps));
+    } else {
+        _sg_clear(&_sg.d3d11.bnd.vbs, sizeof(_sg.d3d11.bnd.vbs));
+        _sg_clear(&_sg.d3d11.bnd.vb_offsets, sizeof(_sg.d3d11.bnd.vb_offsets));
+        _sg_clear(&_sg.d3d11.bnd.vs_srvs, sizeof(_sg.d3d11.bnd.vs_srvs));
+        _sg_clear(&_sg.d3d11.bnd.fs_srvs, sizeof(_sg.d3d11.bnd.fs_srvs));
+        _sg_clear(&_sg.d3d11.bnd.vs_smps, sizeof(_sg.d3d11.bnd.vs_smps));
+        _sg_clear(&_sg.d3d11.bnd.fs_smps, sizeof(_sg.d3d11.bnd.fs_smps));
+    }
+
     // gather all the D3D11 resources into arrays
     ID3D11Buffer* d3d11_ib = bnd->ib ? bnd->ib->d3d11.buf : 0;
-    ID3D11Buffer* d3d11_vbs[SG_MAX_VERTEXBUFFER_BINDSLOTS] = {0};
-    UINT d3d11_vb_offsets[SG_MAX_VERTEXBUFFER_BINDSLOTS] = {0};
-    ID3D11ShaderResourceView* d3d11_vs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS] = {0};
-    ID3D11ShaderResourceView* d3d11_fs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS] = {0};
-    ID3D11ShaderResourceView* d3d11_cs_srvs[_SG_D3D11_MAX_STAGE_SRV_BINDINGS] = {0};
-    ID3D11UnorderedAccessView* d3d11_cs_uavs[_SG_D3D11_MAX_STAGE_UAV_BINDINGS] = {0};
-    ID3D11SamplerState* d3d11_vs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS] = {0};
-    ID3D11SamplerState* d3d11_fs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS] = {0};
-    ID3D11SamplerState* d3d11_cs_smps[_SG_D3D11_MAX_STAGE_SMP_BINDINGS] = {0};
 
-    if (!is_compute) {
+    if (is_compute) {
+        // on D3D11 we need to break a chicken-egg-situation where a resource
+        // may still be set as shader resource view, but is going to be set
+        // as unordered-access-view, so first clear all shader resource view bindings
+        _sg_d3d11_CSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, _sg.d3d11.bnd.cs_srvs);
+    } else {
         for (size_t i = 0; i < SG_MAX_VERTEXBUFFER_BINDSLOTS; i++) {
             const _sg_buffer_t* vb = bnd->vbs[i];
             if (vb == 0) {
                 continue;
             }
             SOKOL_ASSERT(vb->d3d11.buf);
-            d3d11_vbs[i] = vb->d3d11.buf;
-            d3d11_vb_offsets[i] = (UINT)bnd->vb_offsets[i];
+            _sg.d3d11.bnd.vbs[i] = vb->d3d11.buf;
+            _sg.d3d11.bnd.vb_offsets[i] = (UINT)bnd->vb_offsets[i];
         }
     }
     for (size_t i = 0; i < SG_MAX_VIEW_BINDSLOTS; i++) {
@@ -13519,9 +13574,9 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
             ID3D11ShaderResourceView* d3d11_srv = view->d3d11.srv;
             SOKOL_ASSERT(d3d11_srv);
             switch (stage) {
-                case SG_SHADERSTAGE_VERTEX: d3d11_vs_srvs[d3d11_slot] = d3d11_srv; break;
-                case SG_SHADERSTAGE_FRAGMENT: d3d11_fs_srvs[d3d11_slot] = d3d11_srv; break;
-                case SG_SHADERSTAGE_COMPUTE: d3d11_cs_srvs[d3d11_slot] = d3d11_srv; break;
+                case SG_SHADERSTAGE_VERTEX: _sg.d3d11.bnd.vs_srvs[d3d11_slot] = d3d11_srv; break;
+                case SG_SHADERSTAGE_FRAGMENT: _sg.d3d11.bnd.fs_srvs[d3d11_slot] = d3d11_srv; break;
+                case SG_SHADERSTAGE_COMPUTE: _sg.d3d11.bnd.cs_srvs[d3d11_slot] = d3d11_srv; break;
                 default: SOKOL_UNREACHABLE;
             }
         } else if (shd_view->view_type == SG_VIEWTYPE_STORAGEBUFFER) {
@@ -13531,9 +13586,9 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
                 ID3D11ShaderResourceView* d3d11_srv = view->d3d11.srv;
                 SOKOL_ASSERT(d3d11_srv);
                 switch (stage) {
-                    case SG_SHADERSTAGE_VERTEX: d3d11_vs_srvs[d3d11_slot] = d3d11_srv; break;
-                    case SG_SHADERSTAGE_FRAGMENT: d3d11_fs_srvs[d3d11_slot] = d3d11_srv; break;
-                    case SG_SHADERSTAGE_COMPUTE: d3d11_cs_srvs[d3d11_slot] = d3d11_srv; break;
+                    case SG_SHADERSTAGE_VERTEX: _sg.d3d11.bnd.vs_srvs[d3d11_slot] = d3d11_srv; break;
+                    case SG_SHADERSTAGE_FRAGMENT: _sg.d3d11.bnd.fs_srvs[d3d11_slot] = d3d11_srv; break;
+                    case SG_SHADERSTAGE_COMPUTE: _sg.d3d11.bnd.cs_srvs[d3d11_slot] = d3d11_srv; break;
                     default: SOKOL_UNREACHABLE;
                 }
             } else {
@@ -13542,7 +13597,7 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
                 SOKOL_ASSERT(d3d11_slot < _SG_D3D11_MAX_STAGE_UAV_BINDINGS);
                 ID3D11UnorderedAccessView* d3d11_uav = view->d3d11.uav;
                 SOKOL_ASSERT(d3d11_uav);
-                d3d11_cs_uavs[d3d11_slot] = d3d11_uav;
+                _sg.d3d11.bnd.cs_uavs[d3d11_slot] = d3d11_uav;
             }
         } else if (shd_view->view_type == SG_VIEWTYPE_STORAGEIMAGE) {
             SOKOL_ASSERT(stage == SG_SHADERSTAGE_COMPUTE);
@@ -13550,7 +13605,7 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
             SOKOL_ASSERT(d3d11_slot < _SG_D3D11_MAX_STAGE_UAV_BINDINGS);
             ID3D11UnorderedAccessView* d3d11_uav = view->d3d11.uav;
             SOKOL_ASSERT(d3d11_uav);
-            d3d11_cs_uavs[d3d11_slot] = d3d11_uav;
+            _sg.d3d11.bnd.cs_uavs[d3d11_slot] = d3d11_uav;
         } else SOKOL_UNREACHABLE;
     }
     for (size_t i = 0; i < SG_MAX_SAMPLER_BINDSLOTS; i++) {
@@ -13565,26 +13620,27 @@ _SOKOL_PRIVATE bool _sg_d3d11_apply_bindings(_sg_bindings_ptrs_t* bnd) {
         SOKOL_ASSERT(smp->d3d11.smp);
         ID3D11SamplerState* d3d11_smp = smp->d3d11.smp;
         switch (stage) {
-            case SG_SHADERSTAGE_VERTEX: d3d11_vs_smps[d3d11_slot] = d3d11_smp; break;
-            case SG_SHADERSTAGE_FRAGMENT: d3d11_fs_smps[d3d11_slot] = d3d11_smp; break;
-            case SG_SHADERSTAGE_COMPUTE: d3d11_cs_smps[d3d11_slot] = d3d11_smp; break;
+            case SG_SHADERSTAGE_VERTEX: _sg.d3d11.bnd.vs_smps[d3d11_slot] = d3d11_smp; break;
+            case SG_SHADERSTAGE_FRAGMENT: _sg.d3d11.bnd.fs_smps[d3d11_slot] = d3d11_smp; break;
+            case SG_SHADERSTAGE_COMPUTE: _sg.d3d11.bnd.cs_smps[d3d11_slot] = d3d11_smp; break;
             default: SOKOL_UNREACHABLE;
         }
     }
     if (is_compute) {
-        _sg_d3d11_CSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, d3d11_cs_srvs);
-        _sg_d3d11_CSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, d3d11_cs_smps);
-        _sg_d3d11_CSSetUnorderedAccessViews(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_UAV_BINDINGS, d3d11_cs_uavs, NULL);
+        // NOTE: keep UAVs on front of SRVs
+        _sg_d3d11_CSSetUnorderedAccessViews(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_UAV_BINDINGS, _sg.d3d11.bnd.cs_uavs, NULL);
+        _sg_d3d11_CSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, _sg.d3d11.bnd.cs_srvs);
+        _sg_d3d11_CSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, _sg.d3d11.bnd.cs_smps);
         _sg_stats_add(d3d11.bindings.num_cs_set_shader_resources, 1);
         _sg_stats_add(d3d11.bindings.num_cs_set_samplers, 1);
         _sg_stats_add(d3d11.bindings.num_cs_set_unordered_access_views, 1);
     } else {
-        _sg_d3d11_IASetVertexBuffers(_sg.d3d11.ctx, 0, SG_MAX_VERTEXBUFFER_BINDSLOTS, d3d11_vbs, bnd->pip->d3d11.vb_strides, d3d11_vb_offsets);
+        _sg_d3d11_IASetVertexBuffers(_sg.d3d11.ctx, 0, SG_MAX_VERTEXBUFFER_BINDSLOTS, _sg.d3d11.bnd.vbs, bnd->pip->d3d11.vb_strides, _sg.d3d11.bnd.vb_offsets);
         _sg_d3d11_IASetIndexBuffer(_sg.d3d11.ctx, d3d11_ib, bnd->pip->d3d11.index_format, (UINT)bnd->ib_offset);
-        _sg_d3d11_VSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, d3d11_vs_srvs);
-        _sg_d3d11_PSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, d3d11_fs_srvs);
-        _sg_d3d11_VSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, d3d11_vs_smps);
-        _sg_d3d11_PSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, d3d11_fs_smps);
+        _sg_d3d11_VSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, _sg.d3d11.bnd.vs_srvs);
+        _sg_d3d11_PSSetShaderResources(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SRV_BINDINGS, _sg.d3d11.bnd.fs_srvs);
+        _sg_d3d11_VSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, _sg.d3d11.bnd.vs_smps);
+        _sg_d3d11_PSSetSamplers(_sg.d3d11.ctx, 0, _SG_D3D11_MAX_STAGE_SMP_BINDINGS, _sg.d3d11.bnd.fs_smps);
         _sg_stats_add(d3d11.bindings.num_ia_set_vertex_buffers, 1);
         _sg_stats_add(d3d11.bindings.num_ia_set_index_buffer, 1);
         _sg_stats_add(d3d11.bindings.num_vs_set_shader_resources, 1);
@@ -20008,6 +20064,7 @@ _SOKOL_PRIVATE sg_buffer _sg_alloc_buffer(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.buffer_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id = _sg_slot_alloc(&_sg.pools.buffer_pool, &_sg.pools.buffers[slot_index].slot, slot_index);
+        _sg_stats_add(buffers.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(BUFFER_POOL_EXHAUSTED);
@@ -20020,6 +20077,7 @@ _SOKOL_PRIVATE sg_image _sg_alloc_image(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.image_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id = _sg_slot_alloc(&_sg.pools.image_pool, &_sg.pools.images[slot_index].slot, slot_index);
+        _sg_stats_add(images.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(IMAGE_POOL_EXHAUSTED);
@@ -20032,6 +20090,7 @@ _SOKOL_PRIVATE sg_sampler _sg_alloc_sampler(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.sampler_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id = _sg_slot_alloc(&_sg.pools.sampler_pool, &_sg.pools.samplers[slot_index].slot, slot_index);
+        _sg_stats_add(samplers.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(SAMPLER_POOL_EXHAUSTED);
@@ -20044,6 +20103,7 @@ _SOKOL_PRIVATE sg_shader _sg_alloc_shader(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.shader_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id = _sg_slot_alloc(&_sg.pools.shader_pool, &_sg.pools.shaders[slot_index].slot, slot_index);
+        _sg_stats_add(shaders.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(SHADER_POOL_EXHAUSTED);
@@ -20056,6 +20116,7 @@ _SOKOL_PRIVATE sg_pipeline _sg_alloc_pipeline(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.pipeline_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id =_sg_slot_alloc(&_sg.pools.pipeline_pool, &_sg.pools.pipelines[slot_index].slot, slot_index);
+        _sg_stats_add(pipelines.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(PIPELINE_POOL_EXHAUSTED);
@@ -20068,6 +20129,7 @@ _SOKOL_PRIVATE sg_view _sg_alloc_view(void) {
     int slot_index = _sg_pool_alloc_index(&_sg.pools.view_pool);
     if (_SG_INVALID_SLOT_INDEX != slot_index) {
         res.id = _sg_slot_alloc(&_sg.pools.view_pool, &_sg.pools.views[slot_index].slot, slot_index);
+        _sg_stats_add(views.allocated, 1);
     } else {
         res.id = SG_INVALID_ID;
         _SG_ERROR(VIEW_POOL_EXHAUSTED);
@@ -20079,36 +20141,42 @@ _SOKOL_PRIVATE void _sg_dealloc_buffer(_sg_buffer_t* buf) {
     SOKOL_ASSERT(buf && (buf->slot.state == SG_RESOURCESTATE_ALLOC) && (buf->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.buffer_pool, _sg_slot_index(buf->slot.id));
     _sg_slot_reset(&buf->slot);
+    _sg_stats_add(buffers.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_dealloc_image(_sg_image_t* img) {
     SOKOL_ASSERT(img && (img->slot.state == SG_RESOURCESTATE_ALLOC) && (img->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.image_pool, _sg_slot_index(img->slot.id));
     _sg_slot_reset(&img->slot);
+    _sg_stats_add(images.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_dealloc_sampler(_sg_sampler_t* smp) {
     SOKOL_ASSERT(smp && (smp->slot.state == SG_RESOURCESTATE_ALLOC) && (smp->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.sampler_pool, _sg_slot_index(smp->slot.id));
     _sg_slot_reset(&smp->slot);
+    _sg_stats_add(samplers.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_dealloc_shader(_sg_shader_t* shd) {
     SOKOL_ASSERT(shd && (shd->slot.state == SG_RESOURCESTATE_ALLOC) && (shd->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.shader_pool, _sg_slot_index(shd->slot.id));
     _sg_slot_reset(&shd->slot);
+    _sg_stats_add(shaders.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_dealloc_pipeline(_sg_pipeline_t* pip) {
     SOKOL_ASSERT(pip && (pip->slot.state == SG_RESOURCESTATE_ALLOC) && (pip->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.pipeline_pool, _sg_slot_index(pip->slot.id));
     _sg_slot_reset(&pip->slot);
+    _sg_stats_add(pipelines.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_dealloc_view(_sg_view_t* view) {
     SOKOL_ASSERT(view && (view->slot.state == SG_RESOURCESTATE_ALLOC) && (view->slot.id != SG_INVALID_ID));
     _sg_pool_free_index(&_sg.pools.view_pool, _sg_slot_index(view->slot.id));
     _sg_slot_reset(&view->slot);
+    _sg_stats_add(views.deallocated, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_buffer(_sg_buffer_t* buf, const sg_buffer_desc* desc) {
@@ -20121,6 +20189,7 @@ _SOKOL_PRIVATE void _sg_init_buffer(_sg_buffer_t* buf, const sg_buffer_desc* des
         buf->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((buf->slot.state == SG_RESOURCESTATE_VALID)||(buf->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(buffers.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_image(_sg_image_t* img, const sg_image_desc* desc) {
@@ -20133,6 +20202,7 @@ _SOKOL_PRIVATE void _sg_init_image(_sg_image_t* img, const sg_image_desc* desc) 
         img->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((img->slot.state == SG_RESOURCESTATE_VALID)||(img->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(images.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_sampler(_sg_sampler_t* smp, const sg_sampler_desc* desc) {
@@ -20145,6 +20215,7 @@ _SOKOL_PRIVATE void _sg_init_sampler(_sg_sampler_t* smp, const sg_sampler_desc* 
         smp->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((smp->slot.state == SG_RESOURCESTATE_VALID)||(smp->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(samplers.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_shader(_sg_shader_t* shd, const sg_shader_desc* desc) {
@@ -20157,6 +20228,7 @@ _SOKOL_PRIVATE void _sg_init_shader(_sg_shader_t* shd, const sg_shader_desc* des
         shd->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((shd->slot.state == SG_RESOURCESTATE_VALID)||(shd->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(shaders.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_pipeline(_sg_pipeline_t* pip, const sg_pipeline_desc* desc) {
@@ -20174,6 +20246,7 @@ _SOKOL_PRIVATE void _sg_init_pipeline(_sg_pipeline_t* pip, const sg_pipeline_des
         pip->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((pip->slot.state == SG_RESOURCESTATE_VALID)||(pip->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(pipelines.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_init_view(_sg_view_t* view, const sg_view_desc* desc) {
@@ -20206,42 +20279,49 @@ _SOKOL_PRIVATE void _sg_init_view(_sg_view_t* view, const sg_view_desc* desc) {
        view->slot.state = SG_RESOURCESTATE_FAILED;
     }
     SOKOL_ASSERT((view->slot.state == SG_RESOURCESTATE_VALID) || (view->slot.state == SG_RESOURCESTATE_FAILED));
+    _sg_stats_add(views.inited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_buffer(_sg_buffer_t* buf) {
     SOKOL_ASSERT(buf && ((buf->slot.state == SG_RESOURCESTATE_VALID) || (buf->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_buffer(buf);
     _sg_reset_buffer_to_alloc_state(buf);
+    _sg_stats_add(buffers.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_image(_sg_image_t* img) {
     SOKOL_ASSERT(img && ((img->slot.state == SG_RESOURCESTATE_VALID) || (img->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_image(img);
     _sg_reset_image_to_alloc_state(img);
+    _sg_stats_add(images.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_sampler(_sg_sampler_t* smp) {
     SOKOL_ASSERT(smp && ((smp->slot.state == SG_RESOURCESTATE_VALID) || (smp->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_sampler(smp);
     _sg_reset_sampler_to_alloc_state(smp);
+    _sg_stats_add(samplers.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_shader(_sg_shader_t* shd) {
     SOKOL_ASSERT(shd && ((shd->slot.state == SG_RESOURCESTATE_VALID) || (shd->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_shader(shd);
     _sg_reset_shader_to_alloc_state(shd);
+    _sg_stats_add(shaders.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_pipeline(_sg_pipeline_t* pip) {
     SOKOL_ASSERT(pip && ((pip->slot.state == SG_RESOURCESTATE_VALID) || (pip->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_pipeline(pip);
     _sg_reset_pipeline_to_alloc_state(pip);
+    _sg_stats_add(pipelines.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_uninit_view(_sg_view_t* view) {
     SOKOL_ASSERT(view && ((view->slot.state == SG_RESOURCESTATE_VALID) || (view->slot.state == SG_RESOURCESTATE_FAILED)));
     _sg_discard_view(view);
     _sg_reset_view_to_alloc_state(view);
+    _sg_stats_add(views.uninited, 1);
 }
 
 _SOKOL_PRIVATE void _sg_setup_commit_listeners(const sg_desc* desc) {
@@ -21375,9 +21455,7 @@ SOKOL_API_IMPL void sg_commit(void) {
     SOKOL_ASSERT(!_sg.cur_pass.valid);
     SOKOL_ASSERT(!_sg.cur_pass.in_pass);
     _sg_commit();
-    _sg.stats.frame_index = _sg.frame_index;
-    _sg.prev_stats = _sg.stats;
-    _sg_clear(&_sg.stats, sizeof(_sg.stats));
+    _sg_update_frame_stats();
     _sg_notify_commit_listeners();
     _SG_TRACE_NOARGS(commit);
     _sg.frame_index++;
