@@ -3,17 +3,17 @@
 module sokol::saudio;
 import sokol;
 
-extern fn void setup(SaudioDesc* desc) @extern("saudio_setup");
-extern fn void shutdown() @extern("saudio_shutdown");
-extern fn bool isvalid() @extern("saudio_isvalid");
-extern fn void* userdata() @extern("saudio_userdata");
-extern fn SaudioDesc query_desc() @extern("saudio_query_desc");
-extern fn CInt sample_rate() @extern("saudio_sample_rate");
-extern fn CInt buffer_frames() @extern("saudio_buffer_frames");
-extern fn CInt channels() @extern("saudio_channels");
-extern fn bool suspended() @extern("saudio_suspended");
-extern fn CInt expect() @extern("saudio_expect");
-extern fn CInt push(float* frames, CInt num_frames) @extern("saudio_push");
+extern fn void setup(SaudioDesc* desc) @cname("saudio_setup");
+extern fn void shutdown() @cname("saudio_shutdown");
+extern fn bool isvalid() @cname("saudio_isvalid");
+extern fn void* userdata() @cname("saudio_userdata");
+extern fn SaudioDesc query_desc() @cname("saudio_query_desc");
+extern fn CInt sample_rate() @cname("saudio_sample_rate");
+extern fn CInt buffer_frames() @cname("saudio_buffer_frames");
+extern fn CInt channels() @cname("saudio_channels");
+extern fn bool suspended() @cname("saudio_suspended");
+extern fn CInt expect() @cname("saudio_expect");
+extern fn CInt push(float* frames, CInt num_frames) @cname("saudio_push");
 
 enum SaudioLogItem : const int
 {
@@ -44,6 +44,9 @@ enum SaudioLogItem : const int
     COREAUDIO_ALLOCATE_BUFFER_FAILED = 24,
     COREAUDIO_START_FAILED = 25,
     BACKEND_BUFFER_SIZE_ISNT_MULTIPLE_OF_PACKET_SIZE = 26,
+    VITA_SCEAUDIO_OPEN_FAILED = 27,
+    VITA_PTHREAD_CREATE_FAILED = 28,
+    N3DS_NDSP_OPEN_FAILED = 29,
 }
 
 struct SaudioLogger
@@ -59,6 +62,20 @@ struct SaudioAllocator
     void* user_data;
 }
 
+enum SaudioN3dsNdspinterptype : const int
+{
+    DSP_INTERP_POLYPHASE = 0,
+    DSP_INTERP_LINEAR = 1,
+    DSP_INTERP_NONE = 2,
+}
+
+struct SaudioN3dsDesc
+{
+    CInt queue_count;
+    SaudioN3dsNdspinterptype interpolation_type;
+    CInt channel_id;
+}
+
 struct SaudioDesc
 {
     CInt sample_rate;
@@ -69,6 +86,7 @@ struct SaudioDesc
     StreamCb stream_cb;
     StreamDataCb stream_userdata_cb;
     void* user_data;
+    SaudioN3dsDesc n3ds;
     SaudioAllocator allocator;
     SaudioLogger logger;
 }

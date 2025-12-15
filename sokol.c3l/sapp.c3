@@ -3,72 +3,60 @@
 module sokol::sapp;
 import sokol;
 
-extern fn bool isvalid() @extern("sapp_isvalid");
-extern fn CInt width() @extern("sapp_width");
-extern fn float widthf() @extern("sapp_widthf");
-extern fn CInt height() @extern("sapp_height");
-extern fn float heightf() @extern("sapp_heightf");
-extern fn CInt color_format() @extern("sapp_color_format");
-extern fn CInt depth_format() @extern("sapp_depth_format");
-extern fn CInt sample_count() @extern("sapp_sample_count");
-extern fn bool high_dpi() @extern("sapp_high_dpi");
-extern fn float dpi_scale() @extern("sapp_dpi_scale");
-extern fn void show_keyboard(bool show) @extern("sapp_show_keyboard");
-extern fn bool keyboard_shown() @extern("sapp_keyboard_shown");
-extern fn bool is_fullscreen() @extern("sapp_is_fullscreen");
-extern fn void toggle_fullscreen() @extern("sapp_toggle_fullscreen");
-extern fn void show_mouse(bool show) @extern("sapp_show_mouse");
-extern fn bool mouse_shown() @extern("sapp_mouse_shown");
-extern fn void lock_mouse(bool lock) @extern("sapp_lock_mouse");
-extern fn bool mouse_locked() @extern("sapp_mouse_locked");
-extern fn void set_mouse_cursor(SappMouseCursor cursor) @extern("sapp_set_mouse_cursor");
-extern fn SappMouseCursor get_mouse_cursor() @extern("sapp_get_mouse_cursor");
-extern fn SappMouseCursor bind_mouse_cursor_image(SappMouseCursor cursor, SappImageDesc* desc) @extern("sapp_bind_mouse_cursor_image");
-extern fn void unbind_mouse_cursor_image(SappMouseCursor cursor) @extern("sapp_unbind_mouse_cursor_image");
-extern fn void* userdata() @extern("sapp_userdata");
-extern fn SappDesc query_desc() @extern("sapp_query_desc");
-extern fn void request_quit() @extern("sapp_request_quit");
-extern fn void cancel_quit() @extern("sapp_cancel_quit");
-extern fn void quit() @extern("sapp_quit");
-extern fn void consume_event() @extern("sapp_consume_event");
-extern fn ulong frame_count() @extern("sapp_frame_count");
-extern fn double frame_duration() @extern("sapp_frame_duration");
-extern fn void set_clipboard_string(ZString str) @extern("sapp_set_clipboard_string");
-extern fn ZString get_clipboard_string() @extern("sapp_get_clipboard_string");
-extern fn void set_window_title(ZString str) @extern("sapp_set_window_title");
-extern fn void set_icon(SappIconDesc* icon_desc) @extern("sapp_set_icon");
-extern fn CInt get_num_dropped_files() @extern("sapp_get_num_dropped_files");
-extern fn ZString get_dropped_file_path(CInt index) @extern("sapp_get_dropped_file_path");
-extern fn void run(SappDesc* desc) @extern("sapp_run");
-extern fn void* egl_get_display() @extern("sapp_egl_get_display");
-extern fn void* egl_get_context() @extern("sapp_egl_get_context");
-extern fn void html5_ask_leave_site(bool ask) @extern("sapp_html5_ask_leave_site");
-extern fn uint html5_get_dropped_file_size(CInt index) @extern("sapp_html5_get_dropped_file_size");
-extern fn void html5_fetch_dropped_file(SappHtml5FetchRequest* request) @extern("sapp_html5_fetch_dropped_file");
-extern fn void* metal_get_device() @extern("sapp_metal_get_device");
-extern fn void* metal_get_current_drawable() @extern("sapp_metal_get_current_drawable");
-extern fn void* metal_get_depth_stencil_texture() @extern("sapp_metal_get_depth_stencil_texture");
-extern fn void* metal_get_msaa_color_texture() @extern("sapp_metal_get_msaa_color_texture");
-extern fn void* macos_get_window() @extern("sapp_macos_get_window");
-extern fn void* ios_get_window() @extern("sapp_ios_get_window");
-extern fn void* d3d11_get_device() @extern("sapp_d3d11_get_device");
-extern fn void* d3d11_get_device_context() @extern("sapp_d3d11_get_device_context");
-extern fn void* d3d11_get_swap_chain() @extern("sapp_d3d11_get_swap_chain");
-extern fn void* d3d11_get_render_view() @extern("sapp_d3d11_get_render_view");
-extern fn void* d3d11_get_resolve_view() @extern("sapp_d3d11_get_resolve_view");
-extern fn void* d3d11_get_depth_stencil_view() @extern("sapp_d3d11_get_depth_stencil_view");
-extern fn void* win32_get_hwnd() @extern("sapp_win32_get_hwnd");
-extern fn void* wgpu_get_device() @extern("sapp_wgpu_get_device");
-extern fn void* wgpu_get_render_view() @extern("sapp_wgpu_get_render_view");
-extern fn void* wgpu_get_resolve_view() @extern("sapp_wgpu_get_resolve_view");
-extern fn void* wgpu_get_depth_stencil_view() @extern("sapp_wgpu_get_depth_stencil_view");
-extern fn uint gl_get_framebuffer() @extern("sapp_gl_get_framebuffer");
-extern fn CInt gl_get_major_version() @extern("sapp_gl_get_major_version");
-extern fn CInt gl_get_minor_version() @extern("sapp_gl_get_minor_version");
-extern fn bool gl_is_gles() @extern("sapp_gl_is_gles");
-extern fn void* x11_get_window() @extern("sapp_x11_get_window");
-extern fn void* x11_get_display() @extern("sapp_x11_get_display");
-extern fn void* android_get_native_activity() @extern("sapp_android_get_native_activity");
+extern fn bool isvalid() @cname("sapp_isvalid");
+extern fn CInt width() @cname("sapp_width");
+extern fn float widthf() @cname("sapp_widthf");
+extern fn CInt height() @cname("sapp_height");
+extern fn float heightf() @cname("sapp_heightf");
+extern fn SappPixelFormat color_format() @cname("sapp_color_format");
+extern fn SappPixelFormat depth_format() @cname("sapp_depth_format");
+extern fn CInt sample_count() @cname("sapp_sample_count");
+extern fn bool high_dpi() @cname("sapp_high_dpi");
+extern fn float dpi_scale() @cname("sapp_dpi_scale");
+extern fn void show_keyboard(bool show) @cname("sapp_show_keyboard");
+extern fn bool keyboard_shown() @cname("sapp_keyboard_shown");
+extern fn bool is_fullscreen() @cname("sapp_is_fullscreen");
+extern fn void toggle_fullscreen() @cname("sapp_toggle_fullscreen");
+extern fn void show_mouse(bool show) @cname("sapp_show_mouse");
+extern fn bool mouse_shown() @cname("sapp_mouse_shown");
+extern fn void lock_mouse(bool lock) @cname("sapp_lock_mouse");
+extern fn bool mouse_locked() @cname("sapp_mouse_locked");
+extern fn void set_mouse_cursor(SappMouseCursor cursor) @cname("sapp_set_mouse_cursor");
+extern fn SappMouseCursor get_mouse_cursor() @cname("sapp_get_mouse_cursor");
+extern fn SappMouseCursor bind_mouse_cursor_image(SappMouseCursor cursor, SappImageDesc* desc) @cname("sapp_bind_mouse_cursor_image");
+extern fn void unbind_mouse_cursor_image(SappMouseCursor cursor) @cname("sapp_unbind_mouse_cursor_image");
+extern fn void* userdata() @cname("sapp_userdata");
+extern fn SappDesc query_desc() @cname("sapp_query_desc");
+extern fn void request_quit() @cname("sapp_request_quit");
+extern fn void cancel_quit() @cname("sapp_cancel_quit");
+extern fn void quit() @cname("sapp_quit");
+extern fn void consume_event() @cname("sapp_consume_event");
+extern fn ulong frame_count() @cname("sapp_frame_count");
+extern fn double frame_duration() @cname("sapp_frame_duration");
+extern fn void set_clipboard_string(ZString str) @cname("sapp_set_clipboard_string");
+extern fn ZString get_clipboard_string() @cname("sapp_get_clipboard_string");
+extern fn void set_window_title(ZString str) @cname("sapp_set_window_title");
+extern fn void set_icon(SappIconDesc* icon_desc) @cname("sapp_set_icon");
+extern fn CInt get_num_dropped_files() @cname("sapp_get_num_dropped_files");
+extern fn ZString get_dropped_file_path(CInt index) @cname("sapp_get_dropped_file_path");
+extern fn void run(SappDesc* desc) @cname("sapp_run");
+extern fn SappEnvironment get_environment() @cname("sapp_get_environment");
+extern fn SappSwapchain get_swapchain() @cname("sapp_get_swapchain");
+extern fn void* egl_get_display() @cname("sapp_egl_get_display");
+extern fn void* egl_get_context() @cname("sapp_egl_get_context");
+extern fn void html5_ask_leave_site(bool ask) @cname("sapp_html5_ask_leave_site");
+extern fn uint html5_get_dropped_file_size(CInt index) @cname("sapp_html5_get_dropped_file_size");
+extern fn void html5_fetch_dropped_file(SappHtml5FetchRequest* request) @cname("sapp_html5_fetch_dropped_file");
+extern fn void* macos_get_window() @cname("sapp_macos_get_window");
+extern fn void* ios_get_window() @cname("sapp_ios_get_window");
+extern fn void* d3d11_get_swap_chain() @cname("sapp_d3d11_get_swap_chain");
+extern fn void* win32_get_hwnd() @cname("sapp_win32_get_hwnd");
+extern fn CInt gl_get_major_version() @cname("sapp_gl_get_major_version");
+extern fn CInt gl_get_minor_version() @cname("sapp_gl_get_minor_version");
+extern fn bool gl_is_gles() @cname("sapp_gl_is_gles");
+extern fn void* x11_get_window() @cname("sapp_x11_get_window");
+extern fn void* x11_get_display() @cname("sapp_x11_get_display");
+extern fn void* android_get_native_activity() @cname("sapp_android_get_native_activity");
 
 const usz MAX_TOUCHPOINTS = 8;
 const usz MAX_MOUSEBUTTONS = 3;
@@ -416,15 +404,172 @@ enum SappLogItem : const int
     WGPU_REQUEST_ADAPTER_STATUS_ERROR = 98,
     WGPU_REQUEST_ADAPTER_STATUS_UNKNOWN = 99,
     WGPU_CREATE_INSTANCE_FAILED = 100,
-    IMAGE_DATA_SIZE_MISMATCH = 101,
-    DROPPED_FILE_PATH_TOO_LONG = 102,
-    CLIPBOARD_STRING_TOO_BIG = 103,
+    VULKAN_ALLOC_DEVICE_MEMORY_NO_SUITABLE_MEMORY_TYPE = 101,
+    VULKAN_ALLOCATE_MEMORY_FAILED = 102,
+    VULKAN_CREATE_INSTANCE_FAILED = 103,
+    VULKAN_ENUMERATE_PHYSICAL_DEVICES_FAILED = 104,
+    VULKAN_NO_PHYSICAL_DEVICES_FOUND = 105,
+    VULKAN_NO_SUITABLE_PHYSICAL_DEVICE_FOUND = 106,
+    VULKAN_CREATE_DEVICE_FAILED_EXTENSION_NOT_PRESENT = 107,
+    VULKAN_CREATE_DEVICE_FAILED_FEATURE_NOT_PRESENT = 108,
+    VULKAN_CREATE_DEVICE_FAILED_INITIALIZATION_FAILED = 109,
+    VULKAN_CREATE_DEVICE_FAILED_OTHER = 110,
+    VULKAN_CREATE_SURFACE_FAILED = 111,
+    VULKAN_CREATE_SWAPCHAIN_FAILED = 112,
+    VULKAN_SWAPCHAIN_CREATE_IMAGE_VIEW_FAILED = 113,
+    VULKAN_SWAPCHAIN_CREATE_IMAGE_FAILED = 114,
+    VULKAN_SWAPCHAIN_ALLOC_IMAGE_DEVICE_MEMORY_FAILED = 115,
+    VULKAN_SWAPCHAIN_BIND_IMAGE_MEMORY_FAILED = 116,
+    VULKAN_ACQUIRE_NEXT_IMAGE_FAILED = 117,
+    VULKAN_QUEUE_PRESENT_FAILED = 118,
+    IMAGE_DATA_SIZE_MISMATCH = 119,
+    DROPPED_FILE_PATH_TOO_LONG = 120,
+    CLIPBOARD_STRING_TOO_BIG = 121,
+}
+
+enum SappPixelFormat : const uint
+{
+    DEFAULT = 0,
+    NONE = 1,
+    RGBA8 = 2,
+    SRGB8A8 = 3,
+    BGRA8 = 4,
+    SBGRA8 = 5,
+    DEPTH = 6,
+    DEPTH_STENCIL = 7,
+}
+
+struct SappEnvironmentDefaults
+{
+    SappPixelFormat color_format;
+    SappPixelFormat depth_format;
+    CInt sample_count;
+}
+
+struct SappMetalEnvironment
+{
+    void* device;
+}
+
+struct SappD3d11Environment
+{
+    void* device;
+    void* device_context;
+}
+
+struct SappWgpuEnvironment
+{
+    void* device;
+}
+
+struct SappVulkanEnvironment
+{
+    void* physical_device;
+    void* device;
+    void* queue;
+    uint queue_family_index;
+}
+
+struct SappEnvironment
+{
+    SappEnvironmentDefaults defaults;
+    SappMetalEnvironment metal;
+    SappD3d11Environment d3d11;
+    SappWgpuEnvironment wgpu;
+    SappVulkanEnvironment vulkan;
+}
+
+struct SappMetalSwapchain
+{
+    void* current_drawable;
+    void* depth_stencil_texture;
+    void* msaa_color_texture;
+}
+
+struct SappD3d11Swapchain
+{
+    void* render_view;
+    void* resolve_view;
+    void* depth_stencil_view;
+}
+
+struct SappWgpuSwapchain
+{
+    void* render_view;
+    void* resolve_view;
+    void* depth_stencil_view;
+}
+
+struct SappVulkanSwapchain
+{
+    void* render_image;
+    void* render_view;
+    void* resolve_image;
+    void* resolve_view;
+    void* depth_stencil_image;
+    void* depth_stencil_view;
+    void* render_finished_semaphore;
+    void* present_complete_semaphore;
+}
+
+struct SappGlSwapchain
+{
+    uint framebuffer;
+}
+
+struct SappSwapchain
+{
+    CInt width;
+    CInt height;
+    CInt sample_count;
+    SappPixelFormat color_format;
+    SappPixelFormat depth_format;
+    SappMetalSwapchain metal;
+    SappD3d11Swapchain d3d11;
+    SappWgpuSwapchain wgpu;
+    SappVulkanSwapchain vulkan;
+    SappGlSwapchain gl;
 }
 
 struct SappLogger
 {
     LogCb func;
     void* user_data;
+}
+
+struct SappGlDesc
+{
+    CInt major_version;
+    CInt minor_version;
+}
+
+struct SappWin32Desc
+{
+    bool console_utf8;
+    bool console_create;
+    bool console_attach;
+}
+
+struct SappHtml5Desc
+{
+    ZString canvas_selector;
+    bool canvas_resize;
+    bool preserve_drawing_buffer;
+    bool premultiplied_alpha;
+    bool ask_leave_site;
+    bool update_document_title;
+    bool bubble_mouse_events;
+    bool bubble_touch_events;
+    bool bubble_wheel_events;
+    bool bubble_key_events;
+    bool bubble_char_events;
+    bool use_emsc_set_main_loop;
+    bool emsc_set_main_loop_simulate_infinite_loop;
+}
+
+struct SappIosDesc
+{
+    bool keyboard_resizes_canvas;
 }
 
 struct SappDesc
@@ -454,25 +599,10 @@ struct SappDesc
     SappIconDesc icon;
     SappAllocator allocator;
     SappLogger logger;
-    CInt gl_major_version;
-    CInt gl_minor_version;
-    bool win32_console_utf8;
-    bool win32_console_create;
-    bool win32_console_attach;
-    ZString html5_canvas_selector;
-    bool html5_canvas_resize;
-    bool html5_preserve_drawing_buffer;
-    bool html5_premultiplied_alpha;
-    bool html5_ask_leave_site;
-    bool html5_update_document_title;
-    bool html5_bubble_mouse_events;
-    bool html5_bubble_touch_events;
-    bool html5_bubble_wheel_events;
-    bool html5_bubble_key_events;
-    bool html5_bubble_char_events;
-    bool html5_use_emsc_set_main_loop;
-    bool html5_emsc_set_main_loop_simulate_infinite_loop;
-    bool ios_keyboard_resizes_canvas;
+    SappGlDesc gl;
+    SappWin32Desc win32;
+    SappHtml5Desc html5;
+    SappIosDesc ios;
 }
 
 enum SappHtml5FetchError : const int

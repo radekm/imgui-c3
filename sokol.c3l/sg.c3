@@ -3,153 +3,154 @@
 module sokol::sg;
 import sokol;
 
-extern fn void setup(SgDesc* desc) @extern("sg_setup");
-extern fn void shutdown() @extern("sg_shutdown");
-extern fn bool isvalid() @extern("sg_isvalid");
-extern fn void reset_state_cache() @extern("sg_reset_state_cache");
-extern fn void push_debug_group(ZString name) @extern("sg_push_debug_group");
-extern fn void pop_debug_group() @extern("sg_pop_debug_group");
-extern fn bool add_commit_listener(SgCommitListener listener) @extern("sg_add_commit_listener");
-extern fn bool remove_commit_listener(SgCommitListener listener) @extern("sg_remove_commit_listener");
-extern fn SgBuffer make_buffer(SgBufferDesc* desc) @extern("sg_make_buffer");
-extern fn SgImage make_image(SgImageDesc* desc) @extern("sg_make_image");
-extern fn SgSampler make_sampler(SgSamplerDesc* desc) @extern("sg_make_sampler");
-extern fn SgShader make_shader(SgShaderDesc* desc) @extern("sg_make_shader");
-extern fn SgPipeline make_pipeline(SgPipelineDesc* desc) @extern("sg_make_pipeline");
-extern fn SgView make_view(SgViewDesc* desc) @extern("sg_make_view");
-extern fn void destroy_buffer(SgBuffer buf) @extern("sg_destroy_buffer");
-extern fn void destroy_image(SgImage img) @extern("sg_destroy_image");
-extern fn void destroy_sampler(SgSampler smp) @extern("sg_destroy_sampler");
-extern fn void destroy_shader(SgShader shd) @extern("sg_destroy_shader");
-extern fn void destroy_pipeline(SgPipeline pip) @extern("sg_destroy_pipeline");
-extern fn void destroy_view(SgView view) @extern("sg_destroy_view");
-extern fn void update_buffer(SgBuffer buf, SgRange* data) @extern("sg_update_buffer");
-extern fn void update_image(SgImage img, SgImageData* data) @extern("sg_update_image");
-extern fn CInt append_buffer(SgBuffer buf, SgRange* data) @extern("sg_append_buffer");
-extern fn bool query_buffer_overflow(SgBuffer buf) @extern("sg_query_buffer_overflow");
-extern fn bool query_buffer_will_overflow(SgBuffer buf, usz size) @extern("sg_query_buffer_will_overflow");
-extern fn void begin_pass(SgPass* pass) @extern("sg_begin_pass");
-extern fn void apply_viewport(CInt x, CInt y, CInt width, CInt height, bool origin_top_left) @extern("sg_apply_viewport");
-extern fn void apply_viewportf(float x, float y, float width, float height, bool origin_top_left) @extern("sg_apply_viewportf");
-extern fn void apply_scissor_rect(CInt x, CInt y, CInt width, CInt height, bool origin_top_left) @extern("sg_apply_scissor_rect");
-extern fn void apply_scissor_rectf(float x, float y, float width, float height, bool origin_top_left) @extern("sg_apply_scissor_rectf");
-extern fn void apply_pipeline(SgPipeline pip) @extern("sg_apply_pipeline");
-extern fn void apply_bindings(SgBindings* bindings) @extern("sg_apply_bindings");
-extern fn void apply_uniforms(CInt ub_slot, SgRange* data) @extern("sg_apply_uniforms");
-extern fn void draw(CInt base_element, CInt num_elements, CInt num_instances) @extern("sg_draw");
-extern fn void dispatch(CInt num_groups_x, CInt num_groups_y, CInt num_groups_z) @extern("sg_dispatch");
-extern fn void end_pass() @extern("sg_end_pass");
-extern fn void commit() @extern("sg_commit");
-extern fn SgDesc query_desc() @extern("sg_query_desc");
-extern fn SgBackend query_backend() @extern("sg_query_backend");
-extern fn SgFeatures query_features() @extern("sg_query_features");
-extern fn SgLimits query_limits() @extern("sg_query_limits");
-extern fn SgPixelformatInfo query_pixelformat(SgPixelFormat fmt) @extern("sg_query_pixelformat");
-extern fn CInt query_row_pitch(SgPixelFormat fmt, CInt width, CInt row_align_bytes) @extern("sg_query_row_pitch");
-extern fn CInt query_surface_pitch(SgPixelFormat fmt, CInt width, CInt height, CInt row_align_bytes) @extern("sg_query_surface_pitch");
-extern fn SgResourceState query_buffer_state(SgBuffer buf) @extern("sg_query_buffer_state");
-extern fn SgResourceState query_image_state(SgImage img) @extern("sg_query_image_state");
-extern fn SgResourceState query_sampler_state(SgSampler smp) @extern("sg_query_sampler_state");
-extern fn SgResourceState query_shader_state(SgShader shd) @extern("sg_query_shader_state");
-extern fn SgResourceState query_pipeline_state(SgPipeline pip) @extern("sg_query_pipeline_state");
-extern fn SgResourceState query_view_state(SgView view) @extern("sg_query_view_state");
-extern fn SgBufferInfo query_buffer_info(SgBuffer buf) @extern("sg_query_buffer_info");
-extern fn SgImageInfo query_image_info(SgImage img) @extern("sg_query_image_info");
-extern fn SgSamplerInfo query_sampler_info(SgSampler smp) @extern("sg_query_sampler_info");
-extern fn SgShaderInfo query_shader_info(SgShader shd) @extern("sg_query_shader_info");
-extern fn SgPipelineInfo query_pipeline_info(SgPipeline pip) @extern("sg_query_pipeline_info");
-extern fn SgViewInfo query_view_info(SgView view) @extern("sg_query_view_info");
-extern fn SgBufferDesc query_buffer_desc(SgBuffer buf) @extern("sg_query_buffer_desc");
-extern fn SgImageDesc query_image_desc(SgImage img) @extern("sg_query_image_desc");
-extern fn SgSamplerDesc query_sampler_desc(SgSampler smp) @extern("sg_query_sampler_desc");
-extern fn SgShaderDesc query_shader_desc(SgShader shd) @extern("sg_query_shader_desc");
-extern fn SgPipelineDesc query_pipeline_desc(SgPipeline pip) @extern("sg_query_pipeline_desc");
-extern fn SgViewDesc query_view_desc(SgView view) @extern("sg_query_view_desc");
-extern fn SgBufferDesc query_buffer_defaults(SgBufferDesc* desc) @extern("sg_query_buffer_defaults");
-extern fn SgImageDesc query_image_defaults(SgImageDesc* desc) @extern("sg_query_image_defaults");
-extern fn SgSamplerDesc query_sampler_defaults(SgSamplerDesc* desc) @extern("sg_query_sampler_defaults");
-extern fn SgShaderDesc query_shader_defaults(SgShaderDesc* desc) @extern("sg_query_shader_defaults");
-extern fn SgPipelineDesc query_pipeline_defaults(SgPipelineDesc* desc) @extern("sg_query_pipeline_defaults");
-extern fn SgViewDesc query_view_defaults(SgViewDesc* desc) @extern("sg_query_view_defaults");
-extern fn usz query_buffer_size(SgBuffer buf) @extern("sg_query_buffer_size");
-extern fn SgBufferUsage query_buffer_usage(SgBuffer buf) @extern("sg_query_buffer_usage");
-extern fn SgImageType query_image_type(SgImage img) @extern("sg_query_image_type");
-extern fn CInt query_image_width(SgImage img) @extern("sg_query_image_width");
-extern fn CInt query_image_height(SgImage img) @extern("sg_query_image_height");
-extern fn CInt query_image_num_slices(SgImage img) @extern("sg_query_image_num_slices");
-extern fn CInt query_image_num_mipmaps(SgImage img) @extern("sg_query_image_num_mipmaps");
-extern fn SgPixelFormat query_image_pixelformat(SgImage img) @extern("sg_query_image_pixelformat");
-extern fn SgImageUsage query_image_usage(SgImage img) @extern("sg_query_image_usage");
-extern fn CInt query_image_sample_count(SgImage img) @extern("sg_query_image_sample_count");
-extern fn SgViewType query_view_type(SgView view) @extern("sg_query_view_type");
-extern fn SgImage query_view_image(SgView view) @extern("sg_query_view_image");
-extern fn SgBuffer query_view_buffer(SgView view) @extern("sg_query_view_buffer");
-extern fn SgBuffer alloc_buffer() @extern("sg_alloc_buffer");
-extern fn SgImage alloc_image() @extern("sg_alloc_image");
-extern fn SgSampler alloc_sampler() @extern("sg_alloc_sampler");
-extern fn SgShader alloc_shader() @extern("sg_alloc_shader");
-extern fn SgPipeline alloc_pipeline() @extern("sg_alloc_pipeline");
-extern fn SgView alloc_view() @extern("sg_alloc_view");
-extern fn void dealloc_buffer(SgBuffer buf) @extern("sg_dealloc_buffer");
-extern fn void dealloc_image(SgImage img) @extern("sg_dealloc_image");
-extern fn void dealloc_sampler(SgSampler smp) @extern("sg_dealloc_sampler");
-extern fn void dealloc_shader(SgShader shd) @extern("sg_dealloc_shader");
-extern fn void dealloc_pipeline(SgPipeline pip) @extern("sg_dealloc_pipeline");
-extern fn void dealloc_view(SgView view) @extern("sg_dealloc_view");
-extern fn void init_buffer(SgBuffer buf, SgBufferDesc* desc) @extern("sg_init_buffer");
-extern fn void init_image(SgImage img, SgImageDesc* desc) @extern("sg_init_image");
-extern fn void init_sampler(SgSampler smg, SgSamplerDesc* desc) @extern("sg_init_sampler");
-extern fn void init_shader(SgShader shd, SgShaderDesc* desc) @extern("sg_init_shader");
-extern fn void init_pipeline(SgPipeline pip, SgPipelineDesc* desc) @extern("sg_init_pipeline");
-extern fn void init_view(SgView view, SgViewDesc* desc) @extern("sg_init_view");
-extern fn void uninit_buffer(SgBuffer buf) @extern("sg_uninit_buffer");
-extern fn void uninit_image(SgImage img) @extern("sg_uninit_image");
-extern fn void uninit_sampler(SgSampler smp) @extern("sg_uninit_sampler");
-extern fn void uninit_shader(SgShader shd) @extern("sg_uninit_shader");
-extern fn void uninit_pipeline(SgPipeline pip) @extern("sg_uninit_pipeline");
-extern fn void uninit_view(SgView view) @extern("sg_uninit_view");
-extern fn void fail_buffer(SgBuffer buf) @extern("sg_fail_buffer");
-extern fn void fail_image(SgImage img) @extern("sg_fail_image");
-extern fn void fail_sampler(SgSampler smp) @extern("sg_fail_sampler");
-extern fn void fail_shader(SgShader shd) @extern("sg_fail_shader");
-extern fn void fail_pipeline(SgPipeline pip) @extern("sg_fail_pipeline");
-extern fn void fail_view(SgView view) @extern("sg_fail_view");
-extern fn void enable_frame_stats() @extern("sg_enable_frame_stats");
-extern fn void disable_frame_stats() @extern("sg_disable_frame_stats");
-extern fn bool frame_stats_enabled() @extern("sg_frame_stats_enabled");
-extern fn SgFrameStats query_frame_stats() @extern("sg_query_frame_stats");
-extern fn void* d3d11_device() @extern("sg_d3d11_device");
-extern fn void* d3d11_device_context() @extern("sg_d3d11_device_context");
-extern fn SgD3d11BufferInfo d3d11_query_buffer_info(SgBuffer buf) @extern("sg_d3d11_query_buffer_info");
-extern fn SgD3d11ImageInfo d3d11_query_image_info(SgImage img) @extern("sg_d3d11_query_image_info");
-extern fn SgD3d11SamplerInfo d3d11_query_sampler_info(SgSampler smp) @extern("sg_d3d11_query_sampler_info");
-extern fn SgD3d11ShaderInfo d3d11_query_shader_info(SgShader shd) @extern("sg_d3d11_query_shader_info");
-extern fn SgD3d11PipelineInfo d3d11_query_pipeline_info(SgPipeline pip) @extern("sg_d3d11_query_pipeline_info");
-extern fn SgD3d11ViewInfo d3d11_query_view_info(SgView view) @extern("sg_d3d11_query_view_info");
-extern fn void* mtl_device() @extern("sg_mtl_device");
-extern fn void* mtl_render_command_encoder() @extern("sg_mtl_render_command_encoder");
-extern fn void* mtl_compute_command_encoder() @extern("sg_mtl_compute_command_encoder");
-extern fn SgMtlBufferInfo mtl_query_buffer_info(SgBuffer buf) @extern("sg_mtl_query_buffer_info");
-extern fn SgMtlImageInfo mtl_query_image_info(SgImage img) @extern("sg_mtl_query_image_info");
-extern fn SgMtlSamplerInfo mtl_query_sampler_info(SgSampler smp) @extern("sg_mtl_query_sampler_info");
-extern fn SgMtlShaderInfo mtl_query_shader_info(SgShader shd) @extern("sg_mtl_query_shader_info");
-extern fn SgMtlPipelineInfo mtl_query_pipeline_info(SgPipeline pip) @extern("sg_mtl_query_pipeline_info");
-extern fn void* wgpu_device() @extern("sg_wgpu_device");
-extern fn void* wgpu_queue() @extern("sg_wgpu_queue");
-extern fn void* wgpu_command_encoder() @extern("sg_wgpu_command_encoder");
-extern fn void* wgpu_render_pass_encoder() @extern("sg_wgpu_render_pass_encoder");
-extern fn void* wgpu_compute_pass_encoder() @extern("sg_wgpu_compute_pass_encoder");
-extern fn SgWgpuBufferInfo wgpu_query_buffer_info(SgBuffer buf) @extern("sg_wgpu_query_buffer_info");
-extern fn SgWgpuImageInfo wgpu_query_image_info(SgImage img) @extern("sg_wgpu_query_image_info");
-extern fn SgWgpuSamplerInfo wgpu_query_sampler_info(SgSampler smp) @extern("sg_wgpu_query_sampler_info");
-extern fn SgWgpuShaderInfo wgpu_query_shader_info(SgShader shd) @extern("sg_wgpu_query_shader_info");
-extern fn SgWgpuPipelineInfo wgpu_query_pipeline_info(SgPipeline pip) @extern("sg_wgpu_query_pipeline_info");
-extern fn SgWgpuViewInfo wgpu_query_view_info(SgView view) @extern("sg_wgpu_query_view_info");
-extern fn SgGlBufferInfo gl_query_buffer_info(SgBuffer buf) @extern("sg_gl_query_buffer_info");
-extern fn SgGlImageInfo gl_query_image_info(SgImage img) @extern("sg_gl_query_image_info");
-extern fn SgGlSamplerInfo gl_query_sampler_info(SgSampler smp) @extern("sg_gl_query_sampler_info");
-extern fn SgGlShaderInfo gl_query_shader_info(SgShader shd) @extern("sg_gl_query_shader_info");
-extern fn SgGlViewInfo gl_query_view_info(SgView view) @extern("sg_gl_query_view_info");
+extern fn void setup(SgDesc* desc) @cname("sg_setup");
+extern fn void shutdown() @cname("sg_shutdown");
+extern fn bool isvalid() @cname("sg_isvalid");
+extern fn void reset_state_cache() @cname("sg_reset_state_cache");
+extern fn void push_debug_group(ZString name) @cname("sg_push_debug_group");
+extern fn void pop_debug_group() @cname("sg_pop_debug_group");
+extern fn bool add_commit_listener(SgCommitListener listener) @cname("sg_add_commit_listener");
+extern fn bool remove_commit_listener(SgCommitListener listener) @cname("sg_remove_commit_listener");
+extern fn SgBuffer make_buffer(SgBufferDesc* desc) @cname("sg_make_buffer");
+extern fn SgImage make_image(SgImageDesc* desc) @cname("sg_make_image");
+extern fn SgSampler make_sampler(SgSamplerDesc* desc) @cname("sg_make_sampler");
+extern fn SgShader make_shader(SgShaderDesc* desc) @cname("sg_make_shader");
+extern fn SgPipeline make_pipeline(SgPipelineDesc* desc) @cname("sg_make_pipeline");
+extern fn SgView make_view(SgViewDesc* desc) @cname("sg_make_view");
+extern fn void destroy_buffer(SgBuffer buf) @cname("sg_destroy_buffer");
+extern fn void destroy_image(SgImage img) @cname("sg_destroy_image");
+extern fn void destroy_sampler(SgSampler smp) @cname("sg_destroy_sampler");
+extern fn void destroy_shader(SgShader shd) @cname("sg_destroy_shader");
+extern fn void destroy_pipeline(SgPipeline pip) @cname("sg_destroy_pipeline");
+extern fn void destroy_view(SgView view) @cname("sg_destroy_view");
+extern fn void update_buffer(SgBuffer buf, SgRange* data) @cname("sg_update_buffer");
+extern fn void update_image(SgImage img, SgImageData* data) @cname("sg_update_image");
+extern fn CInt append_buffer(SgBuffer buf, SgRange* data) @cname("sg_append_buffer");
+extern fn bool query_buffer_overflow(SgBuffer buf) @cname("sg_query_buffer_overflow");
+extern fn bool query_buffer_will_overflow(SgBuffer buf, usz size) @cname("sg_query_buffer_will_overflow");
+extern fn void begin_pass(SgPass* pass) @cname("sg_begin_pass");
+extern fn void apply_viewport(CInt x, CInt y, CInt width, CInt height, bool origin_top_left) @cname("sg_apply_viewport");
+extern fn void apply_viewportf(float x, float y, float width, float height, bool origin_top_left) @cname("sg_apply_viewportf");
+extern fn void apply_scissor_rect(CInt x, CInt y, CInt width, CInt height, bool origin_top_left) @cname("sg_apply_scissor_rect");
+extern fn void apply_scissor_rectf(float x, float y, float width, float height, bool origin_top_left) @cname("sg_apply_scissor_rectf");
+extern fn void apply_pipeline(SgPipeline pip) @cname("sg_apply_pipeline");
+extern fn void apply_bindings(SgBindings* bindings) @cname("sg_apply_bindings");
+extern fn void apply_uniforms(CInt ub_slot, SgRange* data) @cname("sg_apply_uniforms");
+extern fn void draw(CInt base_element, CInt num_elements, CInt num_instances) @cname("sg_draw");
+extern fn void draw_ex(CInt base_element, CInt num_elements, CInt num_instances, CInt base_vertex, CInt base_instance) @cname("sg_draw_ex");
+extern fn void dispatch(CInt num_groups_x, CInt num_groups_y, CInt num_groups_z) @cname("sg_dispatch");
+extern fn void end_pass() @cname("sg_end_pass");
+extern fn void commit() @cname("sg_commit");
+extern fn SgDesc query_desc() @cname("sg_query_desc");
+extern fn SgBackend query_backend() @cname("sg_query_backend");
+extern fn SgFeatures query_features() @cname("sg_query_features");
+extern fn SgLimits query_limits() @cname("sg_query_limits");
+extern fn SgPixelformatInfo query_pixelformat(SgPixelFormat fmt) @cname("sg_query_pixelformat");
+extern fn CInt query_row_pitch(SgPixelFormat fmt, CInt width, CInt row_align_bytes) @cname("sg_query_row_pitch");
+extern fn CInt query_surface_pitch(SgPixelFormat fmt, CInt width, CInt height, CInt row_align_bytes) @cname("sg_query_surface_pitch");
+extern fn SgResourceState query_buffer_state(SgBuffer buf) @cname("sg_query_buffer_state");
+extern fn SgResourceState query_image_state(SgImage img) @cname("sg_query_image_state");
+extern fn SgResourceState query_sampler_state(SgSampler smp) @cname("sg_query_sampler_state");
+extern fn SgResourceState query_shader_state(SgShader shd) @cname("sg_query_shader_state");
+extern fn SgResourceState query_pipeline_state(SgPipeline pip) @cname("sg_query_pipeline_state");
+extern fn SgResourceState query_view_state(SgView view) @cname("sg_query_view_state");
+extern fn SgBufferInfo query_buffer_info(SgBuffer buf) @cname("sg_query_buffer_info");
+extern fn SgImageInfo query_image_info(SgImage img) @cname("sg_query_image_info");
+extern fn SgSamplerInfo query_sampler_info(SgSampler smp) @cname("sg_query_sampler_info");
+extern fn SgShaderInfo query_shader_info(SgShader shd) @cname("sg_query_shader_info");
+extern fn SgPipelineInfo query_pipeline_info(SgPipeline pip) @cname("sg_query_pipeline_info");
+extern fn SgViewInfo query_view_info(SgView view) @cname("sg_query_view_info");
+extern fn SgBufferDesc query_buffer_desc(SgBuffer buf) @cname("sg_query_buffer_desc");
+extern fn SgImageDesc query_image_desc(SgImage img) @cname("sg_query_image_desc");
+extern fn SgSamplerDesc query_sampler_desc(SgSampler smp) @cname("sg_query_sampler_desc");
+extern fn SgShaderDesc query_shader_desc(SgShader shd) @cname("sg_query_shader_desc");
+extern fn SgPipelineDesc query_pipeline_desc(SgPipeline pip) @cname("sg_query_pipeline_desc");
+extern fn SgViewDesc query_view_desc(SgView view) @cname("sg_query_view_desc");
+extern fn SgBufferDesc query_buffer_defaults(SgBufferDesc* desc) @cname("sg_query_buffer_defaults");
+extern fn SgImageDesc query_image_defaults(SgImageDesc* desc) @cname("sg_query_image_defaults");
+extern fn SgSamplerDesc query_sampler_defaults(SgSamplerDesc* desc) @cname("sg_query_sampler_defaults");
+extern fn SgShaderDesc query_shader_defaults(SgShaderDesc* desc) @cname("sg_query_shader_defaults");
+extern fn SgPipelineDesc query_pipeline_defaults(SgPipelineDesc* desc) @cname("sg_query_pipeline_defaults");
+extern fn SgViewDesc query_view_defaults(SgViewDesc* desc) @cname("sg_query_view_defaults");
+extern fn usz query_buffer_size(SgBuffer buf) @cname("sg_query_buffer_size");
+extern fn SgBufferUsage query_buffer_usage(SgBuffer buf) @cname("sg_query_buffer_usage");
+extern fn SgImageType query_image_type(SgImage img) @cname("sg_query_image_type");
+extern fn CInt query_image_width(SgImage img) @cname("sg_query_image_width");
+extern fn CInt query_image_height(SgImage img) @cname("sg_query_image_height");
+extern fn CInt query_image_num_slices(SgImage img) @cname("sg_query_image_num_slices");
+extern fn CInt query_image_num_mipmaps(SgImage img) @cname("sg_query_image_num_mipmaps");
+extern fn SgPixelFormat query_image_pixelformat(SgImage img) @cname("sg_query_image_pixelformat");
+extern fn SgImageUsage query_image_usage(SgImage img) @cname("sg_query_image_usage");
+extern fn CInt query_image_sample_count(SgImage img) @cname("sg_query_image_sample_count");
+extern fn SgViewType query_view_type(SgView view) @cname("sg_query_view_type");
+extern fn SgImage query_view_image(SgView view) @cname("sg_query_view_image");
+extern fn SgBuffer query_view_buffer(SgView view) @cname("sg_query_view_buffer");
+extern fn SgBuffer alloc_buffer() @cname("sg_alloc_buffer");
+extern fn SgImage alloc_image() @cname("sg_alloc_image");
+extern fn SgSampler alloc_sampler() @cname("sg_alloc_sampler");
+extern fn SgShader alloc_shader() @cname("sg_alloc_shader");
+extern fn SgPipeline alloc_pipeline() @cname("sg_alloc_pipeline");
+extern fn SgView alloc_view() @cname("sg_alloc_view");
+extern fn void dealloc_buffer(SgBuffer buf) @cname("sg_dealloc_buffer");
+extern fn void dealloc_image(SgImage img) @cname("sg_dealloc_image");
+extern fn void dealloc_sampler(SgSampler smp) @cname("sg_dealloc_sampler");
+extern fn void dealloc_shader(SgShader shd) @cname("sg_dealloc_shader");
+extern fn void dealloc_pipeline(SgPipeline pip) @cname("sg_dealloc_pipeline");
+extern fn void dealloc_view(SgView view) @cname("sg_dealloc_view");
+extern fn void init_buffer(SgBuffer buf, SgBufferDesc* desc) @cname("sg_init_buffer");
+extern fn void init_image(SgImage img, SgImageDesc* desc) @cname("sg_init_image");
+extern fn void init_sampler(SgSampler smg, SgSamplerDesc* desc) @cname("sg_init_sampler");
+extern fn void init_shader(SgShader shd, SgShaderDesc* desc) @cname("sg_init_shader");
+extern fn void init_pipeline(SgPipeline pip, SgPipelineDesc* desc) @cname("sg_init_pipeline");
+extern fn void init_view(SgView view, SgViewDesc* desc) @cname("sg_init_view");
+extern fn void uninit_buffer(SgBuffer buf) @cname("sg_uninit_buffer");
+extern fn void uninit_image(SgImage img) @cname("sg_uninit_image");
+extern fn void uninit_sampler(SgSampler smp) @cname("sg_uninit_sampler");
+extern fn void uninit_shader(SgShader shd) @cname("sg_uninit_shader");
+extern fn void uninit_pipeline(SgPipeline pip) @cname("sg_uninit_pipeline");
+extern fn void uninit_view(SgView view) @cname("sg_uninit_view");
+extern fn void fail_buffer(SgBuffer buf) @cname("sg_fail_buffer");
+extern fn void fail_image(SgImage img) @cname("sg_fail_image");
+extern fn void fail_sampler(SgSampler smp) @cname("sg_fail_sampler");
+extern fn void fail_shader(SgShader shd) @cname("sg_fail_shader");
+extern fn void fail_pipeline(SgPipeline pip) @cname("sg_fail_pipeline");
+extern fn void fail_view(SgView view) @cname("sg_fail_view");
+extern fn void enable_stats() @cname("sg_enable_stats");
+extern fn void disable_stats() @cname("sg_disable_stats");
+extern fn bool stats_enabled() @cname("sg_stats_enabled");
+extern fn SgStats query_stats() @cname("sg_query_stats");
+extern fn void* d3d11_device() @cname("sg_d3d11_device");
+extern fn void* d3d11_device_context() @cname("sg_d3d11_device_context");
+extern fn SgD3d11BufferInfo d3d11_query_buffer_info(SgBuffer buf) @cname("sg_d3d11_query_buffer_info");
+extern fn SgD3d11ImageInfo d3d11_query_image_info(SgImage img) @cname("sg_d3d11_query_image_info");
+extern fn SgD3d11SamplerInfo d3d11_query_sampler_info(SgSampler smp) @cname("sg_d3d11_query_sampler_info");
+extern fn SgD3d11ShaderInfo d3d11_query_shader_info(SgShader shd) @cname("sg_d3d11_query_shader_info");
+extern fn SgD3d11PipelineInfo d3d11_query_pipeline_info(SgPipeline pip) @cname("sg_d3d11_query_pipeline_info");
+extern fn SgD3d11ViewInfo d3d11_query_view_info(SgView view) @cname("sg_d3d11_query_view_info");
+extern fn void* mtl_device() @cname("sg_mtl_device");
+extern fn void* mtl_render_command_encoder() @cname("sg_mtl_render_command_encoder");
+extern fn void* mtl_compute_command_encoder() @cname("sg_mtl_compute_command_encoder");
+extern fn SgMtlBufferInfo mtl_query_buffer_info(SgBuffer buf) @cname("sg_mtl_query_buffer_info");
+extern fn SgMtlImageInfo mtl_query_image_info(SgImage img) @cname("sg_mtl_query_image_info");
+extern fn SgMtlSamplerInfo mtl_query_sampler_info(SgSampler smp) @cname("sg_mtl_query_sampler_info");
+extern fn SgMtlShaderInfo mtl_query_shader_info(SgShader shd) @cname("sg_mtl_query_shader_info");
+extern fn SgMtlPipelineInfo mtl_query_pipeline_info(SgPipeline pip) @cname("sg_mtl_query_pipeline_info");
+extern fn void* wgpu_device() @cname("sg_wgpu_device");
+extern fn void* wgpu_queue() @cname("sg_wgpu_queue");
+extern fn void* wgpu_command_encoder() @cname("sg_wgpu_command_encoder");
+extern fn void* wgpu_render_pass_encoder() @cname("sg_wgpu_render_pass_encoder");
+extern fn void* wgpu_compute_pass_encoder() @cname("sg_wgpu_compute_pass_encoder");
+extern fn SgWgpuBufferInfo wgpu_query_buffer_info(SgBuffer buf) @cname("sg_wgpu_query_buffer_info");
+extern fn SgWgpuImageInfo wgpu_query_image_info(SgImage img) @cname("sg_wgpu_query_image_info");
+extern fn SgWgpuSamplerInfo wgpu_query_sampler_info(SgSampler smp) @cname("sg_wgpu_query_sampler_info");
+extern fn SgWgpuShaderInfo wgpu_query_shader_info(SgShader shd) @cname("sg_wgpu_query_shader_info");
+extern fn SgWgpuPipelineInfo wgpu_query_pipeline_info(SgPipeline pip) @cname("sg_wgpu_query_pipeline_info");
+extern fn SgWgpuViewInfo wgpu_query_view_info(SgView view) @cname("sg_wgpu_query_view_info");
+extern fn SgGlBufferInfo gl_query_buffer_info(SgBuffer buf) @cname("sg_gl_query_buffer_info");
+extern fn SgGlImageInfo gl_query_image_info(SgImage img) @cname("sg_gl_query_image_info");
+extern fn SgGlSamplerInfo gl_query_sampler_info(SgSampler smp) @cname("sg_gl_query_sampler_info");
+extern fn SgGlShaderInfo gl_query_shader_info(SgShader shd) @cname("sg_gl_query_shader_info");
+extern fn SgGlViewInfo gl_query_view_info(SgView view) @cname("sg_gl_query_view_info");
 
 struct SgBuffer
 {
@@ -189,15 +190,19 @@ struct SgRange
 
 const uint INVALID_ID = 0;
 const usz NUM_INFLIGHT_FRAMES = 2;
-const usz MAX_COLOR_ATTACHMENTS = 4;
+const usz MAX_COLOR_ATTACHMENTS = 8;
 const usz MAX_UNIFORMBLOCK_MEMBERS = 16;
 const usz MAX_VERTEX_ATTRIBUTES = 16;
 const usz MAX_MIPMAPS = 16;
 const usz MAX_VERTEXBUFFER_BINDSLOTS = 8;
 const usz MAX_UNIFORMBLOCK_BINDSLOTS = 8;
-const usz MAX_VIEW_BINDSLOTS = 28;
-const usz MAX_SAMPLER_BINDSLOTS = 16;
-const usz MAX_TEXTURE_SAMPLER_PAIRS = 16;
+const usz MAX_VIEW_BINDSLOTS = 32;
+const usz MAX_SAMPLER_BINDSLOTS = 12;
+const usz MAX_TEXTURE_SAMPLER_PAIRS = 32;
+const usz MAX_PORTABLE_COLOR_ATTACHMENTS = 4;
+const usz MAX_PORTABLE_TEXTURE_BINDINGS_PER_STAGE = 16;
+const usz MAX_PORTABLE_STORAGEBUFFER_BINDINGS_PER_STAGE = 8;
+const usz MAX_PORTABLE_STORAGEIMAGE_BINDINGS_PER_STAGE = 4;
 
 struct SgColor
 {
@@ -216,7 +221,8 @@ enum SgBackend : const int
     METAL_MACOS = 4,
     METAL_SIMULATOR = 5,
     WGPU = 6,
-    DUMMY = 7,
+    VULKAN = 7,
+    DUMMY = 8,
 }
 
 enum SgPixelFormat : const uint
@@ -315,6 +321,8 @@ struct SgFeatures
     bool compute;
     bool msaa_texture_bindings;
     bool separate_buffer_types;
+    bool draw_base_vertex;
+    bool draw_base_instance;
     bool gl_texture_views;
 }
 
@@ -326,8 +334,14 @@ struct SgLimits
     CInt max_image_size_array;
     CInt max_image_array_layers;
     CInt max_vertex_attrs;
+    CInt max_color_attachments;
+    CInt max_texture_bindings_per_stage;
+    CInt max_storage_buffer_bindings_per_stage;
+    CInt max_storage_image_bindings_per_stage;
     CInt gl_max_vertex_uniform_components;
     CInt gl_max_combined_texture_image_units;
+    CInt d3d11_max_unordered_access_views;
+    CInt vk_min_uniform_buffer_offset_alignment;
 }
 
 enum SgResourceState : const uint
@@ -616,7 +630,7 @@ struct SgStencilAttachmentAction
 
 struct SgPassAction
 {
-    SgColorAttachmentAction[4] colors;
+    SgColorAttachmentAction[8] colors;
     SgDepthAttachmentAction depth;
     SgStencilAttachmentAction stencil;
 }
@@ -642,6 +656,18 @@ struct SgWgpuSwapchain
     void* depth_stencil_view;
 }
 
+struct SgVulkanSwapchain
+{
+    void* render_image;
+    void* render_view;
+    void* resolve_image;
+    void* resolve_view;
+    void* depth_stencil_image;
+    void* depth_stencil_view;
+    void* render_finished_semaphore;
+    void* present_complete_semaphore;
+}
+
 struct SgGlSwapchain
 {
     uint framebuffer;
@@ -657,13 +683,14 @@ struct SgSwapchain
     SgMetalSwapchain metal;
     SgD3d11Swapchain d3d11;
     SgWgpuSwapchain wgpu;
+    SgVulkanSwapchain vulkan;
     SgGlSwapchain gl;
 }
 
 struct SgAttachments
 {
-    SgView[4] colors;
-    SgView[4] resolves;
+    SgView[8] colors;
+    SgView[8] resolves;
     SgView depth_stencil;
 }
 
@@ -685,8 +712,8 @@ struct SgBindings
     CInt[8] vertex_buffer_offsets;
     SgBuffer index_buffer;
     CInt index_buffer_offset;
-    SgView[28] views;
-    SgSampler[16] samplers;
+    SgView[32] views;
+    SgSampler[12] samplers;
     uint _end_canary;
 }
 
@@ -831,6 +858,7 @@ struct SgShaderUniformBlock
     char hlsl_register_b_n;
     char msl_buffer_n;
     char wgsl_group0_binding_n;
+    char spirv_set0_binding_n;
     SgUniformLayout layout;
     SgGlslShaderUniform[16] glsl_uniforms;
 }
@@ -844,6 +872,7 @@ struct SgShaderTextureView
     char hlsl_register_t_n;
     char msl_texture_n;
     char wgsl_group1_binding_n;
+    char spirv_set1_binding_n;
 }
 
 struct SgShaderStorageBufferView
@@ -854,6 +883,7 @@ struct SgShaderStorageBufferView
     char hlsl_register_u_n;
     char msl_buffer_n;
     char wgsl_group1_binding_n;
+    char spirv_set1_binding_n;
     char glsl_binding_n;
 }
 
@@ -866,6 +896,7 @@ struct SgShaderStorageImageView
     char hlsl_register_u_n;
     char msl_texture_n;
     char wgsl_group1_binding_n;
+    char spirv_set1_binding_n;
     char glsl_binding_n;
 }
 
@@ -883,6 +914,7 @@ struct SgShaderSampler
     char hlsl_register_s_n;
     char msl_sampler_n;
     char wgsl_group1_binding_n;
+    char spirv_set1_binding_n;
 }
 
 struct SgShaderTextureSamplerPair
@@ -908,9 +940,9 @@ struct SgShaderDesc
     SgShaderFunction compute_func;
     SgShaderVertexAttr[16] attrs;
     SgShaderUniformBlock[8] uniform_blocks;
-    SgShaderView[28] views;
-    SgShaderSampler[16] samplers;
-    SgShaderTextureSamplerPair[16] texture_sampler_pairs;
+    SgShaderView[32] views;
+    SgShaderSampler[12] samplers;
+    SgShaderTextureSamplerPair[32] texture_sampler_pairs;
     SgMtlShaderThreadsPerThreadgroup mtl_threads_per_threadgroup;
     ZString label;
     uint _end_canary;
@@ -991,7 +1023,7 @@ struct SgPipelineDesc
     SgDepthState depth;
     SgStencilState stencil;
     CInt color_count;
-    SgColorTargetState[4] colors;
+    SgColorTargetState[8] colors;
     SgPrimitiveType primitive_type;
     SgIndexType index_type;
     SgCullMode cull_mode;
@@ -1252,14 +1284,46 @@ struct SgFrameStatsWgpu
     SgFrameStatsWgpuBindings bindings;
 }
 
-struct SgResourceStats
+struct SgFrameStatsVk
 {
-    uint total_alive;
-    uint total_free;
+    uint num_cmd_pipeline_barrier;
+    uint num_allocate_memory;
+    uint num_free_memory;
+    uint size_allocate_memory;
+    uint num_delete_queue_added;
+    uint num_delete_queue_collected;
+    uint num_cmd_copy_buffer;
+    uint num_cmd_copy_buffer_to_image;
+    uint num_cmd_set_descriptor_buffer_offsets;
+    uint size_descriptor_buffer_writes;
+}
+
+struct SgFrameResourceStats
+{
     uint allocated;
     uint deallocated;
     uint inited;
     uint uninited;
+}
+
+struct SgTotalResourceStats
+{
+    uint alive;
+    uint free;
+    uint allocated;
+    uint deallocated;
+    uint inited;
+    uint uninited;
+}
+
+struct SgTotalStats
+{
+    SgTotalResourceStats buffers;
+    SgTotalResourceStats images;
+    SgTotalResourceStats samplers;
+    SgTotalResourceStats views;
+    SgTotalResourceStats shaders;
+    SgTotalResourceStats pipelines;
 }
 
 struct SgFrameStats
@@ -1272,6 +1336,7 @@ struct SgFrameStats
     uint num_apply_bindings;
     uint num_apply_uniforms;
     uint num_draw;
+    uint num_draw_ex;
     uint num_dispatch;
     uint num_update_buffer;
     uint num_append_buffer;
@@ -1280,16 +1345,24 @@ struct SgFrameStats
     uint size_update_buffer;
     uint size_append_buffer;
     uint size_update_image;
-    SgResourceStats buffers;
-    SgResourceStats images;
-    SgResourceStats samplers;
-    SgResourceStats views;
-    SgResourceStats shaders;
-    SgResourceStats pipelines;
+    SgFrameResourceStats buffers;
+    SgFrameResourceStats images;
+    SgFrameResourceStats samplers;
+    SgFrameResourceStats views;
+    SgFrameResourceStats shaders;
+    SgFrameResourceStats pipelines;
     SgFrameStatsGl gl;
     SgFrameStatsD3d11 d3d11;
     SgFrameStatsMetal metal;
     SgFrameStatsWgpu wgpu;
+    SgFrameStatsVk vk;
+}
+
+struct SgStats
+{
+    SgFrameStats prev_frame;
+    SgFrameStats cur_frame;
+    SgTotalStats total;
 }
 
 enum SgLogItem : const int
@@ -1312,400 +1385,447 @@ enum SgLogItem : const int
     GL_FRAMEBUFFER_STATUS_UNSUPPORTED = 15,
     GL_FRAMEBUFFER_STATUS_INCOMPLETE_MULTISAMPLE = 16,
     GL_FRAMEBUFFER_STATUS_UNKNOWN = 17,
-    D3D11_CREATE_BUFFER_FAILED = 18,
-    D3D11_CREATE_BUFFER_SRV_FAILED = 19,
-    D3D11_CREATE_BUFFER_UAV_FAILED = 20,
-    D3D11_CREATE_DEPTH_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 21,
-    D3D11_CREATE_DEPTH_TEXTURE_FAILED = 22,
-    D3D11_CREATE_2D_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 23,
-    D3D11_CREATE_2D_TEXTURE_FAILED = 24,
-    D3D11_CREATE_2D_SRV_FAILED = 25,
-    D3D11_CREATE_3D_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 26,
-    D3D11_CREATE_3D_TEXTURE_FAILED = 27,
-    D3D11_CREATE_3D_SRV_FAILED = 28,
-    D3D11_CREATE_MSAA_TEXTURE_FAILED = 29,
-    D3D11_CREATE_SAMPLER_STATE_FAILED = 30,
-    D3D11_UNIFORMBLOCK_HLSL_REGISTER_B_OUT_OF_RANGE = 31,
-    D3D11_STORAGEBUFFER_HLSL_REGISTER_T_OUT_OF_RANGE = 32,
-    D3D11_STORAGEBUFFER_HLSL_REGISTER_U_OUT_OF_RANGE = 33,
-    D3D11_IMAGE_HLSL_REGISTER_T_OUT_OF_RANGE = 34,
-    D3D11_STORAGEIMAGE_HLSL_REGISTER_U_OUT_OF_RANGE = 35,
-    D3D11_SAMPLER_HLSL_REGISTER_S_OUT_OF_RANGE = 36,
-    D3D11_LOAD_D3DCOMPILER_47_DLL_FAILED = 37,
-    D3D11_SHADER_COMPILATION_FAILED = 38,
-    D3D11_SHADER_COMPILATION_OUTPUT = 39,
-    D3D11_CREATE_CONSTANT_BUFFER_FAILED = 40,
-    D3D11_CREATE_INPUT_LAYOUT_FAILED = 41,
-    D3D11_CREATE_RASTERIZER_STATE_FAILED = 42,
-    D3D11_CREATE_DEPTH_STENCIL_STATE_FAILED = 43,
-    D3D11_CREATE_BLEND_STATE_FAILED = 44,
-    D3D11_CREATE_RTV_FAILED = 45,
-    D3D11_CREATE_DSV_FAILED = 46,
-    D3D11_CREATE_UAV_FAILED = 47,
-    D3D11_MAP_FOR_UPDATE_BUFFER_FAILED = 48,
-    D3D11_MAP_FOR_APPEND_BUFFER_FAILED = 49,
-    D3D11_MAP_FOR_UPDATE_IMAGE_FAILED = 50,
-    METAL_CREATE_BUFFER_FAILED = 51,
-    METAL_TEXTURE_FORMAT_NOT_SUPPORTED = 52,
-    METAL_CREATE_TEXTURE_FAILED = 53,
-    METAL_CREATE_SAMPLER_FAILED = 54,
-    METAL_SHADER_COMPILATION_FAILED = 55,
-    METAL_SHADER_CREATION_FAILED = 56,
-    METAL_SHADER_COMPILATION_OUTPUT = 57,
-    METAL_SHADER_ENTRY_NOT_FOUND = 58,
-    METAL_UNIFORMBLOCK_MSL_BUFFER_SLOT_OUT_OF_RANGE = 59,
-    METAL_STORAGEBUFFER_MSL_BUFFER_SLOT_OUT_OF_RANGE = 60,
-    METAL_STORAGEIMAGE_MSL_TEXTURE_SLOT_OUT_OF_RANGE = 61,
-    METAL_IMAGE_MSL_TEXTURE_SLOT_OUT_OF_RANGE = 62,
-    METAL_SAMPLER_MSL_SAMPLER_SLOT_OUT_OF_RANGE = 63,
-    METAL_CREATE_CPS_FAILED = 64,
-    METAL_CREATE_CPS_OUTPUT = 65,
-    METAL_CREATE_RPS_FAILED = 66,
-    METAL_CREATE_RPS_OUTPUT = 67,
-    METAL_CREATE_DSS_FAILED = 68,
-    WGPU_BINDGROUPS_POOL_EXHAUSTED = 69,
-    WGPU_BINDGROUPSCACHE_SIZE_GREATER_ONE = 70,
-    WGPU_BINDGROUPSCACHE_SIZE_POW2 = 71,
-    WGPU_CREATEBINDGROUP_FAILED = 72,
-    WGPU_CREATE_BUFFER_FAILED = 73,
-    WGPU_CREATE_TEXTURE_FAILED = 74,
-    WGPU_CREATE_TEXTURE_VIEW_FAILED = 75,
-    WGPU_CREATE_SAMPLER_FAILED = 76,
-    WGPU_CREATE_SHADER_MODULE_FAILED = 77,
-    WGPU_SHADER_CREATE_BINDGROUP_LAYOUT_FAILED = 78,
-    WGPU_UNIFORMBLOCK_WGSL_GROUP0_BINDING_OUT_OF_RANGE = 79,
-    WGPU_TEXTURE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 80,
-    WGPU_STORAGEBUFFER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 81,
-    WGPU_STORAGEIMAGE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 82,
-    WGPU_SAMPLER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 83,
-    WGPU_CREATE_PIPELINE_LAYOUT_FAILED = 84,
-    WGPU_CREATE_RENDER_PIPELINE_FAILED = 85,
-    WGPU_CREATE_COMPUTE_PIPELINE_FAILED = 86,
-    IDENTICAL_COMMIT_LISTENER = 87,
-    COMMIT_LISTENER_ARRAY_FULL = 88,
-    TRACE_HOOKS_NOT_ENABLED = 89,
-    DEALLOC_BUFFER_INVALID_STATE = 90,
-    DEALLOC_IMAGE_INVALID_STATE = 91,
-    DEALLOC_SAMPLER_INVALID_STATE = 92,
-    DEALLOC_SHADER_INVALID_STATE = 93,
-    DEALLOC_PIPELINE_INVALID_STATE = 94,
-    DEALLOC_VIEW_INVALID_STATE = 95,
-    INIT_BUFFER_INVALID_STATE = 96,
-    INIT_IMAGE_INVALID_STATE = 97,
-    INIT_SAMPLER_INVALID_STATE = 98,
-    INIT_SHADER_INVALID_STATE = 99,
-    INIT_PIPELINE_INVALID_STATE = 100,
-    INIT_VIEW_INVALID_STATE = 101,
-    UNINIT_BUFFER_INVALID_STATE = 102,
-    UNINIT_IMAGE_INVALID_STATE = 103,
-    UNINIT_SAMPLER_INVALID_STATE = 104,
-    UNINIT_SHADER_INVALID_STATE = 105,
-    UNINIT_PIPELINE_INVALID_STATE = 106,
-    UNINIT_VIEW_INVALID_STATE = 107,
-    FAIL_BUFFER_INVALID_STATE = 108,
-    FAIL_IMAGE_INVALID_STATE = 109,
-    FAIL_SAMPLER_INVALID_STATE = 110,
-    FAIL_SHADER_INVALID_STATE = 111,
-    FAIL_PIPELINE_INVALID_STATE = 112,
-    FAIL_VIEW_INVALID_STATE = 113,
-    BUFFER_POOL_EXHAUSTED = 114,
-    IMAGE_POOL_EXHAUSTED = 115,
-    SAMPLER_POOL_EXHAUSTED = 116,
-    SHADER_POOL_EXHAUSTED = 117,
-    PIPELINE_POOL_EXHAUSTED = 118,
-    VIEW_POOL_EXHAUSTED = 119,
-    BEGINPASS_ATTACHMENTS_ALIVE = 120,
-    DRAW_WITHOUT_BINDINGS = 121,
-    VALIDATE_BUFFERDESC_CANARY = 122,
-    VALIDATE_BUFFERDESC_IMMUTABLE_DYNAMIC_STREAM = 123,
-    VALIDATE_BUFFERDESC_SEPARATE_BUFFER_TYPES = 124,
-    VALIDATE_BUFFERDESC_EXPECT_NONZERO_SIZE = 125,
-    VALIDATE_BUFFERDESC_EXPECT_MATCHING_DATA_SIZE = 126,
-    VALIDATE_BUFFERDESC_EXPECT_ZERO_DATA_SIZE = 127,
-    VALIDATE_BUFFERDESC_EXPECT_NO_DATA = 128,
-    VALIDATE_BUFFERDESC_EXPECT_DATA = 129,
-    VALIDATE_BUFFERDESC_STORAGEBUFFER_SUPPORTED = 130,
-    VALIDATE_BUFFERDESC_STORAGEBUFFER_SIZE_MULTIPLE_4 = 131,
-    VALIDATE_IMAGEDATA_NODATA = 132,
-    VALIDATE_IMAGEDATA_DATA_SIZE = 133,
-    VALIDATE_IMAGEDESC_CANARY = 134,
-    VALIDATE_IMAGEDESC_IMMUTABLE_DYNAMIC_STREAM = 135,
-    VALIDATE_IMAGEDESC_IMAGETYPE_2D_NUMSLICES = 136,
-    VALIDATE_IMAGEDESC_IMAGETYPE_CUBE_NUMSLICES = 137,
-    VALIDATE_IMAGEDESC_IMAGETYPE_ARRAY_NUMSLICES = 138,
-    VALIDATE_IMAGEDESC_IMAGETYPE_3D_NUMSLICES = 139,
-    VALIDATE_IMAGEDESC_NUMSLICES = 140,
-    VALIDATE_IMAGEDESC_WIDTH = 141,
-    VALIDATE_IMAGEDESC_HEIGHT = 142,
-    VALIDATE_IMAGEDESC_NONRT_PIXELFORMAT = 143,
-    VALIDATE_IMAGEDESC_MSAA_BUT_NO_ATTACHMENT = 144,
-    VALIDATE_IMAGEDESC_DEPTH_3D_IMAGE = 145,
-    VALIDATE_IMAGEDESC_ATTACHMENT_EXPECT_IMMUTABLE = 146,
-    VALIDATE_IMAGEDESC_ATTACHMENT_EXPECT_NO_DATA = 147,
-    VALIDATE_IMAGEDESC_ATTACHMENT_PIXELFORMAT = 148,
-    VALIDATE_IMAGEDESC_ATTACHMENT_RESOLVE_EXPECT_NO_MSAA = 149,
-    VALIDATE_IMAGEDESC_ATTACHMENT_NO_MSAA_SUPPORT = 150,
-    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_NUM_MIPMAPS = 151,
-    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_3D_IMAGE = 152,
-    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_CUBE_IMAGE = 153,
-    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_ARRAY_IMAGE = 154,
-    VALIDATE_IMAGEDESC_STORAGEIMAGE_PIXELFORMAT = 155,
-    VALIDATE_IMAGEDESC_STORAGEIMAGE_EXPECT_NO_MSAA = 156,
-    VALIDATE_IMAGEDESC_INJECTED_NO_DATA = 157,
-    VALIDATE_IMAGEDESC_DYNAMIC_NO_DATA = 158,
-    VALIDATE_IMAGEDESC_COMPRESSED_IMMUTABLE = 159,
-    VALIDATE_SAMPLERDESC_CANARY = 160,
-    VALIDATE_SAMPLERDESC_ANISTROPIC_REQUIRES_LINEAR_FILTERING = 161,
-    VALIDATE_SHADERDESC_CANARY = 162,
-    VALIDATE_SHADERDESC_VERTEX_SOURCE = 163,
-    VALIDATE_SHADERDESC_FRAGMENT_SOURCE = 164,
-    VALIDATE_SHADERDESC_COMPUTE_SOURCE = 165,
-    VALIDATE_SHADERDESC_VERTEX_SOURCE_OR_BYTECODE = 166,
-    VALIDATE_SHADERDESC_FRAGMENT_SOURCE_OR_BYTECODE = 167,
-    VALIDATE_SHADERDESC_COMPUTE_SOURCE_OR_BYTECODE = 168,
-    VALIDATE_SHADERDESC_INVALID_SHADER_COMBO = 169,
-    VALIDATE_SHADERDESC_NO_BYTECODE_SIZE = 170,
-    VALIDATE_SHADERDESC_METAL_THREADS_PER_THREADGROUP_INITIALIZED = 171,
-    VALIDATE_SHADERDESC_METAL_THREADS_PER_THREADGROUP_MULTIPLE_32 = 172,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_NO_CONT_MEMBERS = 173,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_SIZE_IS_ZERO = 174,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_METAL_BUFFER_SLOT_OUT_OF_RANGE = 175,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_METAL_BUFFER_SLOT_COLLISION = 176,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_HLSL_REGISTER_B_OUT_OF_RANGE = 177,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_HLSL_REGISTER_B_COLLISION = 178,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_WGSL_GROUP0_BINDING_OUT_OF_RANGE = 179,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_WGSL_GROUP0_BINDING_COLLISION = 180,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_NO_MEMBERS = 181,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_UNIFORM_GLSL_NAME = 182,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_SIZE_MISMATCH = 183,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_ARRAY_COUNT = 184,
-    VALIDATE_SHADERDESC_UNIFORMBLOCK_STD140_ARRAY_TYPE = 185,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_METAL_BUFFER_SLOT_OUT_OF_RANGE = 186,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_METAL_BUFFER_SLOT_COLLISION = 187,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_T_OUT_OF_RANGE = 188,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_T_COLLISION = 189,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_U_OUT_OF_RANGE = 190,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_U_COLLISION = 191,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_GLSL_BINDING_OUT_OF_RANGE = 192,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_GLSL_BINDING_COLLISION = 193,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 194,
-    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_WGSL_GROUP1_BINDING_COLLISION = 195,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_EXPECT_COMPUTE_STAGE = 196,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_METAL_TEXTURE_SLOT_OUT_OF_RANGE = 197,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_METAL_TEXTURE_SLOT_COLLISION = 198,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_HLSL_REGISTER_U_OUT_OF_RANGE = 199,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_HLSL_REGISTER_U_COLLISION = 200,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_GLSL_BINDING_OUT_OF_RANGE = 201,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_GLSL_BINDING_COLLISION = 202,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 203,
-    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_WGSL_GROUP1_BINDING_COLLISION = 204,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_METAL_TEXTURE_SLOT_OUT_OF_RANGE = 205,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_METAL_TEXTURE_SLOT_COLLISION = 206,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_HLSL_REGISTER_T_OUT_OF_RANGE = 207,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_HLSL_REGISTER_T_COLLISION = 208,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 209,
-    VALIDATE_SHADERDESC_VIEW_TEXTURE_WGSL_GROUP1_BINDING_COLLISION = 210,
-    VALIDATE_SHADERDESC_SAMPLER_METAL_SAMPLER_SLOT_OUT_OF_RANGE = 211,
-    VALIDATE_SHADERDESC_SAMPLER_METAL_SAMPLER_SLOT_COLLISION = 212,
-    VALIDATE_SHADERDESC_SAMPLER_HLSL_REGISTER_S_OUT_OF_RANGE = 213,
-    VALIDATE_SHADERDESC_SAMPLER_HLSL_REGISTER_S_COLLISION = 214,
-    VALIDATE_SHADERDESC_SAMPLER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 215,
-    VALIDATE_SHADERDESC_SAMPLER_WGSL_GROUP1_BINDING_COLLISION = 216,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_VIEW_SLOT_OUT_OF_RANGE = 217,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_SAMPLER_SLOT_OUT_OF_RANGE = 218,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_TEXTURE_STAGE_MISMATCH = 219,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_EXPECT_TEXTURE_VIEW = 220,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_SAMPLER_STAGE_MISMATCH = 221,
-    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_GLSL_NAME = 222,
-    VALIDATE_SHADERDESC_NONFILTERING_SAMPLER_REQUIRED = 223,
-    VALIDATE_SHADERDESC_COMPARISON_SAMPLER_REQUIRED = 224,
-    VALIDATE_SHADERDESC_TEXVIEW_NOT_REFERENCED_BY_TEXTURE_SAMPLER_PAIRS = 225,
-    VALIDATE_SHADERDESC_SAMPLER_NOT_REFERENCED_BY_TEXTURE_SAMPLER_PAIRS = 226,
-    VALIDATE_SHADERDESC_ATTR_STRING_TOO_LONG = 227,
-    VALIDATE_PIPELINEDESC_CANARY = 228,
-    VALIDATE_PIPELINEDESC_SHADER = 229,
-    VALIDATE_PIPELINEDESC_COMPUTE_SHADER_EXPECTED = 230,
-    VALIDATE_PIPELINEDESC_NO_COMPUTE_SHADER_EXPECTED = 231,
-    VALIDATE_PIPELINEDESC_NO_CONT_ATTRS = 232,
-    VALIDATE_PIPELINEDESC_ATTR_BASETYPE_MISMATCH = 233,
-    VALIDATE_PIPELINEDESC_LAYOUT_STRIDE4 = 234,
-    VALIDATE_PIPELINEDESC_ATTR_SEMANTICS = 235,
-    VALIDATE_PIPELINEDESC_SHADER_READONLY_STORAGEBUFFERS = 236,
-    VALIDATE_PIPELINEDESC_BLENDOP_MINMAX_REQUIRES_BLENDFACTOR_ONE = 237,
-    VALIDATE_VIEWDESC_CANARY = 238,
-    VALIDATE_VIEWDESC_UNIQUE_VIEWTYPE = 239,
-    VALIDATE_VIEWDESC_ANY_VIEWTYPE = 240,
-    VALIDATE_VIEWDESC_RESOURCE_ALIVE = 241,
-    VALIDATE_VIEWDESC_RESOURCE_FAILED = 242,
-    VALIDATE_VIEWDESC_STORAGEBUFFER_OFFSET_VS_BUFFER_SIZE = 243,
-    VALIDATE_VIEWDESC_STORAGEBUFFER_OFFSET_MULTIPLE_256 = 244,
-    VALIDATE_VIEWDESC_STORAGEBUFFER_USAGE = 245,
-    VALIDATE_VIEWDESC_STORAGEIMAGE_USAGE = 246,
-    VALIDATE_VIEWDESC_COLORATTACHMENT_USAGE = 247,
-    VALIDATE_VIEWDESC_RESOLVEATTACHMENT_USAGE = 248,
-    VALIDATE_VIEWDESC_DEPTHSTENCILATTACHMENT_USAGE = 249,
-    VALIDATE_VIEWDESC_IMAGE_MIPLEVEL = 250,
-    VALIDATE_VIEWDESC_IMAGE_2D_SLICE = 251,
-    VALIDATE_VIEWDESC_IMAGE_CUBEMAP_SLICE = 252,
-    VALIDATE_VIEWDESC_IMAGE_ARRAY_SLICE = 253,
-    VALIDATE_VIEWDESC_IMAGE_3D_SLICE = 254,
-    VALIDATE_VIEWDESC_TEXTURE_EXPECT_NO_MSAA = 255,
-    VALIDATE_VIEWDESC_TEXTURE_MIPLEVELS = 256,
-    VALIDATE_VIEWDESC_TEXTURE_2D_SLICES = 257,
-    VALIDATE_VIEWDESC_TEXTURE_CUBEMAP_SLICES = 258,
-    VALIDATE_VIEWDESC_TEXTURE_ARRAY_SLICES = 259,
-    VALIDATE_VIEWDESC_TEXTURE_3D_SLICES = 260,
-    VALIDATE_VIEWDESC_STORAGEIMAGE_PIXELFORMAT = 261,
-    VALIDATE_VIEWDESC_COLORATTACHMENT_PIXELFORMAT = 262,
-    VALIDATE_VIEWDESC_DEPTHSTENCILATTACHMENT_PIXELFORMAT = 263,
-    VALIDATE_VIEWDESC_RESOLVEATTACHMENT_SAMPLECOUNT = 264,
-    VALIDATE_BEGINPASS_CANARY = 265,
-    VALIDATE_BEGINPASS_COMPUTEPASS_EXPECT_NO_ATTACHMENTS = 266,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_WIDTH = 267,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_WIDTH_NOTSET = 268,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_HEIGHT = 269,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_HEIGHT_NOTSET = 270,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_SAMPLECOUNT = 271,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_SAMPLECOUNT_NOTSET = 272,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_COLORFORMAT = 273,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_COLORFORMAT_NOTSET = 274,
-    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_DEPTHFORMAT_NOTSET = 275,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_CURRENTDRAWABLE = 276,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_CURRENTDRAWABLE_NOTSET = 277,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_DEPTHSTENCILTEXTURE = 278,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_DEPTHSTENCILTEXTURE_NOTSET = 279,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_MSAACOLORTEXTURE = 280,
-    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_MSAACOLORTEXTURE_NOTSET = 281,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RENDERVIEW = 282,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RENDERVIEW_NOTSET = 283,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RESOLVEVIEW = 284,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RESOLVEVIEW_NOTSET = 285,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_DEPTHSTENCILVIEW = 286,
-    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_DEPTHSTENCILVIEW_NOTSET = 287,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RENDERVIEW = 288,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RENDERVIEW_NOTSET = 289,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RESOLVEVIEW = 290,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RESOLVEVIEW_NOTSET = 291,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_DEPTHSTENCILVIEW = 292,
-    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_DEPTHSTENCILVIEW_NOTSET = 293,
-    VALIDATE_BEGINPASS_SWAPCHAIN_GL_EXPECT_FRAMEBUFFER_NOTSET = 294,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEWS_CONTINUOUS = 295,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_ALIVE = 296,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_VALID = 297,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_TYPE = 298,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_IMAGE_ALIVE = 299,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_IMAGE_VALID = 300,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_SIZES = 301,
-    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_SAMPLECOUNTS = 302,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_NO_COLORATTACHMENTVIEW = 303,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_ALIVE = 304,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_VALID = 305,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_TYPE = 306,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_IMAGE_ALIVE = 307,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_IMAGE_VALID = 308,
-    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_SIZES = 309,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEWS_CONTINUOUS = 310,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_ALIVE = 311,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_VALID = 312,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_TYPE = 313,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_IMAGE_ALIVE = 314,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_IMAGE_VALID = 315,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_SIZES = 316,
-    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_SAMPLECOUNT = 317,
-    VALIDATE_BEGINPASS_ATTACHMENTS_EXPECTED = 318,
-    VALIDATE_AVP_RENDERPASS_EXPECTED = 319,
-    VALIDATE_ASR_RENDERPASS_EXPECTED = 320,
-    VALIDATE_APIP_PIPELINE_VALID_ID = 321,
-    VALIDATE_APIP_PIPELINE_EXISTS = 322,
-    VALIDATE_APIP_PIPELINE_VALID = 323,
-    VALIDATE_APIP_PASS_EXPECTED = 324,
-    VALIDATE_APIP_PIPELINE_SHADER_ALIVE = 325,
-    VALIDATE_APIP_PIPELINE_SHADER_VALID = 326,
-    VALIDATE_APIP_COMPUTEPASS_EXPECTED = 327,
-    VALIDATE_APIP_RENDERPASS_EXPECTED = 328,
-    VALIDATE_APIP_SWAPCHAIN_COLOR_COUNT = 329,
-    VALIDATE_APIP_SWAPCHAIN_COLOR_FORMAT = 330,
-    VALIDATE_APIP_SWAPCHAIN_DEPTH_FORMAT = 331,
-    VALIDATE_APIP_SWAPCHAIN_SAMPLE_COUNT = 332,
-    VALIDATE_APIP_ATTACHMENTS_ALIVE = 333,
-    VALIDATE_APIP_COLORATTACHMENTS_COUNT = 334,
-    VALIDATE_APIP_COLORATTACHMENTS_VIEW_VALID = 335,
-    VALIDATE_APIP_COLORATTACHMENTS_IMAGE_VALID = 336,
-    VALIDATE_APIP_COLORATTACHMENTS_FORMAT = 337,
-    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_VIEW_VALID = 338,
-    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_IMAGE_VALID = 339,
-    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_FORMAT = 340,
-    VALIDATE_APIP_ATTACHMENT_SAMPLE_COUNT = 341,
-    VALIDATE_ABND_PASS_EXPECTED = 342,
-    VALIDATE_ABND_EMPTY_BINDINGS = 343,
-    VALIDATE_ABND_NO_PIPELINE = 344,
-    VALIDATE_ABND_PIPELINE_ALIVE = 345,
-    VALIDATE_ABND_PIPELINE_VALID = 346,
-    VALIDATE_ABND_PIPELINE_SHADER_ALIVE = 347,
-    VALIDATE_ABND_PIPELINE_SHADER_VALID = 348,
-    VALIDATE_ABND_COMPUTE_EXPECTED_NO_VBUFS = 349,
-    VALIDATE_ABND_COMPUTE_EXPECTED_NO_IBUF = 350,
-    VALIDATE_ABND_EXPECTED_VBUF = 351,
-    VALIDATE_ABND_VBUF_ALIVE = 352,
-    VALIDATE_ABND_VBUF_USAGE = 353,
-    VALIDATE_ABND_VBUF_OVERFLOW = 354,
-    VALIDATE_ABND_EXPECTED_NO_IBUF = 355,
-    VALIDATE_ABND_EXPECTED_IBUF = 356,
-    VALIDATE_ABND_IBUF_ALIVE = 357,
-    VALIDATE_ABND_IBUF_USAGE = 358,
-    VALIDATE_ABND_IBUF_OVERFLOW = 359,
-    VALIDATE_ABND_EXPECTED_VIEW_BINDING = 360,
-    VALIDATE_ABND_VIEW_ALIVE = 361,
-    VALIDATE_ABND_EXPECT_TEXVIEW = 362,
-    VALIDATE_ABND_EXPECT_SBVIEW = 363,
-    VALIDATE_ABND_EXPECT_SIMGVIEW = 364,
-    VALIDATE_ABND_TEXVIEW_IMAGETYPE_MISMATCH = 365,
-    VALIDATE_ABND_TEXVIEW_EXPECTED_MULTISAMPLED_IMAGE = 366,
-    VALIDATE_ABND_TEXVIEW_EXPECTED_NON_MULTISAMPLED_IMAGE = 367,
-    VALIDATE_ABND_TEXVIEW_EXPECTED_FILTERABLE_IMAGE = 368,
-    VALIDATE_ABND_TEXVIEW_EXPECTED_DEPTH_IMAGE = 369,
-    VALIDATE_ABND_SBVIEW_READWRITE_IMMUTABLE = 370,
-    VALIDATE_ABND_SIMGVIEW_COMPUTE_PASS_EXPECTED = 371,
-    VALIDATE_ABND_SIMGVIEW_IMAGETYPE_MISMATCH = 372,
-    VALIDATE_ABND_SIMGVIEW_ACCESSFORMAT = 373,
-    VALIDATE_ABND_EXPECTED_SAMPLER_BINDING = 374,
-    VALIDATE_ABND_UNEXPECTED_SAMPLER_COMPARE_NEVER = 375,
-    VALIDATE_ABND_EXPECTED_SAMPLER_COMPARE_NEVER = 376,
-    VALIDATE_ABND_EXPECTED_NONFILTERING_SAMPLER = 377,
-    VALIDATE_ABND_SAMPLER_ALIVE = 378,
-    VALIDATE_ABND_SAMPLER_VALID = 379,
-    VALIDATE_ABND_TEXTURE_BINDING_VS_DEPTHSTENCIL_ATTACHMENT = 380,
-    VALIDATE_ABND_TEXTURE_BINDING_VS_COLOR_ATTACHMENT = 381,
-    VALIDATE_ABND_TEXTURE_BINDING_VS_RESOLVE_ATTACHMENT = 382,
-    VALIDATE_ABND_TEXTURE_VS_STORAGEIMAGE_BINDING = 383,
-    VALIDATE_AU_PASS_EXPECTED = 384,
-    VALIDATE_AU_NO_PIPELINE = 385,
-    VALIDATE_AU_PIPELINE_ALIVE = 386,
-    VALIDATE_AU_PIPELINE_VALID = 387,
-    VALIDATE_AU_PIPELINE_SHADER_ALIVE = 388,
-    VALIDATE_AU_PIPELINE_SHADER_VALID = 389,
-    VALIDATE_AU_NO_UNIFORMBLOCK_AT_SLOT = 390,
-    VALIDATE_AU_SIZE = 391,
-    VALIDATE_DRAW_RENDERPASS_EXPECTED = 392,
-    VALIDATE_DRAW_BASEELEMENT = 393,
-    VALIDATE_DRAW_NUMELEMENTS = 394,
-    VALIDATE_DRAW_NUMINSTANCES = 395,
-    VALIDATE_DRAW_REQUIRED_BINDINGS_OR_UNIFORMS_MISSING = 396,
-    VALIDATE_DISPATCH_COMPUTEPASS_EXPECTED = 397,
-    VALIDATE_DISPATCH_NUMGROUPSX = 398,
-    VALIDATE_DISPATCH_NUMGROUPSY = 399,
-    VALIDATE_DISPATCH_NUMGROUPSZ = 400,
-    VALIDATE_DISPATCH_REQUIRED_BINDINGS_OR_UNIFORMS_MISSING = 401,
-    VALIDATE_UPDATEBUF_USAGE = 402,
-    VALIDATE_UPDATEBUF_SIZE = 403,
-    VALIDATE_UPDATEBUF_ONCE = 404,
-    VALIDATE_UPDATEBUF_APPEND = 405,
-    VALIDATE_APPENDBUF_USAGE = 406,
-    VALIDATE_APPENDBUF_SIZE = 407,
-    VALIDATE_APPENDBUF_UPDATE = 408,
-    VALIDATE_UPDIMG_USAGE = 409,
-    VALIDATE_UPDIMG_ONCE = 410,
-    VALIDATION_FAILED = 411,
+    D3D11_FEATURE_LEVEL_0_DETECTED = 18,
+    D3D11_CREATE_BUFFER_FAILED = 19,
+    D3D11_CREATE_BUFFER_SRV_FAILED = 20,
+    D3D11_CREATE_BUFFER_UAV_FAILED = 21,
+    D3D11_CREATE_DEPTH_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 22,
+    D3D11_CREATE_DEPTH_TEXTURE_FAILED = 23,
+    D3D11_CREATE_2D_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 24,
+    D3D11_CREATE_2D_TEXTURE_FAILED = 25,
+    D3D11_CREATE_2D_SRV_FAILED = 26,
+    D3D11_CREATE_3D_TEXTURE_UNSUPPORTED_PIXEL_FORMAT = 27,
+    D3D11_CREATE_3D_TEXTURE_FAILED = 28,
+    D3D11_CREATE_3D_SRV_FAILED = 29,
+    D3D11_CREATE_MSAA_TEXTURE_FAILED = 30,
+    D3D11_CREATE_SAMPLER_STATE_FAILED = 31,
+    D3D11_UNIFORMBLOCK_HLSL_REGISTER_B_OUT_OF_RANGE = 32,
+    D3D11_STORAGEBUFFER_HLSL_REGISTER_T_OUT_OF_RANGE = 33,
+    D3D11_STORAGEBUFFER_HLSL_REGISTER_U_OUT_OF_RANGE = 34,
+    D3D11_IMAGE_HLSL_REGISTER_T_OUT_OF_RANGE = 35,
+    D3D11_STORAGEIMAGE_HLSL_REGISTER_U_OUT_OF_RANGE = 36,
+    D3D11_SAMPLER_HLSL_REGISTER_S_OUT_OF_RANGE = 37,
+    D3D11_LOAD_D3DCOMPILER_47_DLL_FAILED = 38,
+    D3D11_SHADER_COMPILATION_FAILED = 39,
+    D3D11_SHADER_COMPILATION_OUTPUT = 40,
+    D3D11_CREATE_CONSTANT_BUFFER_FAILED = 41,
+    D3D11_CREATE_INPUT_LAYOUT_FAILED = 42,
+    D3D11_CREATE_RASTERIZER_STATE_FAILED = 43,
+    D3D11_CREATE_DEPTH_STENCIL_STATE_FAILED = 44,
+    D3D11_CREATE_BLEND_STATE_FAILED = 45,
+    D3D11_CREATE_RTV_FAILED = 46,
+    D3D11_CREATE_DSV_FAILED = 47,
+    D3D11_CREATE_UAV_FAILED = 48,
+    D3D11_MAP_FOR_UPDATE_BUFFER_FAILED = 49,
+    D3D11_MAP_FOR_APPEND_BUFFER_FAILED = 50,
+    D3D11_MAP_FOR_UPDATE_IMAGE_FAILED = 51,
+    METAL_CREATE_BUFFER_FAILED = 52,
+    METAL_TEXTURE_FORMAT_NOT_SUPPORTED = 53,
+    METAL_CREATE_TEXTURE_FAILED = 54,
+    METAL_CREATE_SAMPLER_FAILED = 55,
+    METAL_SHADER_COMPILATION_FAILED = 56,
+    METAL_SHADER_CREATION_FAILED = 57,
+    METAL_SHADER_COMPILATION_OUTPUT = 58,
+    METAL_SHADER_ENTRY_NOT_FOUND = 59,
+    METAL_UNIFORMBLOCK_MSL_BUFFER_SLOT_OUT_OF_RANGE = 60,
+    METAL_STORAGEBUFFER_MSL_BUFFER_SLOT_OUT_OF_RANGE = 61,
+    METAL_STORAGEIMAGE_MSL_TEXTURE_SLOT_OUT_OF_RANGE = 62,
+    METAL_IMAGE_MSL_TEXTURE_SLOT_OUT_OF_RANGE = 63,
+    METAL_SAMPLER_MSL_SAMPLER_SLOT_OUT_OF_RANGE = 64,
+    METAL_CREATE_CPS_FAILED = 65,
+    METAL_CREATE_CPS_OUTPUT = 66,
+    METAL_CREATE_RPS_FAILED = 67,
+    METAL_CREATE_RPS_OUTPUT = 68,
+    METAL_CREATE_DSS_FAILED = 69,
+    WGPU_BINDGROUPS_POOL_EXHAUSTED = 70,
+    WGPU_BINDGROUPSCACHE_SIZE_GREATER_ONE = 71,
+    WGPU_BINDGROUPSCACHE_SIZE_POW2 = 72,
+    WGPU_CREATEBINDGROUP_FAILED = 73,
+    WGPU_CREATE_BUFFER_FAILED = 74,
+    WGPU_CREATE_TEXTURE_FAILED = 75,
+    WGPU_CREATE_TEXTURE_VIEW_FAILED = 76,
+    WGPU_CREATE_SAMPLER_FAILED = 77,
+    WGPU_CREATE_SHADER_MODULE_FAILED = 78,
+    WGPU_SHADER_CREATE_BINDGROUP_LAYOUT_FAILED = 79,
+    WGPU_UNIFORMBLOCK_WGSL_GROUP0_BINDING_OUT_OF_RANGE = 80,
+    WGPU_TEXTURE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 81,
+    WGPU_STORAGEBUFFER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 82,
+    WGPU_STORAGEIMAGE_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 83,
+    WGPU_SAMPLER_WGSL_GROUP1_BINDING_OUT_OF_RANGE = 84,
+    WGPU_CREATE_PIPELINE_LAYOUT_FAILED = 85,
+    WGPU_CREATE_RENDER_PIPELINE_FAILED = 86,
+    WGPU_CREATE_COMPUTE_PIPELINE_FAILED = 87,
+    VULKAN_REQUIRED_EXTENSION_FUNCTION_MISSING = 88,
+    VULKAN_ALLOC_DEVICE_MEMORY_NO_SUITABLE_MEMORY_TYPE = 89,
+    VULKAN_ALLOCATE_MEMORY_FAILED = 90,
+    VULKAN_ALLOC_BUFFER_DEVICE_MEMORY_FAILED = 91,
+    VULKAN_ALLOC_IMAGE_DEVICE_MEMORY_FAILED = 92,
+    VULKAN_DELETE_QUEUE_EXHAUSTED = 93,
+    VULKAN_STAGING_CREATE_BUFFER_FAILED = 94,
+    VULKAN_STAGING_ALLOCATE_MEMORY_FAILED = 95,
+    VULKAN_STAGING_BIND_BUFFER_MEMORY_FAILED = 96,
+    VULKAN_STAGING_STREAM_BUFFER_OVERFLOW = 97,
+    VULKAN_CREATE_SHARED_BUFFER_FAILED = 98,
+    VULKAN_ALLOCATE_SHARED_BUFFER_MEMORY_FAILED = 99,
+    VULKAN_BIND_SHARED_BUFFER_MEMORY_FAILED = 100,
+    VULKAN_MAP_SHARED_BUFFER_MEMORY_FAILED = 101,
+    VULKAN_CREATE_BUFFER_FAILED = 102,
+    VULKAN_BIND_BUFFER_MEMORY_FAILED = 103,
+    VULKAN_CREATE_IMAGE_FAILED = 104,
+    VULKAN_BIND_IMAGE_MEMORY_FAILED = 105,
+    VULKAN_CREATE_SHADER_MODULE_FAILED = 106,
+    VULKAN_UNIFORMBLOCK_SPIRV_SET0_BINDING_OUT_OF_RANGE = 107,
+    VULKAN_TEXTURE_SPIRV_SET1_BINDING_OUT_OF_RANGE = 108,
+    VULKAN_STORAGEBUFFER_SPIRV_SET1_BINDING_OUT_OF_RANGE = 109,
+    VULKAN_STORAGEIMAGE_SPIRV_SET1_BINDING_OUT_OF_RANGE = 110,
+    VULKAN_SAMPLER_SPIRV_SET1_BINDING_OUT_OF_RANGE = 111,
+    VULKAN_CREATE_DESCRIPTOR_SET_LAYOUT_FAILED = 112,
+    VULKAN_CREATE_PIPELINE_LAYOUT_FAILED = 113,
+    VULKAN_CREATE_GRAPHICS_PIPELINE_FAILED = 114,
+    VULKAN_CREATE_COMPUTE_PIPELINE_FAILED = 115,
+    VULKAN_CREATE_IMAGE_VIEW_FAILED = 116,
+    VULKAN_VIEW_MAX_DESCRIPTOR_SIZE = 117,
+    VULKAN_CREATE_SAMPLER_FAILED = 118,
+    VULKAN_SAMPLER_MAX_DESCRIPTOR_SIZE = 119,
+    VULKAN_WAIT_FOR_FENCE_FAILED = 120,
+    VULKAN_UNIFORM_BUFFER_OVERFLOW = 121,
+    VULKAN_DESCRIPTOR_BUFFER_OVERFLOW = 122,
+    IDENTICAL_COMMIT_LISTENER = 123,
+    COMMIT_LISTENER_ARRAY_FULL = 124,
+    TRACE_HOOKS_NOT_ENABLED = 125,
+    DEALLOC_BUFFER_INVALID_STATE = 126,
+    DEALLOC_IMAGE_INVALID_STATE = 127,
+    DEALLOC_SAMPLER_INVALID_STATE = 128,
+    DEALLOC_SHADER_INVALID_STATE = 129,
+    DEALLOC_PIPELINE_INVALID_STATE = 130,
+    DEALLOC_VIEW_INVALID_STATE = 131,
+    INIT_BUFFER_INVALID_STATE = 132,
+    INIT_IMAGE_INVALID_STATE = 133,
+    INIT_SAMPLER_INVALID_STATE = 134,
+    INIT_SHADER_INVALID_STATE = 135,
+    INIT_PIPELINE_INVALID_STATE = 136,
+    INIT_VIEW_INVALID_STATE = 137,
+    UNINIT_BUFFER_INVALID_STATE = 138,
+    UNINIT_IMAGE_INVALID_STATE = 139,
+    UNINIT_SAMPLER_INVALID_STATE = 140,
+    UNINIT_SHADER_INVALID_STATE = 141,
+    UNINIT_PIPELINE_INVALID_STATE = 142,
+    UNINIT_VIEW_INVALID_STATE = 143,
+    FAIL_BUFFER_INVALID_STATE = 144,
+    FAIL_IMAGE_INVALID_STATE = 145,
+    FAIL_SAMPLER_INVALID_STATE = 146,
+    FAIL_SHADER_INVALID_STATE = 147,
+    FAIL_PIPELINE_INVALID_STATE = 148,
+    FAIL_VIEW_INVALID_STATE = 149,
+    BUFFER_POOL_EXHAUSTED = 150,
+    IMAGE_POOL_EXHAUSTED = 151,
+    SAMPLER_POOL_EXHAUSTED = 152,
+    SHADER_POOL_EXHAUSTED = 153,
+    PIPELINE_POOL_EXHAUSTED = 154,
+    VIEW_POOL_EXHAUSTED = 155,
+    BEGINPASS_TOO_MANY_COLOR_ATTACHMENTS = 156,
+    BEGINPASS_TOO_MANY_RESOLVE_ATTACHMENTS = 157,
+    BEGINPASS_ATTACHMENTS_ALIVE = 158,
+    DRAW_WITHOUT_BINDINGS = 159,
+    SHADERDESC_TOO_MANY_VERTEXSTAGE_TEXTURES = 160,
+    SHADERDESC_TOO_MANY_FRAGMENTSTAGE_TEXTURES = 161,
+    SHADERDESC_TOO_MANY_COMPUTESTAGE_TEXTURES = 162,
+    SHADERDESC_TOO_MANY_VERTEXSTAGE_STORAGEBUFFERS = 163,
+    SHADERDESC_TOO_MANY_FRAGMENTSTAGE_STORAGEBUFFERS = 164,
+    SHADERDESC_TOO_MANY_COMPUTESTAGE_STORAGEBUFFERS = 165,
+    SHADERDESC_TOO_MANY_VERTEXSTAGE_STORAGEIMAGES = 166,
+    SHADERDESC_TOO_MANY_FRAGMENTSTAGE_STORAGEIMAGES = 167,
+    SHADERDESC_TOO_MANY_COMPUTESTAGE_STORAGEIMAGES = 168,
+    SHADERDESC_TOO_MANY_VERTEXSTAGE_TEXTURESAMPLERPAIRS = 169,
+    SHADERDESC_TOO_MANY_FRAGMENTSTAGE_TEXTURESAMPLERPAIRS = 170,
+    SHADERDESC_TOO_MANY_COMPUTESTAGE_TEXTURESAMPLERPAIRS = 171,
+    VALIDATE_BUFFERDESC_CANARY = 172,
+    VALIDATE_BUFFERDESC_IMMUTABLE_DYNAMIC_STREAM = 173,
+    VALIDATE_BUFFERDESC_SEPARATE_BUFFER_TYPES = 174,
+    VALIDATE_BUFFERDESC_EXPECT_NONZERO_SIZE = 175,
+    VALIDATE_BUFFERDESC_EXPECT_MATCHING_DATA_SIZE = 176,
+    VALIDATE_BUFFERDESC_EXPECT_ZERO_DATA_SIZE = 177,
+    VALIDATE_BUFFERDESC_EXPECT_NO_DATA = 178,
+    VALIDATE_BUFFERDESC_EXPECT_DATA = 179,
+    VALIDATE_BUFFERDESC_STORAGEBUFFER_SUPPORTED = 180,
+    VALIDATE_BUFFERDESC_STORAGEBUFFER_SIZE_MULTIPLE_4 = 181,
+    VALIDATE_IMAGEDATA_NODATA = 182,
+    VALIDATE_IMAGEDATA_DATA_SIZE = 183,
+    VALIDATE_IMAGEDESC_CANARY = 184,
+    VALIDATE_IMAGEDESC_IMMUTABLE_DYNAMIC_STREAM = 185,
+    VALIDATE_IMAGEDESC_IMAGETYPE_2D_NUMSLICES = 186,
+    VALIDATE_IMAGEDESC_IMAGETYPE_CUBE_NUMSLICES = 187,
+    VALIDATE_IMAGEDESC_IMAGETYPE_ARRAY_NUMSLICES = 188,
+    VALIDATE_IMAGEDESC_IMAGETYPE_3D_NUMSLICES = 189,
+    VALIDATE_IMAGEDESC_NUMSLICES = 190,
+    VALIDATE_IMAGEDESC_WIDTH = 191,
+    VALIDATE_IMAGEDESC_HEIGHT = 192,
+    VALIDATE_IMAGEDESC_NONRT_PIXELFORMAT = 193,
+    VALIDATE_IMAGEDESC_MSAA_BUT_NO_ATTACHMENT = 194,
+    VALIDATE_IMAGEDESC_DEPTH_3D_IMAGE = 195,
+    VALIDATE_IMAGEDESC_ATTACHMENT_EXPECT_IMMUTABLE = 196,
+    VALIDATE_IMAGEDESC_ATTACHMENT_EXPECT_NO_DATA = 197,
+    VALIDATE_IMAGEDESC_ATTACHMENT_PIXELFORMAT = 198,
+    VALIDATE_IMAGEDESC_ATTACHMENT_RESOLVE_EXPECT_NO_MSAA = 199,
+    VALIDATE_IMAGEDESC_ATTACHMENT_NO_MSAA_SUPPORT = 200,
+    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_NUM_MIPMAPS = 201,
+    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_3D_IMAGE = 202,
+    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_CUBE_IMAGE = 203,
+    VALIDATE_IMAGEDESC_ATTACHMENT_MSAA_ARRAY_IMAGE = 204,
+    VALIDATE_IMAGEDESC_STORAGEIMAGE_PIXELFORMAT = 205,
+    VALIDATE_IMAGEDESC_STORAGEIMAGE_EXPECT_NO_MSAA = 206,
+    VALIDATE_IMAGEDESC_INJECTED_NO_DATA = 207,
+    VALIDATE_IMAGEDESC_DYNAMIC_NO_DATA = 208,
+    VALIDATE_IMAGEDESC_COMPRESSED_IMMUTABLE = 209,
+    VALIDATE_SAMPLERDESC_CANARY = 210,
+    VALIDATE_SAMPLERDESC_ANISTROPIC_REQUIRES_LINEAR_FILTERING = 211,
+    VALIDATE_SHADERDESC_CANARY = 212,
+    VALIDATE_SHADERDESC_VERTEX_SOURCE = 213,
+    VALIDATE_SHADERDESC_FRAGMENT_SOURCE = 214,
+    VALIDATE_SHADERDESC_COMPUTE_SOURCE = 215,
+    VALIDATE_SHADERDESC_VERTEX_SOURCE_OR_BYTECODE = 216,
+    VALIDATE_SHADERDESC_FRAGMENT_SOURCE_OR_BYTECODE = 217,
+    VALIDATE_SHADERDESC_COMPUTE_SOURCE_OR_BYTECODE = 218,
+    VALIDATE_SHADERDESC_INVALID_SHADER_COMBO = 219,
+    VALIDATE_SHADERDESC_NO_BYTECODE_SIZE = 220,
+    VALIDATE_SHADERDESC_METAL_THREADS_PER_THREADGROUP_INITIALIZED = 221,
+    VALIDATE_SHADERDESC_METAL_THREADS_PER_THREADGROUP_MULTIPLE_32 = 222,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_NO_CONT_MEMBERS = 223,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_SIZE_IS_ZERO = 224,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_METAL_BUFFER_SLOT_COLLISION = 225,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_HLSL_REGISTER_B_COLLISION = 226,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_WGSL_GROUP0_BINDING_COLLISION = 227,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_SPIRV_SET0_BINDING_COLLISION = 228,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_NO_MEMBERS = 229,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_UNIFORM_GLSL_NAME = 230,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_SIZE_MISMATCH = 231,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_ARRAY_COUNT = 232,
+    VALIDATE_SHADERDESC_UNIFORMBLOCK_STD140_ARRAY_TYPE = 233,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_METAL_BUFFER_SLOT_COLLISION = 234,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_T_COLLISION = 235,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_HLSL_REGISTER_U_COLLISION = 236,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_GLSL_BINDING_COLLISION = 237,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_WGSL_GROUP1_BINDING_COLLISION = 238,
+    VALIDATE_SHADERDESC_VIEW_STORAGEBUFFER_SPIRV_SET1_BINDING_COLLISION = 239,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_EXPECT_COMPUTE_STAGE = 240,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_METAL_TEXTURE_SLOT_COLLISION = 241,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_HLSL_REGISTER_U_COLLISION = 242,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_GLSL_BINDING_COLLISION = 243,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_WGSL_GROUP1_BINDING_COLLISION = 244,
+    VALIDATE_SHADERDESC_VIEW_STORAGEIMAGE_SPIRV_SET1_BINDING_COLLISION = 245,
+    VALIDATE_SHADERDESC_VIEW_TEXTURE_METAL_TEXTURE_SLOT_COLLISION = 246,
+    VALIDATE_SHADERDESC_VIEW_TEXTURE_HLSL_REGISTER_T_COLLISION = 247,
+    VALIDATE_SHADERDESC_VIEW_TEXTURE_WGSL_GROUP1_BINDING_COLLISION = 248,
+    VALIDATE_SHADERDESC_VIEW_TEXTURE_SPIRV_SET1_BINDING_COLLISION = 249,
+    VALIDATE_SHADERDESC_SAMPLER_METAL_SAMPLER_SLOT_COLLISION = 250,
+    VALIDATE_SHADERDESC_SAMPLER_HLSL_REGISTER_S_COLLISION = 251,
+    VALIDATE_SHADERDESC_SAMPLER_WGSL_GROUP1_BINDING_COLLISION = 252,
+    VALIDATE_SHADERDESC_SAMPLER_SPIRV_SET1_BINDING_COLLISION = 253,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_VIEW_SLOT_OUT_OF_RANGE = 254,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_SAMPLER_SLOT_OUT_OF_RANGE = 255,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_TEXTURE_STAGE_MISMATCH = 256,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_EXPECT_TEXTURE_VIEW = 257,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_SAMPLER_STAGE_MISMATCH = 258,
+    VALIDATE_SHADERDESC_TEXTURE_SAMPLER_PAIR_GLSL_NAME = 259,
+    VALIDATE_SHADERDESC_NONFILTERING_SAMPLER_REQUIRED = 260,
+    VALIDATE_SHADERDESC_COMPARISON_SAMPLER_REQUIRED = 261,
+    VALIDATE_SHADERDESC_TEXVIEW_NOT_REFERENCED_BY_TEXTURE_SAMPLER_PAIRS = 262,
+    VALIDATE_SHADERDESC_SAMPLER_NOT_REFERENCED_BY_TEXTURE_SAMPLER_PAIRS = 263,
+    VALIDATE_SHADERDESC_ATTR_STRING_TOO_LONG = 264,
+    VALIDATE_PIPELINEDESC_CANARY = 265,
+    VALIDATE_PIPELINEDESC_SHADER = 266,
+    VALIDATE_PIPELINEDESC_COMPUTE_SHADER_EXPECTED = 267,
+    VALIDATE_PIPELINEDESC_NO_COMPUTE_SHADER_EXPECTED = 268,
+    VALIDATE_PIPELINEDESC_NO_CONT_ATTRS = 269,
+    VALIDATE_PIPELINEDESC_ATTR_BASETYPE_MISMATCH = 270,
+    VALIDATE_PIPELINEDESC_LAYOUT_STRIDE4 = 271,
+    VALIDATE_PIPELINEDESC_ATTR_SEMANTICS = 272,
+    VALIDATE_PIPELINEDESC_SHADER_READONLY_STORAGEBUFFERS = 273,
+    VALIDATE_PIPELINEDESC_BLENDOP_MINMAX_REQUIRES_BLENDFACTOR_ONE = 274,
+    VALIDATE_VIEWDESC_CANARY = 275,
+    VALIDATE_VIEWDESC_UNIQUE_VIEWTYPE = 276,
+    VALIDATE_VIEWDESC_ANY_VIEWTYPE = 277,
+    VALIDATE_VIEWDESC_RESOURCE_ALIVE = 278,
+    VALIDATE_VIEWDESC_RESOURCE_FAILED = 279,
+    VALIDATE_VIEWDESC_STORAGEBUFFER_OFFSET_VS_BUFFER_SIZE = 280,
+    VALIDATE_VIEWDESC_STORAGEBUFFER_OFFSET_MULTIPLE_256 = 281,
+    VALIDATE_VIEWDESC_STORAGEBUFFER_USAGE = 282,
+    VALIDATE_VIEWDESC_STORAGEIMAGE_USAGE = 283,
+    VALIDATE_VIEWDESC_COLORATTACHMENT_USAGE = 284,
+    VALIDATE_VIEWDESC_RESOLVEATTACHMENT_USAGE = 285,
+    VALIDATE_VIEWDESC_DEPTHSTENCILATTACHMENT_USAGE = 286,
+    VALIDATE_VIEWDESC_IMAGE_MIPLEVEL = 287,
+    VALIDATE_VIEWDESC_IMAGE_2D_SLICE = 288,
+    VALIDATE_VIEWDESC_IMAGE_CUBEMAP_SLICE = 289,
+    VALIDATE_VIEWDESC_IMAGE_ARRAY_SLICE = 290,
+    VALIDATE_VIEWDESC_IMAGE_3D_SLICE = 291,
+    VALIDATE_VIEWDESC_TEXTURE_EXPECT_NO_MSAA = 292,
+    VALIDATE_VIEWDESC_TEXTURE_MIPLEVELS = 293,
+    VALIDATE_VIEWDESC_TEXTURE_2D_SLICES = 294,
+    VALIDATE_VIEWDESC_TEXTURE_CUBEMAP_SLICES = 295,
+    VALIDATE_VIEWDESC_TEXTURE_ARRAY_SLICES = 296,
+    VALIDATE_VIEWDESC_TEXTURE_3D_SLICES = 297,
+    VALIDATE_VIEWDESC_STORAGEIMAGE_PIXELFORMAT = 298,
+    VALIDATE_VIEWDESC_COLORATTACHMENT_PIXELFORMAT = 299,
+    VALIDATE_VIEWDESC_DEPTHSTENCILATTACHMENT_PIXELFORMAT = 300,
+    VALIDATE_VIEWDESC_RESOLVEATTACHMENT_SAMPLECOUNT = 301,
+    VALIDATE_BEGINPASS_CANARY = 302,
+    VALIDATE_BEGINPASS_COMPUTEPASS_EXPECT_NO_ATTACHMENTS = 303,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_WIDTH = 304,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_WIDTH_NOTSET = 305,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_HEIGHT = 306,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_HEIGHT_NOTSET = 307,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_SAMPLECOUNT = 308,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_SAMPLECOUNT_NOTSET = 309,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_COLORFORMAT = 310,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_COLORFORMAT_NOTSET = 311,
+    VALIDATE_BEGINPASS_SWAPCHAIN_EXPECT_DEPTHFORMAT_NOTSET = 312,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_CURRENTDRAWABLE = 313,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_CURRENTDRAWABLE_NOTSET = 314,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_DEPTHSTENCILTEXTURE = 315,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_DEPTHSTENCILTEXTURE_NOTSET = 316,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_MSAACOLORTEXTURE = 317,
+    VALIDATE_BEGINPASS_SWAPCHAIN_METAL_EXPECT_MSAACOLORTEXTURE_NOTSET = 318,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RENDERVIEW = 319,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RENDERVIEW_NOTSET = 320,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RESOLVEVIEW = 321,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_RESOLVEVIEW_NOTSET = 322,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_DEPTHSTENCILVIEW = 323,
+    VALIDATE_BEGINPASS_SWAPCHAIN_D3D11_EXPECT_DEPTHSTENCILVIEW_NOTSET = 324,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RENDERVIEW = 325,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RENDERVIEW_NOTSET = 326,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RESOLVEVIEW = 327,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_RESOLVEVIEW_NOTSET = 328,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_DEPTHSTENCILVIEW = 329,
+    VALIDATE_BEGINPASS_SWAPCHAIN_WGPU_EXPECT_DEPTHSTENCILVIEW_NOTSET = 330,
+    VALIDATE_BEGINPASS_SWAPCHAIN_GL_EXPECT_FRAMEBUFFER_NOTSET = 331,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEWS_CONTINUOUS = 332,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_ALIVE = 333,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_VALID = 334,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_TYPE = 335,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_IMAGE_ALIVE = 336,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_IMAGE_VALID = 337,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_SIZES = 338,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_SAMPLECOUNT = 339,
+    VALIDATE_BEGINPASS_COLORATTACHMENTVIEW_SAMPLECOUNTS_EQUAL = 340,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_NO_COLORATTACHMENTVIEW = 341,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_ALIVE = 342,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_VALID = 343,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_TYPE = 344,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_IMAGE_ALIVE = 345,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_IMAGE_VALID = 346,
+    VALIDATE_BEGINPASS_RESOLVEATTACHMENTVIEW_SIZES = 347,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEWS_CONTINUOUS = 348,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_ALIVE = 349,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_VALID = 350,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_TYPE = 351,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_IMAGE_ALIVE = 352,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_IMAGE_VALID = 353,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_SIZES = 354,
+    VALIDATE_BEGINPASS_DEPTHSTENCILATTACHMENTVIEW_SAMPLECOUNT = 355,
+    VALIDATE_BEGINPASS_ATTACHMENTS_EXPECTED = 356,
+    VALIDATE_AVP_RENDERPASS_EXPECTED = 357,
+    VALIDATE_ASR_RENDERPASS_EXPECTED = 358,
+    VALIDATE_APIP_PIPELINE_VALID_ID = 359,
+    VALIDATE_APIP_PIPELINE_EXISTS = 360,
+    VALIDATE_APIP_PIPELINE_VALID = 361,
+    VALIDATE_APIP_PASS_EXPECTED = 362,
+    VALIDATE_APIP_PIPELINE_SHADER_ALIVE = 363,
+    VALIDATE_APIP_PIPELINE_SHADER_VALID = 364,
+    VALIDATE_APIP_COMPUTEPASS_EXPECTED = 365,
+    VALIDATE_APIP_RENDERPASS_EXPECTED = 366,
+    VALIDATE_APIP_SWAPCHAIN_COLOR_COUNT = 367,
+    VALIDATE_APIP_SWAPCHAIN_COLOR_FORMAT = 368,
+    VALIDATE_APIP_SWAPCHAIN_DEPTH_FORMAT = 369,
+    VALIDATE_APIP_SWAPCHAIN_SAMPLE_COUNT = 370,
+    VALIDATE_APIP_ATTACHMENTS_ALIVE = 371,
+    VALIDATE_APIP_COLORATTACHMENTS_COUNT = 372,
+    VALIDATE_APIP_COLORATTACHMENTS_VIEW_VALID = 373,
+    VALIDATE_APIP_COLORATTACHMENTS_IMAGE_VALID = 374,
+    VALIDATE_APIP_COLORATTACHMENTS_FORMAT = 375,
+    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_VIEW_VALID = 376,
+    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_IMAGE_VALID = 377,
+    VALIDATE_APIP_DEPTHSTENCILATTACHMENT_FORMAT = 378,
+    VALIDATE_APIP_ATTACHMENT_SAMPLE_COUNT = 379,
+    VALIDATE_ABND_PASS_EXPECTED = 380,
+    VALIDATE_ABND_EMPTY_BINDINGS = 381,
+    VALIDATE_ABND_NO_PIPELINE = 382,
+    VALIDATE_ABND_PIPELINE_ALIVE = 383,
+    VALIDATE_ABND_PIPELINE_VALID = 384,
+    VALIDATE_ABND_PIPELINE_SHADER_ALIVE = 385,
+    VALIDATE_ABND_PIPELINE_SHADER_VALID = 386,
+    VALIDATE_ABND_COMPUTE_EXPECTED_NO_VBUFS = 387,
+    VALIDATE_ABND_COMPUTE_EXPECTED_NO_IBUF = 388,
+    VALIDATE_ABND_EXPECTED_VBUF = 389,
+    VALIDATE_ABND_VBUF_ALIVE = 390,
+    VALIDATE_ABND_VBUF_USAGE = 391,
+    VALIDATE_ABND_VBUF_OVERFLOW = 392,
+    VALIDATE_ABND_EXPECTED_NO_IBUF = 393,
+    VALIDATE_ABND_EXPECTED_IBUF = 394,
+    VALIDATE_ABND_IBUF_ALIVE = 395,
+    VALIDATE_ABND_IBUF_USAGE = 396,
+    VALIDATE_ABND_IBUF_OVERFLOW = 397,
+    VALIDATE_ABND_EXPECTED_VIEW_BINDING = 398,
+    VALIDATE_ABND_VIEW_ALIVE = 399,
+    VALIDATE_ABND_EXPECT_TEXVIEW = 400,
+    VALIDATE_ABND_EXPECT_SBVIEW = 401,
+    VALIDATE_ABND_EXPECT_SIMGVIEW = 402,
+    VALIDATE_ABND_TEXVIEW_IMAGETYPE_MISMATCH = 403,
+    VALIDATE_ABND_TEXVIEW_EXPECTED_MULTISAMPLED_IMAGE = 404,
+    VALIDATE_ABND_TEXVIEW_EXPECTED_NON_MULTISAMPLED_IMAGE = 405,
+    VALIDATE_ABND_TEXVIEW_EXPECTED_FILTERABLE_IMAGE = 406,
+    VALIDATE_ABND_TEXVIEW_EXPECTED_DEPTH_IMAGE = 407,
+    VALIDATE_ABND_SBVIEW_READWRITE_IMMUTABLE = 408,
+    VALIDATE_ABND_SIMGVIEW_COMPUTE_PASS_EXPECTED = 409,
+    VALIDATE_ABND_SIMGVIEW_IMAGETYPE_MISMATCH = 410,
+    VALIDATE_ABND_SIMGVIEW_ACCESSFORMAT = 411,
+    VALIDATE_ABND_EXPECTED_SAMPLER_BINDING = 412,
+    VALIDATE_ABND_UNEXPECTED_SAMPLER_COMPARE_NEVER = 413,
+    VALIDATE_ABND_EXPECTED_SAMPLER_COMPARE_NEVER = 414,
+    VALIDATE_ABND_EXPECTED_NONFILTERING_SAMPLER = 415,
+    VALIDATE_ABND_SAMPLER_ALIVE = 416,
+    VALIDATE_ABND_SAMPLER_VALID = 417,
+    VALIDATE_ABND_TEXTURE_BINDING_VS_DEPTHSTENCIL_ATTACHMENT = 418,
+    VALIDATE_ABND_TEXTURE_BINDING_VS_COLOR_ATTACHMENT = 419,
+    VALIDATE_ABND_TEXTURE_BINDING_VS_RESOLVE_ATTACHMENT = 420,
+    VALIDATE_ABND_TEXTURE_VS_STORAGEIMAGE_BINDING = 421,
+    VALIDATE_AU_PASS_EXPECTED = 422,
+    VALIDATE_AU_NO_PIPELINE = 423,
+    VALIDATE_AU_PIPELINE_ALIVE = 424,
+    VALIDATE_AU_PIPELINE_VALID = 425,
+    VALIDATE_AU_PIPELINE_SHADER_ALIVE = 426,
+    VALIDATE_AU_PIPELINE_SHADER_VALID = 427,
+    VALIDATE_AU_NO_UNIFORMBLOCK_AT_SLOT = 428,
+    VALIDATE_AU_SIZE = 429,
+    VALIDATE_DRAW_RENDERPASS_EXPECTED = 430,
+    VALIDATE_DRAW_BASEELEMENT_GE_ZERO = 431,
+    VALIDATE_DRAW_NUMELEMENTS_GE_ZERO = 432,
+    VALIDATE_DRAW_NUMINSTANCES_GE_ZERO = 433,
+    VALIDATE_DRAW_EX_RENDERPASS_EXPECTED = 434,
+    VALIDATE_DRAW_EX_BASEELEMENT_GE_ZERO = 435,
+    VALIDATE_DRAW_EX_NUMELEMENTS_GE_ZERO = 436,
+    VALIDATE_DRAW_EX_NUMINSTANCES_GE_ZERO = 437,
+    VALIDATE_DRAW_EX_BASEINSTANCE_GE_ZERO = 438,
+    VALIDATE_DRAW_EX_BASEVERTEX_VS_INDEXED = 439,
+    VALIDATE_DRAW_EX_BASEINSTANCE_VS_INSTANCED = 440,
+    VALIDATE_DRAW_EX_BASEVERTEX_NOT_SUPPORTED = 441,
+    VALIDATE_DRAW_EX_BASEINSTANCE_NOT_SUPPORTED = 442,
+    VALIDATE_DRAW_REQUIRED_BINDINGS_OR_UNIFORMS_MISSING = 443,
+    VALIDATE_DISPATCH_COMPUTEPASS_EXPECTED = 444,
+    VALIDATE_DISPATCH_NUMGROUPSX = 445,
+    VALIDATE_DISPATCH_NUMGROUPSY = 446,
+    VALIDATE_DISPATCH_NUMGROUPSZ = 447,
+    VALIDATE_DISPATCH_REQUIRED_BINDINGS_OR_UNIFORMS_MISSING = 448,
+    VALIDATE_UPDATEBUF_USAGE = 449,
+    VALIDATE_UPDATEBUF_SIZE = 450,
+    VALIDATE_UPDATEBUF_ONCE = 451,
+    VALIDATE_UPDATEBUF_APPEND = 452,
+    VALIDATE_APPENDBUF_USAGE = 453,
+    VALIDATE_APPENDBUF_SIZE = 454,
+    VALIDATE_APPENDBUF_UPDATE = 455,
+    VALIDATE_UPDIMG_USAGE = 456,
+    VALIDATE_UPDIMG_ONCE = 457,
+    VALIDATION_FAILED = 458,
 }
 
 struct SgEnvironmentDefaults
@@ -1731,12 +1851,21 @@ struct SgWgpuEnvironment
     void* device;
 }
 
+struct SgVulkanEnvironment
+{
+    void* physical_device;
+    void* device;
+    void* queue;
+    uint queue_family_index;
+}
+
 struct SgEnvironment
 {
     SgEnvironmentDefaults defaults;
     SgMetalEnvironment metal;
     SgD3d11Environment d3d11;
     SgWgpuEnvironment wgpu;
+    SgVulkanEnvironment vulkan;
 }
 
 struct SgCommitListener
@@ -1758,6 +1887,30 @@ struct SgLogger
     void* user_data;
 }
 
+struct SgD3d11Desc
+{
+    bool shader_debugging;
+}
+
+struct SgMetalDesc
+{
+    bool force_managed_storage_mode;
+    bool use_command_buffer_with_retained_references;
+}
+
+struct SgWgpuDesc
+{
+    bool disable_bindgroups_cache;
+    CInt bindgroups_cache_size;
+}
+
+struct SgVulkanDesc
+{
+    CInt copy_staging_buffer_size;
+    CInt stream_staging_buffer_size;
+    CInt descriptor_buffer_size;
+}
+
 struct SgDesc
 {
     uint _start_canary;
@@ -1770,11 +1923,11 @@ struct SgDesc
     CInt uniform_buffer_size;
     CInt max_commit_listeners;
     bool disable_validation;
-    bool d3d11_shader_debugging;
-    bool mtl_force_managed_storage_mode;
-    bool mtl_use_command_buffer_with_retained_references;
-    bool wgpu_disable_bindgroups_cache;
-    CInt wgpu_bindgroups_cache_size;
+    bool enforce_portable_limits;
+    SgD3d11Desc d3d11;
+    SgMetalDesc metal;
+    SgWgpuDesc wgpu;
+    SgVulkanDesc vulkan;
     SgAllocator allocator;
     SgLogger logger;
     SgEnvironment environment;

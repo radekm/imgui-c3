@@ -3,30 +3,31 @@
 module sokol::simgui;
 import sokol;
 
-extern fn void setup(SimguiDesc* desc) @extern("simgui_setup");
-extern fn void new_frame(SimguiFrameDesc* desc) @extern("simgui_new_frame");
-extern fn void render() @extern("simgui_render");
-extern fn ulong imtextureid(SgView tex_view) @extern("simgui_imtextureid");
-extern fn ulong imtextureid_with_sampler(SgView tex_view, SgSampler smp) @extern("simgui_imtextureid_with_sampler");
-extern fn SgView texture_view_from_imtextureid(ulong imtex_id) @extern("simgui_texture_view_from_imtextureid");
-extern fn SgSampler sampler_from_imtextureid(ulong imtex_id) @extern("simgui_sampler_from_imtextureid");
-extern fn void add_focus_event(bool focus) @extern("simgui_add_focus_event");
-extern fn void add_mouse_pos_event(float x, float y) @extern("simgui_add_mouse_pos_event");
-extern fn void add_touch_pos_event(float x, float y) @extern("simgui_add_touch_pos_event");
-extern fn void add_mouse_button_event(CInt mouse_button, bool down) @extern("simgui_add_mouse_button_event");
-extern fn void add_mouse_wheel_event(float wheel_x, float wheel_y) @extern("simgui_add_mouse_wheel_event");
-extern fn void add_key_event(CInt imgui_key, bool down) @extern("simgui_add_key_event");
-extern fn void add_input_character(uint c) @extern("simgui_add_input_character");
-extern fn void add_input_characters_utf8(ZString c) @extern("simgui_add_input_characters_utf8");
-extern fn void add_touch_button_event(CInt mouse_button, bool down) @extern("simgui_add_touch_button_event");
-extern fn bool handle_event(SappEvent* ev) @extern("simgui_handle_event");
-extern fn CInt map_keycode(SappKeycode keycode) @extern("simgui_map_keycode");
-extern fn void shutdown() @extern("simgui_shutdown");
+extern fn void setup(SimguiDesc* desc) @cname("simgui_setup");
+extern fn void new_frame(SimguiFrameDesc* desc) @cname("simgui_new_frame");
+extern fn void render() @cname("simgui_render");
+extern fn ulong imtextureid(SgView tex_view) @cname("simgui_imtextureid");
+extern fn ulong imtextureid_with_sampler(SgView tex_view, SgSampler smp) @cname("simgui_imtextureid_with_sampler");
+extern fn SgView texture_view_from_imtextureid(ulong imtex_id) @cname("simgui_texture_view_from_imtextureid");
+extern fn SgSampler sampler_from_imtextureid(ulong imtex_id) @cname("simgui_sampler_from_imtextureid");
+extern fn void add_focus_event(bool focus) @cname("simgui_add_focus_event");
+extern fn void add_mouse_pos_event(float x, float y) @cname("simgui_add_mouse_pos_event");
+extern fn void add_touch_pos_event(float x, float y) @cname("simgui_add_touch_pos_event");
+extern fn void add_mouse_button_event(CInt mouse_button, bool down) @cname("simgui_add_mouse_button_event");
+extern fn void add_mouse_wheel_event(float wheel_x, float wheel_y) @cname("simgui_add_mouse_wheel_event");
+extern fn void add_key_event(CInt imgui_key, bool down) @cname("simgui_add_key_event");
+extern fn void add_input_character(uint c) @cname("simgui_add_input_character");
+extern fn void add_input_characters_utf8(ZString c) @cname("simgui_add_input_characters_utf8");
+extern fn void add_touch_button_event(CInt mouse_button, bool down) @cname("simgui_add_touch_button_event");
+extern fn bool handle_event(SappEvent* ev) @cname("simgui_handle_event");
+extern fn CInt map_keycode(SappKeycode keycode) @cname("simgui_map_keycode");
+extern fn void shutdown() @cname("simgui_shutdown");
 
 enum SimguiLogItem : const int
 {
     OK = 0,
     MALLOC_FAILED = 1,
+    BUFFER_OVERFLOW = 2,
 }
 
 struct SimguiAllocator
